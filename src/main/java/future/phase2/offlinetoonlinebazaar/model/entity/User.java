@@ -7,23 +7,23 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "bazaar")
-public class Bazaar {
-    @Id
-    private String _id;
+@NoArgsConstructor
+@Document(collection = "user")
+public class User {
 
-    private Long bazaarId;
+    @Id
+    private String id;
 
     @NotNull
-    private String name;
+    private String email;
 
-    private Date startDate;
-    private Date endDate;
-    private Boolean activeStatus;
+    @NotNull
+    private String password;
+
+    private List<Role> roles;
 
 }

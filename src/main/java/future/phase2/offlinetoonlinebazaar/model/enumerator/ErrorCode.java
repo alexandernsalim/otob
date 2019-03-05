@@ -1,6 +1,6 @@
-package future.phase2.offlinetoonlinebazaar.helper;
+package future.phase2.offlinetoonlinebazaar.model.enumerator;
 
-public enum  ErrorCodeGenerator {
+public enum ErrorCode {
     NOT_FOUND("404", "Not Found"),
     BAD_REQUEST("400", "Bad Request"),
     INTERNAL_SERVER_ERROR("500", "Internal Server Error");
@@ -8,7 +8,7 @@ public enum  ErrorCodeGenerator {
     private String code;
     private String message;
 
-    ErrorCodeGenerator(String code, String message){
+    ErrorCode(String code, String message){
         this.code = code;
         this.message = message;
     }
