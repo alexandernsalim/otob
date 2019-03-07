@@ -25,15 +25,8 @@ public class RoleServiceImpl implements RoleService {
     private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
     @Override
-    public RoleDto getRoleByName(String name) {
-        Role role = roleRepository.findByName(name);
-
-        mapperFactory.classMap(Role.class, RoleDto.class)
-                .byDefault().register();
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-        RoleDto roleDto = mapper.map(role, RoleDto.class);
-
-        return roleDto;
+    public Role getRoleByName(String name) {
+        return roleRepository.findByName(name);
     }
 
     @Override

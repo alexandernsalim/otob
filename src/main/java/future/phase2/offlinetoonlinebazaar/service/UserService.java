@@ -1,10 +1,10 @@
 package future.phase2.offlinetoonlinebazaar.service;
 
-import future.phase2.offlinetoonlinebazaar.model.request.UserRequest;
-import future.phase2.offlinetoonlinebazaar.model.response.UserResponse;
+import future.phase2.offlinetoonlinebazaar.model.dto.UserDto;
 
 public interface UserService {
 
-    UserResponse registerNewUser(UserRequest user);
+    UserDto registerNewUser(UserDto user);
+    UserDto registerNewAdmin(UserDto user);
 
 }

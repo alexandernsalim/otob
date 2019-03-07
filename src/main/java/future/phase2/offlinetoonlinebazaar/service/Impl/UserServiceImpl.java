@@ -1,10 +1,11 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
+import future.phase2.offlinetoonlinebazaar.generator.RandomPasswordGenerator;
 import future.phase2.offlinetoonlinebazaar.model.entity.User;
-import future.phase2.offlinetoonlinebazaar.model.request.UserRequest;
-import future.phase2.offlinetoonlinebazaar.model.response.UserResponse;
-import future.phase2.offlinetoonlinebazaar.repository.RoleRepository;
+import future.phase2.offlinetoonlinebazaar.model.dto.UserDto;
 import future.phase2.offlinetoonlinebazaar.repository.UserRepository;
+import future.phase2.offlinetoonlinebazaar.service.EmailService;
+import future.phase2.offlinetoonlinebazaar.service.RoleService;
 import future.phase2.offlinetoonlinebazaar.service.UserService;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -22,29 +23,40 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleService roleService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private PasswordEncoder encoder;
 
+    @Autowired
+    private RandomPasswordGenerator passwordGenerator;
+
     private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
     @Override
-    public UserResponse registerNewUser(UserRequest userRequest) {
+    public UserDto registerNewUser(UserDto userDto) {
         User user = new User();
+        String password =passwordGenerator.generateRandomPassword();
 
-        user.setEmail(userRequest.getEmail());
-        user.setPassword(encoder.encode(userRequest.getPassword()));
-        user.setRoles(Arrays.asList(roleRepository.findByName("USER")));
+        user.setEmail(userDto.getEmail());
+        user.setPassword(encoder.encode(password));
+        user.setRoles(Arrays.asList(roleService.getRoleByName("USER")));
         userRepository.save(user);
 
-        mapperFactory.classMap(UserRequest.class, UserResponse.class)
-                .exclude("password")
-                .byDefault().register();
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-        UserResponse userResponse = mapper.map(userRequest, UserResponse.class);
+        String text = "This message contains your password to login into the system.\n";
+        text += "Please don't share this password to anyone.\n" + password;
 
-        return userResponse;
+        emailService.sendSimpleMessage(userDto.getEmail(), "Login Password", text);
+
+        return userDto;
+    }
+
+    @Override
+    public UserDto registerNewAdmin(UserDto user) {
+        return null;
     }
 
 }
