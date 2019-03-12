@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -37,13 +38,23 @@ public class UserServiceImpl implements UserService {
     private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
     @Override
-    public UserDto registerNewUser(UserDto userDto) {
+    public List<UserDto> getAllUser() {
+        List<User> userList = userRepository.findAll();
+
+        MapperFacade mapper = mapperFactory.getMapperFacade();
+        List<UserDto> users = mapper.mapAsList(userList, UserDto.class);
+
+        return users;
+    }
+
+    @Override
+    public UserDto registerNewUser(UserDto userDto, String role) {
         User user = new User();
         String password =passwordGenerator.generateRandomPassword();
 
         user.setEmail(userDto.getEmail());
         user.setPassword(encoder.encode(password));
-        user.setRoles(Arrays.asList(roleService.getRoleByName("USER")));
+        user.setRoles(Arrays.asList(roleService.getRoleByName(role)));
         userRepository.save(user);
 
         String text = "This message contains your password to login into the system.\n";
@@ -52,11 +63,6 @@ public class UserServiceImpl implements UserService {
         emailService.sendSimpleMessage(userDto.getEmail(), "Login Password", text);
 
         return userDto;
-    }
-
-    @Override
-    public UserDto registerNewAdmin(UserDto user) {
-        return null;
     }
 
 }

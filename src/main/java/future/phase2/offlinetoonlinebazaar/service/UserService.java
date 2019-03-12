@@ -2,9 +2,11 @@ package future.phase2.offlinetoonlinebazaar.service;
 
 import future.phase2.offlinetoonlinebazaar.model.dto.UserDto;
 
+import java.util.List;
+
 public interface UserService {
 
-    UserDto registerNewUser(UserDto user);
-    UserDto registerNewAdmin(UserDto user);
+    List<UserDto> getAllUser();
+    UserDto registerNewUser(UserDto user, String role);
 
 }
