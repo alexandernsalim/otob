@@ -13,6 +13,7 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,24 +36,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RandomPasswordGenerator passwordGenerator;
 
-    private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
-
     @Override
-    public List<UserDto> getAllUser() {
-        List<User> userList = userRepository.findAll();
-
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-        List<UserDto> users = mapper.mapAsList(userList, UserDto.class);
-
-        return users;
+    public List<User> getAllUser() {
+        return userRepository.findAll();
     }
 
     @Override
-    public UserDto registerNewUser(UserDto userDto, String role) {
+    public User registerNewUser(User userRequest, String role){
         User user = new User();
-        String password =passwordGenerator.generateRandomPassword();
+        String password = passwordGenerator.generateRandomPassword();
 
-        user.setEmail(userDto.getEmail());
+        user.setEmail(userRequest.getEmail());
         user.setPassword(encoder.encode(password));
         user.setRoles(Arrays.asList(roleService.getRoleByName(role)));
         userRepository.save(user);
@@ -60,9 +54,14 @@ public class UserServiceImpl implements UserService {
         String text = "This message contains your password to login into the system.\n";
         text += "Please don't share this password to anyone.\n" + password;
 
-        emailService.sendSimpleMessage(userDto.getEmail(), "Login Password", text);
+        emailService.sendSimpleMessage(userRequest.getEmail(), "Login Password", text);
 
-        return userDto;
+        return user;
+    }
+
+    @Override
+    public Boolean removeUser(String email) {
+        return (userRepository.deleteByEmail(email) == 1) ? Boolean.TRUE : Boolean.FALSE;
     }
 
 }

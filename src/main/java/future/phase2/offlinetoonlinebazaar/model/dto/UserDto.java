@@ -1,5 +1,6 @@
 package future.phase2.offlinetoonlinebazaar.model.dto;
 
+import future.phase2.offlinetoonlinebazaar.validator.EmailFormatConstraint;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -10,6 +11,7 @@ public class UserDto {
 
     @NotNull
     @NotEmpty
+    @EmailFormatConstraint
     private String email;
 
 }
