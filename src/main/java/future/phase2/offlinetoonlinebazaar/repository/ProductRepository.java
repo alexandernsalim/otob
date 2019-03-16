@@ -10,5 +10,11 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     List<Product> findAllByNameContaining(String name);
 
+    Product findByName(String name);
+
     boolean existsByNameContaining(String name);
+
+    boolean existsByName(String name);
+
+    boolean deleteByProductId(Long productId);
 }

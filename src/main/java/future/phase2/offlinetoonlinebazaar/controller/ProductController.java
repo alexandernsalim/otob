@@ -7,6 +7,9 @@ import future.phase2.offlinetoonlinebazaar.service.ProductService;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +32,36 @@ public class ProductController extends GlobalController {
     public Response<ProductDto> create(@Valid @RequestBody ProductDto productDto){
         Product product = convertToEntity(productDto);
         return toResponse(convertToDto(productService.createProduct(product)));
+    }
+
+    @PostMapping("/import")
+    public Response<List<ProductDto>> batchUpload(@RequestParam("file") MultipartFile dataFile) throws IOException {
+        List<Product> productList = new ArrayList<Product>();
+
+        XSSFWorkbook workbook = new XSSFWorkbook(dataFile.getInputStream());
+        XSSFSheet worksheet = workbook.getSheetAt(0);
+
+        for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
+            XSSFRow row = worksheet.getRow(i);
+
+            Product product = new Product();
+
+            product.setName(row.getCell(1).getStringCellValue());
+            product.setDescription(row.getCell(2).getStringCellValue());
+            product.setListPrice(row.getCell(3).getNumericCellValue());
+            product.setOfferPrice(row.getCell(4).getNumericCellValue());
+            product.setStock((int)row.getCell(5).getNumericCellValue());
+
+            productList.add(product);
+        }
+
+        List<Product> productListResult = productService.bacthUpload(productList);
+
+        return toResponse(
+                productListResult.stream()
+                        .map(post -> convertToDto(post))
+                        .collect(Collectors.toList())
+        );
     }
 
     @GetMapping("/getAll")
@@ -61,6 +94,15 @@ public class ProductController extends GlobalController {
         Product product = convertToEntity(productDto);
         return toResponse(convertToDto(productService.updateProductById(productId, product)));
     }
+
+    @DeleteMapping("/deleteById/{productId}")
+    public Response<Boolean> deleteById(@PathVariable Long productId) {
+        return toResponse(productService.deleteProductById(productId));
+    }
+
+
+
+
 
     /*======================== Converter ======================*/
     private ProductDto convertToDto(Product product){

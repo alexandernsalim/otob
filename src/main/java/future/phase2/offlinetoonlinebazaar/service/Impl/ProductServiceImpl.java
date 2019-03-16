@@ -9,6 +9,7 @@ import future.phase2.offlinetoonlinebazaar.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,6 +29,26 @@ public class ProductServiceImpl implements ProductService {
         }catch(Exception e){
             throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
+    }
+
+
+    public List<Product> bacthUpload(List<Product> _product) {
+        List<Product> productList = new ArrayList<>();
+
+        for (Product product: _product) {
+            if(productRepository.existsByName(product.getName())){
+                updateProductByName(product);
+            }else {
+                try {
+                    product.setProductId(idGenerator.getNextId("productid"));
+                    productRepository.save(product);
+                } catch (Exception e) {
+                    throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+                }
+            }
+            productList.add(product);
+        }
+        return productList;
     }
 
     @Override
@@ -67,6 +88,7 @@ public class ProductServiceImpl implements ProductService {
             product.setDescription(_product.getDescription());
             product.setListPrice(_product.getListPrice());
             product.setOfferPrice(_product.getOfferPrice());
+            product.setStock(_product.getStock());
 
             productRepository.save(product);
         }
@@ -74,6 +96,28 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
+    public boolean deleteProductById(Long productId) {
+        Product product = productRepository.findByProductId(productId);
 
+        if (product == null){
+            throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+        }
+        productRepository.deleteByProductId(productId);
+
+        return true;
+    }
+
+    public Product updateProductByName(Product _product) {
+        Product product = productRepository.findByName(_product.getName());
+
+        product.setDescription(_product.getDescription());
+        product.setListPrice(_product.getListPrice());
+        product.setOfferPrice(_product.getOfferPrice());
+        product.setStock(_product.getStock());
+
+        productRepository.save(product);
+
+        return product;
+    }
 
 }
