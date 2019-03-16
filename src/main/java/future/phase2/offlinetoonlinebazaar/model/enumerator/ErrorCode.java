@@ -3,6 +3,7 @@ package future.phase2.offlinetoonlinebazaar.model.enumerator;
 public enum ErrorCode {
     NOT_FOUND("404", "Not Found"),
     BAD_REQUEST("400", "Bad Request"),
+    EMAIL_EXISTS("400", "Email found, please check your password"),
     INTERNAL_SERVER_ERROR("500", "Internal Server Error");
 
     private String code;

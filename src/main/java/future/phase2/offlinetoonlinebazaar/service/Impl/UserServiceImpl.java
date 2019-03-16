@@ -1,19 +1,16 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
+import future.phase2.offlinetoonlinebazaar.exception.EmailExistsException;
 import future.phase2.offlinetoonlinebazaar.generator.RandomPasswordGenerator;
 import future.phase2.offlinetoonlinebazaar.model.entity.User;
-import future.phase2.offlinetoonlinebazaar.model.dto.UserDto;
+import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
 import future.phase2.offlinetoonlinebazaar.repository.UserRepository;
 import future.phase2.offlinetoonlinebazaar.service.EmailService;
 import future.phase2.offlinetoonlinebazaar.service.RoleService;
 import future.phase2.offlinetoonlinebazaar.service.UserService;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +40,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerNewUser(User userRequest, String role){
+        if(userRepository.existsByEmail(userRequest.getEmail())){
+            throw new EmailExistsException(
+                    ErrorCode.EMAIL_EXISTS.getCode(),
+                    ErrorCode.EMAIL_EXISTS.getMessage()
+            );
+        }
         User user = new User();
         String password = passwordGenerator.generateRandomPassword();
 
