@@ -1,16 +1,17 @@
 package future.phase2.offlinetoonlinebazaar.service;
 
-import future.phase2.offlinetoonlinebazaar.model.dto.ProductDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Product;
 
+import java.util.List;
+
 public interface ProductService {
-    ProductDto createProduct(Product product, String image);
+    Product createProduct(Product product);
 
-    ProductDto viewProduct();
+    List<Product> getAllProduct();
 
-    ProductDto viewProductById(Long productId);
+    Product getProductById (Long productId);
 
-    ProductDto updateProduct(Long productId);
+    List<Product> getAllProductByName(String name);
 
-    boolean deleteProduct(Long productId);
+    Product updateProductById(Long productId, Product product);
 }

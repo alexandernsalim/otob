@@ -1,0 +1,79 @@
+package future.phase2.offlinetoonlinebazaar.controller;
+
+import future.phase2.offlinetoonlinebazaar.model.dto.ProductDto;
+import future.phase2.offlinetoonlinebazaar.model.entity.Product;
+import future.phase2.offlinetoonlinebazaar.model.response.Response;
+import future.phase2.offlinetoonlinebazaar.service.ProductService;
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/product")
+public class ProductController extends GlobalController {
+    @Autowired
+    private ProductService productService;
+
+    private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
+
+    @PostMapping("/create")
+    public Response<ProductDto> create(@Valid @RequestBody ProductDto productDto){
+        Product product = convertToEntity(productDto);
+        return toResponse(convertToDto(productService.createProduct(product)));
+    }
+
+    @GetMapping("/getAll")
+    public Response<List<ProductDto>> getAll(){
+        List<Product> products = productService.getAllProduct();
+        return toResponse(
+                products.stream()
+                        .map(post -> convertToDto(post))
+                        .collect(Collectors.toList())
+        );
+    }
+
+    @GetMapping("/getById/{productId}")
+    public Response<ProductDto> getById(@PathVariable Long productId){
+        return toResponse(convertToDto(productService.getProductById(productId)));
+    }
+
+    @GetMapping("/getByName/{name}")
+    public Response<List<ProductDto>> getByName(@PathVariable String name){
+        List<Product> products = productService.getAllProductByName(name);
+        return toResponse(
+                products.stream()
+                        .map(post -> convertToDto(post))
+                        .collect(Collectors.toList())
+        );
+    }
+
+    @PutMapping("/updateById/{productId}")
+    public Response<ProductDto> updateById(@PathVariable Long productId, @Valid @RequestBody ProductDto productDto) {
+        Product product = convertToEntity(productDto);
+        return toResponse(convertToDto(productService.updateProductById(productId, product)));
+    }
+
+    /*======================== Converter ======================*/
+    private ProductDto convertToDto(Product product){
+        MapperFacade mapper = mapperFactory.getMapperFacade();
+        ProductDto productDto = mapper.map(product, ProductDto.class);
+
+        return productDto;
+    }
+
+    private Product convertToEntity(ProductDto productDto){
+        MapperFacade mapper = mapperFactory.getMapperFacade();
+        Product product = mapper.map(productDto, Product.class);
+
+        return product;
+    }
+}

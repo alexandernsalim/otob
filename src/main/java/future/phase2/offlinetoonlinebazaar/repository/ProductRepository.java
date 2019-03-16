@@ -1,7 +1,14 @@
 package future.phase2.offlinetoonlinebazaar.repository;
 
-import future.phase2.offlinetoonlinebazaar.model.entity.Bazaar;
+import future.phase2.offlinetoonlinebazaar.model.entity.Product;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface ProductRepository extends MongoRepository<Bazaar, String> {
+import java.util.List;
+
+public interface ProductRepository extends MongoRepository<Product, String> {
+    Product findByProductId(Long productId);
+
+    List<Product> findAllByNameContaining(String name);
+
+    boolean existsByNameContaining(String name);
 }

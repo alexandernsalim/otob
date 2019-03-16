@@ -26,8 +26,4 @@ public class Product {
     private double offerPrice;
 
     private int stock;
-
-    private String picture;
-
-    private String tag;
 }
