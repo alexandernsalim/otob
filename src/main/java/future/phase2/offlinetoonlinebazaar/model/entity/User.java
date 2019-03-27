@@ -22,7 +22,6 @@ public class User {
 
     @NotNull
     @NotEmpty
-    @EmailFormatConstraint
     private String email;
 
     @NotNull

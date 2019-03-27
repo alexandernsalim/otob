@@ -10,6 +10,7 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,21 +28,21 @@ public class UserController extends GlobalController{
     }
 
     @PostMapping("/register/customer")
-    public Response<User> registerNewCustomer(@RequestBody UserDto userDto){
+    public Response<User> registerNewCustomer(@RequestBody @Valid UserDto userDto){
         User user = convertToEntity(userDto);
 
         return toResponse(convertToDto(userService.registerNewUser(user, "ROLE_CUSTOMER")));
     }
 
     @PostMapping("/register/admin")
-    public Response<UserDto> registerNewAdmin(@RequestBody UserDto userDto){
+    public Response<UserDto> registerNewAdmin(@RequestBody @Valid UserDto userDto){
         User user = convertToEntity(userDto);
 
         return toResponse(convertToDto(userService.registerNewUser(user, "ROLE_ADMIN")));
     }
 
     @PostMapping("/register/cashier")
-    public Response<UserDto> registerNewCashier(@RequestBody UserDto userDto){
+    public Response<UserDto> registerNewCashier(@RequestBody @Valid UserDto userDto){
         User user = convertToEntity(userDto);
 
         return toResponse(convertToDto(userService.registerNewUser(user, "ROLE_CASHIER")));

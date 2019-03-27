@@ -46,6 +46,7 @@ public class UserServiceImpl implements UserService {
                     ErrorCode.EMAIL_EXISTS.getMessage()
             );
         }
+
         User user = new User();
         String password = passwordGenerator.generateRandomPassword();
 
