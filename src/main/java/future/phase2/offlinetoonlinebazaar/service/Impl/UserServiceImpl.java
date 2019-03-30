@@ -68,4 +68,9 @@ public class UserServiceImpl implements UserService {
         return (userRepository.deleteByEmail(email) == 1) ? Boolean.TRUE : Boolean.FALSE;
     }
 
+    @Override
+    public String forgetPassword(String email) {
+        return null;
+    }
+
 }

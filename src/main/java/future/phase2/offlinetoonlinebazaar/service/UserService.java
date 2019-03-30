@@ -9,5 +9,6 @@ public interface UserService {
     List<User> getAllUser();
     User registerNewUser(User user, String role);
     Boolean removeUser(String email);
+    String forgetPassword(String email);
 
 }
