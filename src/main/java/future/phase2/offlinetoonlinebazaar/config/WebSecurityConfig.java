@@ -28,15 +28,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable()
             .authorizeRequests()
-            .antMatchers(
-                    "/api/users/register/admin",
-                    "/api/users/register/cashier",
-                    "/api/users/delete/*",
-                    "/api/users",
-                    "/api/roles"
-            ).hasRole("ADMIN")
-            .antMatchers("/api/users/register/customer").permitAll()
-            .anyRequest().authenticated()
+//            .antMatchers(
+//                    "/api/users/register/admin",
+//                    "/api/users/register/cashier",
+//                    "/api/users/delete/*",
+//                    "/api/users",
+//                    "/api/roles"
+//            ).hasRole("ADMIN")
+//            .antMatchers("/api/users/register/customer").permitAll()
+            .anyRequest().permitAll()
             .and()
             .formLogin();
 //            .loginPage("/login.html")

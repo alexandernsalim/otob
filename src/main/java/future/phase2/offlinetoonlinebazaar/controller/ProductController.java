@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/api/products")
 public class ProductController extends GlobalController {
     @Autowired
     private ProductService productService;
@@ -67,6 +67,7 @@ public class ProductController extends GlobalController {
     @GetMapping("/getAll")
     public Response<List<ProductDto>> getAll(){
         List<Product> products = productService.getAllProduct();
+
         return toResponse(
                 products.stream()
                         .map(post -> convertToDto(post))
@@ -99,10 +100,6 @@ public class ProductController extends GlobalController {
     public Response<Boolean> deleteById(@PathVariable Long productId) {
         return toResponse(productService.deleteProductById(productId));
     }
-
-
-
-
 
     /*======================== Converter ======================*/
     private ProductDto convertToDto(Product product){
