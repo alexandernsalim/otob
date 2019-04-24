@@ -1,5 +1,6 @@
 package future.phase2.offlinetoonlinebazaar.controller;
 
+import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
 import future.phase2.offlinetoonlinebazaar.model.dto.ProductDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import future.phase2.offlinetoonlinebazaar.model.entity.Product;
@@ -33,6 +34,19 @@ public class CartController extends GlobalController{
                                               @PathVariable Long productId,
                                               @PathVariable Long qty){
         return toResponse(convertToDto(cartService.addItemToCart(userEmail, productId, qty)));
+    }
+
+    @PutMapping("/update/{userEmail}/{productId}/{qty}")
+    public Response<ProductDto> updateItemQty (@PathVariable String userEmail,
+                                               @PathVariable Long productId,
+                                               @PathVariable Long qty) {
+        return toResponse(convertToDto(cartService.updateItemQty(userEmail, productId, qty)));
+    }
+
+    @DeleteMapping("/remove/{userEmail}/{productId}")
+    public Response<Boolean> removeItemFromCart(@PathVariable String userEmail,
+                                                @PathVariable Long productId){
+        return toResponse(cartService.removeItemFromCart(userEmail, productId));
     }
 
     //Private

@@ -29,6 +29,13 @@ public class CartServiceImpl implements CartService {
     private UserService userService;
 
     @Override
+    public Cart createUserCart(String userEmail){
+        Cart cart = new Cart(userEmail);
+
+        return cartRepository.save(cart);
+    }
+
+    @Override
     public List<CartItem> getCartItems(String userEmail) {
         if(!userService.checkUser(userEmail)){
             throw new ResourceNotFoundException(
@@ -54,28 +61,92 @@ public class CartServiceImpl implements CartService {
 
         Product product = productService.getProductById(productId);
 
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
-        DB database =   mongoClient.getDB("offline-to-online");
-        DBCollection collection = database.getCollection("cart");
-        DBObject findQuery = new BasicDBObject("userEmail", userEmail);
-        DBObject newItem = new BasicDBObject("cartItems",
-                new BasicDBObject("productId", productId)
-                .append("productName", product.getName())
-                .append("productPrice", product.getOfferPrice())
-                .append("qty", qty)
-        );
-        DBObject updateQuery = new BasicDBObject("$push", newItem);
+        DBCollection collection = getCollection();
+        DBObject find = new BasicDBObject("userEmail", userEmail)
+                .append("cartItems.productId", productId);
+        DBCursor cursor = collection.find(find);
 
-        collection.findAndModify(findQuery, updateQuery);
+        if(cursor.length() == 1){
+            DBObject updateItem = new BasicDBObject();
+
+            updateItem.put("$inc", new BasicDBObject("cartItems.$.qty", qty));
+
+            collection.findAndModify(find, updateItem);
+        }else{
+            DBObject findQuery = new BasicDBObject("userEmail", userEmail);
+            DBObject newItem = new BasicDBObject("cartItems",
+                    new BasicDBObject("productId", productId)
+                            .append("productName", product.getName())
+                            .append("productPrice", product.getOfferPrice())
+                            .append("qty", qty)
+            );
+            DBObject updateQuery = new BasicDBObject("$push", newItem);
+
+            collection.findAndModify(findQuery, updateQuery);
+        }
 
         return product;
     }
 
     @Override
-    public Cart createUserCart(String userEmail){
-        Cart cart = new Cart(userEmail);
+    public Product updateItemQty(String userEmail, Long productId, Long qty) {
+        if(!userService.checkUser(userEmail)){
+            throw new ResourceNotFoundException(
+                    ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage()
+            );
+        }
 
-        return cartRepository.save(cart);
+        Product product = productService.getProductById(productId);
+
+        DBCollection collection = getCollection();
+        DBObject find = new BasicDBObject("userEmail", userEmail)
+                .append("cartItems.productId", productId);
+        DBCursor cursor = collection.find(find);
+
+        if(cursor.length() == 1){
+            DBObject newQty = new BasicDBObject();
+
+            newQty.put("$set", new BasicDBObject("cartItems.$.qty", qty));
+
+            collection.findAndModify(find, newQty);
+
+            return product;
+        }else{
+            throw new ResourceNotFoundException(
+                    ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage()
+            );
+        }
+    }
+
+    @Override
+    public boolean removeItemFromCart(String userEmail, Long productId) {
+        if(!userService.checkUser(userEmail)){
+            throw new ResourceNotFoundException(
+                    ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage()
+            );
+        }
+
+        DBCollection collection = getCollection();
+        DBObject find = new BasicDBObject("userEmail", userEmail)
+                .append("cartItems.productId", productId);
+        DBCursor cursor = collection.find(find);
+
+        if(cursor.length() == 1) {
+            DBObject updateQuery = new BasicDBObject("$pull",
+                    new BasicDBObject("cartItems", new BasicDBObject("productId", productId)));
+
+            collection.findAndModify(find, updateQuery);
+
+            return true;
+        }else{
+            throw new ResourceNotFoundException(
+                    ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage()
+            );
+        }
     }
 
     private Cart getUserCart(String userEmail){
@@ -84,4 +155,17 @@ public class CartServiceImpl implements CartService {
         return cart;
     }
 
+    private DBCollection getCollection(){
+        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        DB database = mongoClient.getDB("offline-to-online");
+        DBCollection collection = database.getCollection("cart");
+
+        return collection;
+    }
+
+
+    //(Increase qty) db.cart.update({"userEmail": "twinzeno21@gmail.com", "cartItems.productId": NumberLong(1)}, {$inc: {"cartItems.$.qty": NumberLong(5)}})
+    //(Decrease qty) db.cart.update({"userEmail": "twinzeno21@gmail.com", "cartItems.productId": NumberLong(1)}, {$inc: {"cartItems.$.qty": NumberLong(-5)}})
+    //(Set qty) db.cart.update({"userEmail": "twinzeno21@gmail.com", "cartItems.productId": NumberLong(1)}, {$set: {"cartItems.$.qty": NumberLong(5)}})
+    //(Remove item) db.cart.update({"userEmail": "twinzeno21@gmail.com"}, {$pull: {"cartItems": {"productId": NumberLong(1)}}})
 }
