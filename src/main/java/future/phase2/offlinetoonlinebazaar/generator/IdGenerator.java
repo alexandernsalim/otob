@@ -1,9 +1,9 @@
-package future.phase2.offlinetoonlinebazaar.helper;
+package future.phase2.offlinetoonlinebazaar.generator;
 
 import com.mongodb.*;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class IdGenerator {
 
     public Long getNextId(String name) throws Exception{

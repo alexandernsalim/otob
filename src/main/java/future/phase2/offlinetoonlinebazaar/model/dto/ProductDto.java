@@ -4,16 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BazaarDto {
+public class ProductDto {
+    private int productId;
 
-    private String bazaarId;
     private String name;
-    private Date startDate;
-    private Date endDate;
 
+    private String description;
+
+    private double listPrice;
+
+    private double offerPrice;
+
+    private int stock;
 }

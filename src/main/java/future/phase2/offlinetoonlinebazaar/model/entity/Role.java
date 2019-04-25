@@ -1,29 +1,28 @@
 package future.phase2.offlinetoonlinebazaar.model.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-@Document(collection = "bazaar")
-public class Bazaar {
-    @Id
-    private String _id;
+@NoArgsConstructor
+@Document(collection = "role")
+public class Role {
 
-    private Long bazaarId;
+    @Id
+    private String id;
+
+    @NotNull
+    private Long roleId;
 
     @NotNull
     private String name;
-
-    private Date startDate;
-    private Date endDate;
-    private Boolean activeStatus;
 
 }
