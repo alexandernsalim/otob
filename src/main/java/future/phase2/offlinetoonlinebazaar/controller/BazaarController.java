@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/bazaar")
-public class BazaarController extends GlobalController{
+public class BazaarController{
 
-    @Autowired
-    private BazaarService bazaarService;
-
-    @PostMapping
-    public ResponseGenerator<BazaarDto> createBazaar(@RequestBody Bazaar bazaar){
-        return toResponse(bazaarService.createBazaar(bazaar));
-    }
+//    @Autowired
+//    private BazaarService bazaarService;
+//
+//    @PostMapping
+//    public ResponseGenerator<BazaarDto> createBazaar(@RequestBody Bazaar bazaar){
+//        return toResponse(bazaarService.createBazaar(bazaar));
+//    }
 
 }
