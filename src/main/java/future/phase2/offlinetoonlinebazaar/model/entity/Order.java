@@ -7,28 +7,23 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "cart")
-public class Cart {
+@AllArgsConstructor
+@Document(collection = "order")
+public class Order {
 
     @Id
     private String id;
 
-    @NotNull
-    private String userEmail;
-
-    private List<CartItem> cartItems;
-
-    public Cart(String userEmail){
-        this.userEmail = userEmail;
-        this.cartItems = new ArrayList<>();
-    }
+    private String usrEmail;
+    private String ordDate;
+    private List<CartItem> ordItems;
+    private int totItem;
+    private Long totPrice;
+    private String ordStatus;
 
 }

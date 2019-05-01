@@ -13,5 +13,5 @@ public class CartItem {
     private Long productId;
     private String productName;
     private double productPrice;
-    private Long qty;
+    private int qty;
 }

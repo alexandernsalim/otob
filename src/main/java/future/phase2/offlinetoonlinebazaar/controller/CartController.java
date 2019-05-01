@@ -1,6 +1,5 @@
 package future.phase2.offlinetoonlinebazaar.controller;
 
-import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
 import future.phase2.offlinetoonlinebazaar.model.dto.ProductDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import future.phase2.offlinetoonlinebazaar.model.entity.Product;
@@ -32,14 +31,14 @@ public class CartController extends GlobalController{
     @PostMapping("/add/{userEmail}/{productId}/{qty}")
     public Response<ProductDto> addItemToCart(@PathVariable String userEmail,
                                               @PathVariable Long productId,
-                                              @PathVariable Long qty){
+                                              @PathVariable int qty){
         return toResponse(convertToDto(cartService.addItemToCart(userEmail, productId, qty)));
     }
 
     @PutMapping("/update/{userEmail}/{productId}/{qty}")
     public Response<ProductDto> updateItemQty (@PathVariable String userEmail,
                                                @PathVariable Long productId,
-                                               @PathVariable Long qty) {
+                                               @PathVariable int qty) {
         return toResponse(convertToDto(cartService.updateItemQty(userEmail, productId, qty)));
     }
 
