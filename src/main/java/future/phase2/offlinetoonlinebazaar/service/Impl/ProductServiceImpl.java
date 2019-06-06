@@ -1,7 +1,7 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
 import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
-import future.phase2.offlinetoonlinebazaar.helper.IdGenerator;
+import future.phase2.offlinetoonlinebazaar.generator.IdGenerator;
 import future.phase2.offlinetoonlinebazaar.model.entity.Product;
 import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
 import future.phase2.offlinetoonlinebazaar.repository.ProductRepository;
@@ -25,6 +25,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             _product.setProductId(idGenerator.getNextId("productid"));
             productRepository.save(_product);
+ 
             return _product;
         }catch(Exception e){
             throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
@@ -102,8 +103,9 @@ public class ProductServiceImpl implements ProductService {
         if (product == null){
             throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
-        productRepository.deleteByProductId(productId);
 
+        productRepository.delete(product);
+ 
         return true;
     }
 

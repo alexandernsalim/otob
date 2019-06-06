@@ -53,6 +53,8 @@ public class UserController extends GlobalController{
         return toResponse(userService.removeUser(email));
     }
 
+
+    //Private
     private User convertToEntity(UserDto userDto){
         mapperFactory.classMap(UserDto.class, User.class).byDefault();
 

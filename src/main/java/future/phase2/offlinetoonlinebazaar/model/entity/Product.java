@@ -1,17 +1,15 @@
 package future.phase2.offlinetoonlinebazaar.model.entity;
 
-public class Product {
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "product")
+@Document(collection = "product") 
 public class Product {
     @Id
     private String _id;
