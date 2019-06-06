@@ -67,7 +67,6 @@ public class ProductController extends GlobalController {
     @GetMapping("/")
     public Response<List<ProductDto>> getAll(){
         List<Product> products = productService.getAllProduct();
-
         return toResponse(
                 products.stream()
                         .map(post -> convertToDto(post))
