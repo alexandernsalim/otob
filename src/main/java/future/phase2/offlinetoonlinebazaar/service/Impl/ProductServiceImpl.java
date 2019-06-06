@@ -103,7 +103,8 @@ public class ProductServiceImpl implements ProductService {
         if (product == null){
             throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
-        productRepository.deleteByProductId(productId);
+
+        productRepository.delete(product);
 
         return true;
     }

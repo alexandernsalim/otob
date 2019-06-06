@@ -28,7 +28,7 @@ public class ProductController extends GlobalController {
 
     private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
-    @PostMapping("/create")
+    @PostMapping("/")
     public Response<ProductDto> create(@Valid @RequestBody ProductDto productDto){
         Product product = convertToEntity(productDto);
         return toResponse(convertToDto(productService.createProduct(product)));
@@ -41,7 +41,7 @@ public class ProductController extends GlobalController {
         XSSFWorkbook workbook = new XSSFWorkbook(dataFile.getInputStream());
         XSSFSheet worksheet = workbook.getSheetAt(0);
 
-        for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
+        for(int i=2;i<worksheet.getPhysicalNumberOfRows() ;i++) {
             XSSFRow row = worksheet.getRow(i);
 
             Product product = new Product();
@@ -64,7 +64,7 @@ public class ProductController extends GlobalController {
         );
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/")
     public Response<List<ProductDto>> getAll(){
         List<Product> products = productService.getAllProduct();
 
