@@ -7,9 +7,6 @@ import future.phase2.offlinetoonlinebazaar.model.entity.Role;
 import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
 import future.phase2.offlinetoonlinebazaar.repository.RoleRepository;
 import future.phase2.offlinetoonlinebazaar.service.RoleService;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,33 +19,24 @@ public class RoleServiceImpl implements RoleService {
     @Autowired
     RoleRepository roleRepository;
 
-    private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
-
     @Override
     public Role getRoleByName(String name) {
         return roleRepository.findByName(name);
     }
 
     @Override
-    public RoleDto addRole(RoleDto roleRequest) {
+    public Role addRole(RoleDto roleRequest) {
         try {
             Role role = new Role();
 
             role.setName(roleRequest.getName());
             role.setRoleId(idGenerator.getNextId("roleid"));
-            roleRepository.save(role);
 
-            mapperFactory.classMap(Role.class, RoleDto.class)
-                    .exclude("id")
-                    .byDefault().register();
-            MapperFacade mapper = mapperFactory.getMapperFacade();
-            RoleDto roleDto = mapper.map(role, RoleDto.class);
-
-            return roleDto;
+            return roleRepository.save(role);
         }catch(Exception e){
             throw new ResourceNotFoundException(
-                    ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage()
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
             );
         }
     }
