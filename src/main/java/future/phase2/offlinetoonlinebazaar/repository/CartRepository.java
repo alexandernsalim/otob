@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface CartRepository extends MongoRepository<Cart, String>, CartRepositoryCustom {
     Cart findByUserEmail(String userEmail);
     Boolean existsByUserEmail(String userEmail);
-    Boolean deleteByUserEmail(String userEmail);
+    long deleteByUserEmail(String userEmail);
 }

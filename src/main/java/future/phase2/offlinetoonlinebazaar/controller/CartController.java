@@ -47,7 +47,7 @@ public class CartController extends GlobalController{
         return toResponse(mapper.map(cartService.removeItemFromCart(principal.getName(), productId), CartDto.class));
     }
 
-    @DeleteMapping("/remove/{userEmail}")
+    @DeleteMapping("/remove/user/{userEmail}")
     public Response<Boolean> removeUserCart(@PathVariable String userEmail){
         return toResponse(cartService.removeUserCart(userEmail));
     }
