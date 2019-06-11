@@ -1,6 +1,5 @@
 package future.phase2.offlinetoonlinebazaar.service;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import future.phase2.offlinetoonlinebazaar.model.entity.User;
 
 import java.util.List;

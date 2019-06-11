@@ -52,4 +52,29 @@ public class CartController extends GlobalController{
         return toResponse(cartService.removeUserCart(userEmail));
     }
 
+    @GetMapping("/{userEmail}")
+    public Response<List<Cart>> getCartItems(@PathVariable String userEmail){
+        return toResponse(mapper.map(cartService.getUserCart(userEmail), CartDto.class));
+    }
+
+    @PostMapping("/{userEmail}/add/{productId}/{qty}")
+    public Response<Cart> addItemToCart(@PathVariable String userEmail,
+                                        @PathVariable Long productId,
+                                        @PathVariable int qty){
+        return toResponse(mapper.map(cartService.addItemToCart(userEmail, productId, qty), CartDto.class));
+    }
+
+    @PutMapping("/{userEmail}/update/{productId}/{qty}")
+    public Response<Cart> updateItemQty (@PathVariable String userEmail,
+                                         @PathVariable Long productId,
+                                         @PathVariable int qty) {
+        return toResponse(mapper.map(cartService.updateItemQty(userEmail, productId, qty), CartDto.class));
+    }
+
+    @DeleteMapping("/{userEmail}/remove/{productId}")
+    public Response<Cart> removeItemFromCart(@PathVariable String userEmail,
+                                             @PathVariable Long productId){
+        return toResponse(mapper.map(cartService.removeItemFromCart(userEmail, productId), CartDto.class));
+    }
+
 }

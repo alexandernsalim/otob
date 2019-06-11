@@ -33,7 +33,7 @@ public class ProductController extends GlobalController {
 
     private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
-    @PostMapping("/create")
+    @PostMapping("")
     public Response<ProductDto> create(@Valid @RequestBody ProductDto productDto){
         Product product = mapper.map(productDto, Product.class);
 
@@ -66,7 +66,7 @@ public class ProductController extends GlobalController {
         return toResponse(mapper.mapAsList(productListResult, ProductDto.class));
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("")
     public Response<List<ProductDto>> getAll(){
         List<Product> products = productService.getAllProduct();
 
