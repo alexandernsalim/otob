@@ -142,7 +142,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Boolean removeUserCart(String userEmail) {
-        return cartRepository.deleteByUserEmail(userEmail);
+        return (cartRepository.deleteByUserEmail(userEmail) == 1) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     //Private Method
