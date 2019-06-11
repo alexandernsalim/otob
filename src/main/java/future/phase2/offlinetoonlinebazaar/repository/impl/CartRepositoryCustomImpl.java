@@ -20,8 +20,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Qualifier
-@Repository
 public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
     @Autowired

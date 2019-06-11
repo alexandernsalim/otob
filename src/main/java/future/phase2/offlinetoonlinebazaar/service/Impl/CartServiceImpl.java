@@ -29,10 +29,6 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private CartRepository cartRepository;
 
-    @Qualifier
-    @Autowired
-    private CartRepositoryCustom cartRepositoryCustom;
-
     @Autowired
     private ProductService productService;
 
@@ -76,7 +72,7 @@ public class CartServiceImpl implements CartService {
 
         this.checkStock(qty, product.getStock());
 
-        return cartRepositoryCustom.addToCart(userEmail, qty, productId);
+        return cartRepository.addToCart(userEmail, qty, productId);
     }
 
     @Override
@@ -88,7 +84,7 @@ public class CartServiceImpl implements CartService {
             );
         }
 
-        return cartRepositoryCustom.updateQty(userEmail, qty, productId);
+        return cartRepository.updateQty(userEmail, qty, productId);
     }
 
     @Override
@@ -100,7 +96,7 @@ public class CartServiceImpl implements CartService {
             );
         }
 
-        return cartRepositoryCustom.removeFromCart(userEmail, productId);
+        return cartRepository.removeFromCart(userEmail, productId);
     }
 
     @Override
@@ -145,7 +141,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public boolean removeUserCart(String userEmail) {
+    public Boolean removeUserCart(String userEmail) {
         return cartRepository.deleteByUserEmail(userEmail);
     }
 
@@ -159,7 +155,7 @@ public class CartServiceImpl implements CartService {
         }
     }
 
-    private boolean checkUserCartExistence(String userEmail){
+    private Boolean checkUserCartExistence(String userEmail){
         return cartRepository.existsByUserEmail(userEmail);
     }
 

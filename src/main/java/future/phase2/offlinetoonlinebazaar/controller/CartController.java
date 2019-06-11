@@ -9,7 +9,7 @@ import future.phase2.offlinetoonlinebazaar.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -22,29 +22,34 @@ public class CartController extends GlobalController{
     @Autowired
     private BeanMapper mapper;
 
-    @GetMapping("/{userEmail}")
-    public Response<List<CartItem>> getCartItems(@PathVariable @Valid String userEmail){
-        return toResponse(mapper.map(cartService.getUserCart(userEmail), CartDto.class));
+    @GetMapping
+    public Response<List<CartItem>> getCartItems(Principal principal){
+        return toResponse(mapper.map(cartService.getUserCart(principal.getName()), CartDto.class));
     }
 
-    @PostMapping("/add/{userEmail}/{productId}/{qty}")
-    public Response<Cart> addItemToCart(@PathVariable String userEmail,
+    @PostMapping("/add/{productId}/{qty}")
+    public Response<Cart> addItemToCart(Principal principal,
                                         @PathVariable Long productId,
                                         @PathVariable int qty){
-        return toResponse(mapper.map(cartService.addItemToCart(userEmail, productId, qty), CartDto.class));
+        return toResponse(mapper.map(cartService.addItemToCart(principal.getName(), productId, qty), CartDto.class));
     }
 
-    @PutMapping("/update/{userEmail}/{productId}/{qty}")
-    public Response<Cart> updateItemQty (@PathVariable String userEmail,
-                                               @PathVariable Long productId,
-                                               @PathVariable int qty) {
-        return toResponse(mapper.map(cartService.updateItemQty(userEmail, productId, qty), CartDto.class));
+    @PutMapping("/update/{productId}/{qty}")
+    public Response<Cart> updateItemQty (Principal principal,
+                                         @PathVariable Long productId,
+                                         @PathVariable int qty) {
+        return toResponse(mapper.map(cartService.updateItemQty(principal.getName(), productId, qty), CartDto.class));
     }
 
-    @DeleteMapping("/remove/{userEmail}/{productId}")
-    public Response<Cart> removeItemFromCart(@PathVariable String userEmail,
-                                                @PathVariable Long productId){
-        return toResponse(mapper.map(cartService.removeItemFromCart(userEmail, productId), CartDto.class));
+    @DeleteMapping("/remove/{productId}")
+    public Response<Cart> removeItemFromCart(Principal principal,
+                                             @PathVariable Long productId){
+        return toResponse(mapper.map(cartService.removeItemFromCart(principal.getName(), productId), CartDto.class));
+    }
+
+    @DeleteMapping("/remove/{userEmail}")
+    public Response<Boolean> removeUserCart(@PathVariable String userEmail){
+        return toResponse(cartService.removeUserCart(userEmail));
     }
 
 }
