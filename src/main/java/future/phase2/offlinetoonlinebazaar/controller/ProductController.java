@@ -1,5 +1,6 @@
 package future.phase2.offlinetoonlinebazaar.controller;
 
+import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
 import future.phase2.offlinetoonlinebazaar.model.dto.ProductDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Product;
 import future.phase2.offlinetoonlinebazaar.model.response.Response;
@@ -23,15 +24,20 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/products")
 public class ProductController extends GlobalController {
+
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private BeanMapper mapper;
 
     private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
     @PostMapping("/")
     public Response<ProductDto> create(@Valid @RequestBody ProductDto productDto){
-        Product product = convertToEntity(productDto);
-        return toResponse(convertToDto(productService.createProduct(product)));
+        Product product = mapper.map(productDto, Product.class);
+
+        return toResponse(mapper.map(productService.createProduct(product), ProductDto.class));
     }
 
     @PostMapping("/import")
@@ -57,42 +63,33 @@ public class ProductController extends GlobalController {
 
         List<Product> productListResult = productService.bacthUpload(productList);
 
-        return toResponse(
-                productListResult.stream()
-                        .map(post -> convertToDto(post))
-                        .collect(Collectors.toList())
-        );
+        return toResponse(mapper.mapAsList(productListResult, ProductDto.class));
     }
 
     @GetMapping("/")
     public Response<List<ProductDto>> getAll(){
         List<Product> products = productService.getAllProduct();
-        return toResponse(
-                products.stream()
-                        .map(post -> convertToDto(post))
-                        .collect(Collectors.toList())
-        );
+
+        return toResponse(mapper.mapAsList(products, ProductDto.class));
     }
 
     @GetMapping("/getById/{productId}")
     public Response<ProductDto> getById(@PathVariable Long productId){
-        return toResponse(convertToDto(productService.getProductById(productId)));
+        return toResponse(mapper.map(productService.getProductById(productId), ProductDto.class));
     }
 
     @GetMapping("/getByName/{name}")
     public Response<List<ProductDto>> getByName(@PathVariable String name){
         List<Product> products = productService.getAllProductByName(name);
-        return toResponse(
-                products.stream()
-                        .map(post -> convertToDto(post))
-                        .collect(Collectors.toList())
-        );
+
+        return toResponse(mapper.mapAsList(products, ProductDto.class));
     }
 
     @PutMapping("/updateById/{productId}")
     public Response<ProductDto> updateById(@PathVariable Long productId, @Valid @RequestBody ProductDto productDto) {
-        Product product = convertToEntity(productDto);
-        return toResponse(convertToDto(productService.updateProductById(productId, product)));
+        Product product = mapper.map(productDto, Product.class);
+
+        return toResponse(mapper.map(productService.updateProductById(productId, product), ProductDto.class));
     }
 
     @DeleteMapping("/deleteById/{productId}")
@@ -100,18 +97,4 @@ public class ProductController extends GlobalController {
         return toResponse(productService.deleteProductById(productId));
     }
 
-    /*======================== Converter ======================*/
-    private ProductDto convertToDto(Product product){
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-        ProductDto productDto = mapper.map(product, ProductDto.class);
-
-        return productDto;
-    }
-
-    private Product convertToEntity(ProductDto productDto){
-        MapperFacade mapper = mapperFactory.getMapperFacade();
-        Product product = mapper.map(productDto, Product.class);
-
-        return product;
-    }
 }

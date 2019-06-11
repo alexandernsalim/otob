@@ -34,4 +34,28 @@ public class GlobalExceptionHandler {
 //                .build();
 //    }
 
+    @ExceptionHandler(value = ResourceNotFoundException.class)
+    public Response resourceNotFoundException(ResourceNotFoundException ex){
+        return Response.builder()
+                .code(ex.getErrorCode())
+                .message(ex.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(value = StockInsufficientException.class)
+    public Response stockInsufficientException(StockInsufficientException ex){
+        return Response.builder()
+                .code(ex.getErrorCode())
+                .message(ex.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(value = Exception.class)
+    public Response unknownException(Exception ex){
+        return Response.builder()
+                .code(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+                .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
+                .build();
+    }
+
 }

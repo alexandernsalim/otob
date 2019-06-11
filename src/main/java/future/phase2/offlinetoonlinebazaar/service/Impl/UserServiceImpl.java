@@ -60,7 +60,6 @@ import java.util.List;
         user.setRoles(Arrays.asList(roleService.getRoleByName(role)));
 
         userRepository.save(user);
-        cartService.createUserCart(userRequest.getEmail());
 
         String text = "This message contains your password to login into the system.\n";
         text += "Please don't share this password to anyone.\n" + password;
@@ -77,7 +76,7 @@ import java.util.List;
 
     @Override
     public Boolean removeUser(String email) {
-        return (userRepository.deleteByEmail(email) == 1) ? Boolean.TRUE : Boolean.FALSE;
+        return (userRepository.deleteByEmail(email) && cartService.removeUserCart(email)) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     @Override

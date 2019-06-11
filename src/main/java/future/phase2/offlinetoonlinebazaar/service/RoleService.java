@@ -6,6 +6,6 @@ import future.phase2.offlinetoonlinebazaar.model.entity.Role;
 public interface RoleService {
 
     Role getRoleByName(String name);
-    RoleDto addRole(RoleDto roleResponse);
+    Role addRole(RoleDto roleResponse);
 
 }
