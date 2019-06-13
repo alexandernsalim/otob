@@ -2,6 +2,7 @@ package future.phase2.offlinetoonlinebazaar.controller;
 
 import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
 import future.phase2.offlinetoonlinebazaar.model.dto.CartDto;
+import future.phase2.offlinetoonlinebazaar.model.dto.OrderDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Cart;
 import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import future.phase2.offlinetoonlinebazaar.model.response.Response;
@@ -25,6 +26,11 @@ public class CartController extends GlobalController{
     @GetMapping
     public Response<List<CartItem>> getCartItems(Principal principal){
         return toResponse(mapper.map(cartService.getUserCart(principal.getName()), CartDto.class));
+    }
+
+    @GetMapping("/checkout")
+    public Response<OrderDto> checkout(Principal principal){
+        return toResponse(cartService.checkout(principal.getName()));
     }
 
     @PostMapping("/add/{productId}/{qty}")
