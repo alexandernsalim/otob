@@ -1,8 +1,9 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
-import com.mongodb.*;
 import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
 import future.phase2.offlinetoonlinebazaar.exception.StockInsufficientException;
+import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
+import future.phase2.offlinetoonlinebazaar.model.dto.OrderDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Cart;
 import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import future.phase2.offlinetoonlinebazaar.model.entity.Order;
@@ -10,13 +11,11 @@ import future.phase2.offlinetoonlinebazaar.model.entity.Product;
 import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
 import future.phase2.offlinetoonlinebazaar.model.enumerator.Status;
 import future.phase2.offlinetoonlinebazaar.repository.CartRepository;
-import future.phase2.offlinetoonlinebazaar.repository.CartRepositoryCustom;
 import future.phase2.offlinetoonlinebazaar.service.CartService;
 import future.phase2.offlinetoonlinebazaar.service.OrderService;
 import future.phase2.offlinetoonlinebazaar.service.ProductService;
 import future.phase2.offlinetoonlinebazaar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
@@ -37,6 +36,9 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private BeanMapper mapper;
 
     @Override
     public Cart createUserCart(String userEmail){
@@ -100,7 +102,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Order checkout(String userEmail) {
+    public OrderDto checkout(String userEmail) {
         Cart cart = getUserCart(userEmail);
         List<CartItem> cartItems = cart.getCartItems();
 
@@ -118,7 +120,6 @@ public class CartServiceImpl implements CartService {
 
             if(itemQty > productStock){
                 outOfStockProducts.add(product.getName());
-                removeItemFromCart(userEmail, product.getProductId());
                 cartItems.remove(item);
             }else{
                 totPrice += item.getProductPrice();
@@ -126,9 +127,11 @@ public class CartServiceImpl implements CartService {
                 product.setStock(productStock - itemQty);
                 productService.updateProductById(product.getProductId(), product);
             }
+
+            removeItemFromCart(userEmail, product.getProductId());
         }
 
-        Order newOrder = Order.builder()
+        Order tempOrder = Order.builder()
                               .usrEmail(userEmail)
                               .ordDate(ordDate)
                               .ordItems(cartItems)
@@ -137,7 +140,12 @@ public class CartServiceImpl implements CartService {
                               .ordStatus(Status.WAIT.getStatus())
                               .build();
 
-        return orderService.createOrder(newOrder);
+        orderService.createOrder(tempOrder);
+
+        OrderDto order = mapper.map(tempOrder, OrderDto.class);
+        order.setOutOfStockProducts(outOfStockProducts);
+
+        return order;
     }
 
     @Override
