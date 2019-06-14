@@ -53,7 +53,7 @@ public class CartController extends GlobalController{
     }
 
     @GetMapping("/{userEmail}")
-    public Response<List<Cart>> getCartItems(@PathVariable String userEmail){
+    public Response<List<CartItem>> getCartItems(@PathVariable String userEmail){
         return toResponse(mapper.map(cartService.getUserCart(userEmail), CartDto.class));
     }
 
