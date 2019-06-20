@@ -6,4 +6,6 @@ public interface OrderService {
 
     Order createOrder(Order order);
 
+    Order getUserAllOrder(String userEmail);
+
 }
