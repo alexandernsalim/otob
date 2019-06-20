@@ -2,7 +2,10 @@ package future.phase2.offlinetoonlinebazaar.exception;
 
 import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
 import future.phase2.offlinetoonlinebazaar.model.response.Response;
+import org.springframework.http.MediaType;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.xml.bind.ValidationException;

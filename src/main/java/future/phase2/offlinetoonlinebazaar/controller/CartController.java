@@ -8,6 +8,7 @@ import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import future.phase2.offlinetoonlinebazaar.model.response.Response;
 import future.phase2.offlinetoonlinebazaar.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -53,7 +54,7 @@ public class CartController extends GlobalController{
         return toResponse(mapper.map(cartService.removeItemFromCart(principal.getName(), productId), CartDto.class));
     }
 
-    @DeleteMapping("/remove/user/{userEmail}")
+    @DeleteMapping(value="/remove/user/{userEmail}", produces={MediaType.APPLICATION_JSON_VALUE})
     public Response<Boolean> removeUserCart(@PathVariable String userEmail){
         return toResponse(cartService.removeUserCart(userEmail));
     }
@@ -81,6 +82,11 @@ public class CartController extends GlobalController{
     public Response<Cart> removeItemFromCart(@PathVariable String userEmail,
                                              @PathVariable Long productId){
         return toResponse(mapper.map(cartService.removeItemFromCart(userEmail, productId), CartDto.class));
+    }
+
+    @GetMapping("/{userEmail}/checkout")
+    public Response<OrderDto> checkout(@PathVariable String userEmail){
+        return toResponse(cartService.checkout(userEmail));
     }
 
 }

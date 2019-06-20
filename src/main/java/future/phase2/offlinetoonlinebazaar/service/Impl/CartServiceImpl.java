@@ -106,6 +106,13 @@ public class CartServiceImpl implements CartService {
         Cart cart = getUserCart(userEmail);
         List<CartItem> cartItems = cart.getCartItems();
 
+        if(cartItems.size() == 0){
+            throw new ResourceNotFoundException(
+                    ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage()
+            );
+        }
+
         int totItem = 0;
         long totPrice = 0;
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
