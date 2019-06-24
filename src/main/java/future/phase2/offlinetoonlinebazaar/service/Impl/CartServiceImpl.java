@@ -2,6 +2,7 @@ package future.phase2.offlinetoonlinebazaar.service.Impl;
 
 import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
 import future.phase2.offlinetoonlinebazaar.exception.StockInsufficientException;
+import future.phase2.offlinetoonlinebazaar.generator.IdGenerator;
 import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
 import future.phase2.offlinetoonlinebazaar.model.dto.CheckoutDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Cart;
@@ -36,6 +37,9 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private IdGenerator idGenerator;
 
     @Autowired
     private BeanMapper mapper;
@@ -153,14 +157,23 @@ public class CartServiceImpl implements CartService {
             }
         }
 
-        Order order = Order.builder()
-                              .usrEmail(userEmail)
-                              .ordDate(ordDate)
-                              .ordItems(cartItems)
-                              .totItem(totItem)
-                              .totPrice(totPrice)
-                              .ordStatus(Status.WAIT.getStatus())
-                              .build();
+        Order order = null;
+        try {
+            order = Order.builder()
+                          .ordId(idGenerator.getNextId("orderid"))
+                          .usrEmail(userEmail)
+                          .ordDate(ordDate)
+                          .ordItems(cartItems)
+                          .totItem(totItem)
+                          .totPrice(totPrice)
+                          .ordStatus(Status.WAIT.getStatus())
+                          .build();
+        } catch (Exception e) {
+            throw new ResourceNotFoundException(
+                ErrorCode.NOT_FOUND.getCode(),
+                ErrorCode.NOT_FOUND.getMessage()
+            );
+        }
 
         orderService.createOrder(order);
 

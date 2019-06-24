@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderDto {
 
+    private Long ordId;
     private String usrEmail;
     private String ordDate;
     private List<CartItem> ordItems;
