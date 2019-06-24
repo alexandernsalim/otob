@@ -68,7 +68,7 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
             checkStock(currQty + qty, product.getStock());
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(productId));
-            update.inc("cartItems.$.qty", qty);
+            update.set("cartItems.$.qty", qty);
 
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
         }else{

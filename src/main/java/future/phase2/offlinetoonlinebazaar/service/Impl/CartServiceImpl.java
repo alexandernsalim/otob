@@ -17,6 +17,7 @@ import future.phase2.offlinetoonlinebazaar.service.ProductService;
 import future.phase2.offlinetoonlinebazaar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -112,6 +113,13 @@ public class CartServiceImpl implements CartService {
         String ordDate = dateFormat.format(new Date());
 
         List<String> outOfStockProducts = new ArrayList<>();
+
+        if(cartItems.size() <= 0){
+            throw new ResourceNotFoundException(
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+            );
+        }
 
         for(CartItem item : cartItems){
             Product product = productService.getProductById(item.getProductId());

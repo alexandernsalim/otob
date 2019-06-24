@@ -6,6 +6,8 @@ import future.phase2.offlinetoonlinebazaar.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -15,5 +17,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order createOrder(Order order) {
         return orderRepository.save(order);
+    }
+
+    @Override
+    public List<Order> getUserOrder(String usrEmail) {
+        return orderRepository.findAllByUsrEmail(usrEmail);
     }
 }
