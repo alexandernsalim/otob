@@ -3,7 +3,7 @@ package future.phase2.offlinetoonlinebazaar.service.Impl;
 import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
 import future.phase2.offlinetoonlinebazaar.exception.StockInsufficientException;
 import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
-import future.phase2.offlinetoonlinebazaar.model.dto.OrderDto;
+import future.phase2.offlinetoonlinebazaar.model.dto.CheckoutDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Cart;
 import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import future.phase2.offlinetoonlinebazaar.model.entity.Order;
@@ -17,7 +17,6 @@ import future.phase2.offlinetoonlinebazaar.service.ProductService;
 import future.phase2.offlinetoonlinebazaar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -103,11 +102,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public OrderDto checkout(String userEmail) {
+    public CheckoutDto checkout(String userEmail) {
         Cart cart = getUserCart(userEmail);
         List<CartItem> cartItems = cart.getCartItems();
+        int cartItemsSize = cartItems.size();
 
-        if(cartItems.size() == 0){
+        if(cartItemsSize == 0){
             throw new ResourceNotFoundException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
@@ -128,7 +128,9 @@ public class CartServiceImpl implements CartService {
             );
         }
 
-        for(CartItem item : cartItems){
+        for(int i = 0; i < cartItemsSize; i++){
+            CartItem item = cartItems.get(0);
+
             Product product = productService.getProductById(item.getProductId());
             int itemQty = item.getQty();
             int productStock = product.getStock();
@@ -137,16 +139,21 @@ public class CartServiceImpl implements CartService {
                 outOfStockProducts.add(product.getName());
                 cartItems.remove(item);
             }else{
-                totPrice += item.getProductPrice();
+                totPrice += item.getProductPrice() * itemQty;
                 totItem++;
                 product.setStock(productStock - itemQty);
                 productService.updateProductById(product.getProductId(), product);
             }
 
             removeItemFromCart(userEmail, product.getProductId());
+            if(i == 0) {
+                System.out.println(item);
+            }else if(i == 1){
+                System.out.println(item);
+            }
         }
 
-        Order tempOrder = Order.builder()
+        Order order = Order.builder()
                               .usrEmail(userEmail)
                               .ordDate(ordDate)
                               .ordItems(cartItems)
@@ -155,12 +162,14 @@ public class CartServiceImpl implements CartService {
                               .ordStatus(Status.WAIT.getStatus())
                               .build();
 
-        orderService.createOrder(tempOrder);
+        orderService.createOrder(order);
 
-        OrderDto order = mapper.map(tempOrder, OrderDto.class);
-        order.setOutOfStockProducts(outOfStockProducts);
+        CheckoutDto checkoutDet = CheckoutDto.builder()
+                .order(order)
+                .outOfStockProducts(outOfStockProducts)
+                .build();
 
-        return order;
+        return checkoutDet;
     }
 
     @Override

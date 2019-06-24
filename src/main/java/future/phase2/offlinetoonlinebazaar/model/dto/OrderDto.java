@@ -18,6 +18,5 @@ public class OrderDto {
     private int totItem;
     private Long totPrice;
     private String ordStatus;
-    private List<String> outOfStockProducts;
 
 }

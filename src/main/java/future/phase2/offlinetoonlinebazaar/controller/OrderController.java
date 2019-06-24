@@ -5,10 +5,7 @@ import future.phase2.offlinetoonlinebazaar.model.dto.OrderDto;
 import future.phase2.offlinetoonlinebazaar.model.response.Response;
 import future.phase2.offlinetoonlinebazaar.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,8 +19,8 @@ public class OrderController extends GlobalController {
     @Autowired
     private BeanMapper mapper;
 
-    @GetMapping("/{usrEmail}")
-    public Response<List<OrderDto>> getUserOrder(@PathVariable String usrEmail){
+    @GetMapping
+    public Response<List<OrderDto>> getUserOrder(@RequestParam String usrEmail){
         return toResponse(mapper.mapAsList(orderService.getUserOrder(usrEmail), OrderDto.class));
     }
 
