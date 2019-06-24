@@ -15,14 +15,9 @@ public class Product {
     private String _id;
 
     private Long productId;
-
     private String name;
-
     private String description;
-
     private double listPrice;
-
     private double offerPrice;
-
     private int stock;
 }

@@ -1,6 +1,6 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
-import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
+import future.phase2.offlinetoonlinebazaar.exception.CustomException;
 import future.phase2.offlinetoonlinebazaar.exception.StockInsufficientException;
 import future.phase2.offlinetoonlinebazaar.generator.OrderIdGenerator;
 import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
@@ -54,7 +54,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart getUserCart(String userEmail) {
         if(!userService.checkUser(userEmail)){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
             );
@@ -66,7 +66,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart addItemToCart(String userEmail, Long productId, int qty) {
         if(!userService.checkUser(userEmail)){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
             );
@@ -84,7 +84,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart updateItemQty(String userEmail, Long productId, int qty) {
         if(!userService.checkUser(userEmail)){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                 ErrorCode.NOT_FOUND.getCode(),
                 ErrorCode.NOT_FOUND.getMessage()
             );
@@ -96,7 +96,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart removeItemFromCart(String userEmail, Long productId) {
         if(!userService.checkUser(userEmail)){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
             );
@@ -112,9 +112,9 @@ public class CartServiceImpl implements CartService {
         int cartItemsSize = cartItems.size();
 
         if(cartItemsSize == 0){
-            throw new ResourceNotFoundException(
-                    ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage()
+            throw new CustomException(
+                ErrorCode.NOT_FOUND.getCode(),
+                ErrorCode.NOT_FOUND.getMessage()
             );
         }
 
@@ -126,14 +126,15 @@ public class CartServiceImpl implements CartService {
         List<String> outOfStockProducts = new ArrayList<>();
 
         if(cartItems.size() <= 0){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                 ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
                 ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
             );
         }
 
+        int itemIdx = 0;
         for(int i = 0; i < cartItemsSize; i++){
-            CartItem item = cartItems.get(0);
+            CartItem item = cartItems.get(itemIdx);
 
             Product product = productService.getProductById(item.getProductId());
             int itemQty = item.getQty();
@@ -142,6 +143,7 @@ public class CartServiceImpl implements CartService {
             if(itemQty > productStock){
                 outOfStockProducts.add(product.getName());
                 cartItems.remove(item);
+                itemIdx--;
             }else{
                 totPrice += item.getProductPrice() * itemQty;
                 totItem++;
@@ -150,18 +152,14 @@ public class CartServiceImpl implements CartService {
             }
 
             removeItemFromCart(userEmail, product.getProductId());
-            if(i == 0) {
-                System.out.println(item);
-            }else if(i == 1){
-                System.out.println(item);
-            }
+            itemIdx++;
         }
 
         Order order = null;
         try {
             order = Order.builder()
                           .ordId(orderIdGenerator.generate(ordDate))
-                          .usrEmail(userEmail)
+                          .userEmail(userEmail)
                           .ordDate(ordDate)
                           .ordItems(cartItems)
                           .totItem(totItem)
@@ -169,7 +167,7 @@ public class CartServiceImpl implements CartService {
                           .ordStatus(Status.WAIT.getStatus())
                           .build();
         } catch (Exception e) {
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                 ErrorCode.NOT_FOUND.getCode(),
                 ErrorCode.NOT_FOUND.getMessage()
             );

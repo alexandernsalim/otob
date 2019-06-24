@@ -1,9 +1,9 @@
 package future.phase2.offlinetoonlinebazaar.exception;
 
-public class ResourceNotFoundException extends RuntimeException {
+public class CustomException extends RuntimeException {
     private String errorCode;
 
-    public ResourceNotFoundException(String errorCode, String message){
+    public CustomException(String errorCode, String message) {
         super(message);
         this.errorCode = errorCode;
     }
@@ -11,5 +11,4 @@ public class ResourceNotFoundException extends RuntimeException {
     public String getErrorCode() {
         return errorCode;
     }
-
 }

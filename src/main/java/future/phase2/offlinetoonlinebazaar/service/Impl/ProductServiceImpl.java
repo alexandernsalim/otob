@@ -1,6 +1,6 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
-import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
+import future.phase2.offlinetoonlinebazaar.exception.CustomException;
 import future.phase2.offlinetoonlinebazaar.generator.IdGenerator;
 import future.phase2.offlinetoonlinebazaar.model.entity.Product;
 import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
 
             return _product;
         }catch(Exception e){
-            throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
     }
 
@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
                     product.setProductId(idGenerator.getNextId("productid"));
                     productRepository.save(product);
                 } catch (Exception e) {
-                    throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+                    throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
                 }
             }
             productList.add(product);
@@ -57,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = productRepository.findAll();
 
         if (products.isEmpty()){
-            throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
         return products;
     }
@@ -67,14 +67,14 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByProductId(productId);
 
         if (product == null){
-            throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
         return product;
     }
 
     public List<Product> getAllProductByName(String name){
         if(!productRepository.existsByNameContaining(name)){
-            throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
         return productRepository.findAllByNameContaining(name);
     }
@@ -83,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByProductId(productId);
 
         if(product == null){
-            throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }else{
             product.setName(_product.getName());
             product.setDescription(_product.getDescription());
@@ -101,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByProductId(productId);
 
         if (product == null){
-            throw new ResourceNotFoundException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
         productRepository.deleteByProductId(productId);
 

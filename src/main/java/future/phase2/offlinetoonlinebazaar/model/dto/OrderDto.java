@@ -13,7 +13,7 @@ import java.util.List;
 public class OrderDto {
 
     private String ordId;
-    private String usrEmail;
+    private String userEmail;
     private String ordDate;
     private List<CartItem> ordItems;
     private int totItem;
