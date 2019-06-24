@@ -66,7 +66,7 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
         if(cart != null){
             int currQty = getExistingItemQty(cart, productId);
 
-            checkStock(currQty + qty, product.getStock());
+            checkStock(qty, product.getStock());
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(productId));
             update.set("cartItems.$.qty", qty);
 
