@@ -19,7 +19,7 @@ public class Order {
     @Id
     private String id;
 
-    private Long ordId;
+    private String ordId;
     private String usrEmail;
     private String ordDate;
     private List<CartItem> ordItems;
