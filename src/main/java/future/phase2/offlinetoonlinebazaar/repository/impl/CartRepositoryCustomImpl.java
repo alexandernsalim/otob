@@ -2,7 +2,6 @@ package future.phase2.offlinetoonlinebazaar.repository.impl;
 
 import com.mongodb.BasicDBObject;
 import future.phase2.offlinetoonlinebazaar.exception.CustomException;
-import future.phase2.offlinetoonlinebazaar.exception.StockInsufficientException;
 import future.phase2.offlinetoonlinebazaar.model.entity.Cart;
 import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import future.phase2.offlinetoonlinebazaar.model.entity.Product;
@@ -69,8 +68,8 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
         }else{
             throw new CustomException(
-                    ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage()
+                ErrorCode.NOT_FOUND.getCode(),
+                ErrorCode.NOT_FOUND.getMessage()
             );
         }
     }
@@ -91,8 +90,8 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
         }else{
             throw new CustomException(
-                    ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage()
+                ErrorCode.NOT_FOUND.getCode(),
+                ErrorCode.NOT_FOUND.getMessage()
             );
         }
     }
@@ -121,7 +120,7 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
     private void checkStock(int qty, int stock){
         if(qty > stock){
-            throw new StockInsufficientException(
+            throw new CustomException(
                 ErrorCode.STOCK_INSUFFICIENT.getCode(),
                 ErrorCode.STOCK_INSUFFICIENT.getMessage()
             );

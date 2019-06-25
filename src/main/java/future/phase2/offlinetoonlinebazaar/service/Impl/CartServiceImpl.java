@@ -1,7 +1,6 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
 import future.phase2.offlinetoonlinebazaar.exception.CustomException;
-import future.phase2.offlinetoonlinebazaar.exception.StockInsufficientException;
 import future.phase2.offlinetoonlinebazaar.generator.IdGenerator;
 import future.phase2.offlinetoonlinebazaar.model.dto.CheckoutDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Cart;
@@ -179,7 +178,7 @@ public class CartServiceImpl implements CartService {
     //Private Method
     private void checkStock(int qty, int stock){
         if(qty > stock){
-            throw new StockInsufficientException(
+            throw new CustomException(
                 ErrorCode.STOCK_INSUFFICIENT.getCode(),
                 ErrorCode.STOCK_INSUFFICIENT.getMessage()
             );
