@@ -76,7 +76,7 @@ import java.util.List;
 
     @Override
     public Boolean removeUser(String email) {
-        return (userRepository.deleteByEmail(email) && cartService.removeUserCart(email)) ? Boolean.TRUE : Boolean.FALSE;
+        return (userRepository.deleteByEmail(email) == 1 && cartService.removeUserCart(email)) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     @Override

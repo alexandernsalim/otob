@@ -1,23 +1,16 @@
-package future.phase2.offlinetoonlinebazaar.model.entity;
+package future.phase2.offlinetoonlinebazaar.model.dto;
 
+import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "order")
-public class Order {
-
-    @Id
-    private String id;
+@NoArgsConstructor
+public class OrderDto {
 
     private String ordId;
     private String userEmail;

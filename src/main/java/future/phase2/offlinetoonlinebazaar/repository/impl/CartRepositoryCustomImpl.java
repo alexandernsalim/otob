@@ -1,7 +1,7 @@
 package future.phase2.offlinetoonlinebazaar.repository.impl;
 
 import com.mongodb.BasicDBObject;
-import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
+import future.phase2.offlinetoonlinebazaar.exception.CustomException;
 import future.phase2.offlinetoonlinebazaar.exception.StockInsufficientException;
 import future.phase2.offlinetoonlinebazaar.model.entity.Cart;
 import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
@@ -10,18 +10,14 @@ import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
 import future.phase2.offlinetoonlinebazaar.repository.CartRepositoryCustom;
 import future.phase2.offlinetoonlinebazaar.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Qualifier
-@Repository
 public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
     @Autowired
@@ -66,15 +62,13 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
         Product product = productService.getProductById(productId);
 
         if(cart != null){
-            int currQty = getExistingItemQty(cart, productId);
-
             checkStock(qty, product.getStock());
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(productId));
-            update.inc("cartItems.$.qty", qty);
+            update.set("cartItems.$.qty", qty);
 
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
         }else{
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
             );
@@ -96,7 +90,7 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
         }else{
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
             );

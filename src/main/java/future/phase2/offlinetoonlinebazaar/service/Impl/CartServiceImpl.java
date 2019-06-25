@@ -1,8 +1,10 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
-import com.mongodb.*;
-import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
+import future.phase2.offlinetoonlinebazaar.exception.CustomException;
 import future.phase2.offlinetoonlinebazaar.exception.StockInsufficientException;
+import future.phase2.offlinetoonlinebazaar.generator.OrderIdGenerator;
+import future.phase2.offlinetoonlinebazaar.mapper.BeanMapper;
+import future.phase2.offlinetoonlinebazaar.model.dto.CheckoutDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Cart;
 import future.phase2.offlinetoonlinebazaar.model.entity.CartItem;
 import future.phase2.offlinetoonlinebazaar.model.entity.Order;
@@ -10,13 +12,11 @@ import future.phase2.offlinetoonlinebazaar.model.entity.Product;
 import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
 import future.phase2.offlinetoonlinebazaar.model.enumerator.Status;
 import future.phase2.offlinetoonlinebazaar.repository.CartRepository;
-import future.phase2.offlinetoonlinebazaar.repository.CartRepositoryCustom;
 import future.phase2.offlinetoonlinebazaar.service.CartService;
 import future.phase2.offlinetoonlinebazaar.service.OrderService;
 import future.phase2.offlinetoonlinebazaar.service.ProductService;
 import future.phase2.offlinetoonlinebazaar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
@@ -29,10 +29,6 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private CartRepository cartRepository;
 
-    @Qualifier
-    @Autowired
-    private CartRepositoryCustom cartRepositoryCustom;
-
     @Autowired
     private ProductService productService;
 
@@ -41,6 +37,12 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private OrderIdGenerator orderIdGenerator;
+
+    @Autowired
+    private BeanMapper mapper;
 
     @Override
     public Cart createUserCart(String userEmail){
@@ -52,7 +54,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart getUserCart(String userEmail) {
         if(!userService.checkUser(userEmail)){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
             );
@@ -64,7 +66,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart addItemToCart(String userEmail, Long productId, int qty) {
         if(!userService.checkUser(userEmail)){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
             );
@@ -76,37 +78,45 @@ public class CartServiceImpl implements CartService {
 
         this.checkStock(qty, product.getStock());
 
-        return cartRepositoryCustom.addToCart(userEmail, qty, productId);
+        return cartRepository.addToCart(userEmail, qty, productId);
     }
 
     @Override
     public Cart updateItemQty(String userEmail, Long productId, int qty) {
         if(!userService.checkUser(userEmail)){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                 ErrorCode.NOT_FOUND.getCode(),
                 ErrorCode.NOT_FOUND.getMessage()
             );
         }
 
-        return cartRepositoryCustom.updateQty(userEmail, qty, productId);
+        return cartRepository.updateQty(userEmail, qty, productId);
     }
 
     @Override
     public Cart removeItemFromCart(String userEmail, Long productId) {
         if(!userService.checkUser(userEmail)){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                     ErrorCode.NOT_FOUND.getCode(),
                     ErrorCode.NOT_FOUND.getMessage()
             );
         }
 
-        return cartRepositoryCustom.removeFromCart(userEmail, productId);
+        return cartRepository.removeFromCart(userEmail, productId);
     }
 
     @Override
-    public Order checkout(String userEmail) {
+    public CheckoutDto checkout(String userEmail) {
         Cart cart = getUserCart(userEmail);
         List<CartItem> cartItems = cart.getCartItems();
+        int cartItemsSize = cartItems.size();
+
+        if(cartItemsSize == 0){
+            throw new CustomException(
+                ErrorCode.NOT_FOUND.getCode(),
+                ErrorCode.NOT_FOUND.getMessage()
+            );
+        }
 
         int totItem = 0;
         long totPrice = 0;
@@ -115,38 +125,67 @@ public class CartServiceImpl implements CartService {
 
         List<String> outOfStockProducts = new ArrayList<>();
 
-        for(CartItem item : cartItems){
+        if(cartItems.size() <= 0){
+            throw new CustomException(
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+            );
+        }
+
+        int itemIdx = 0;
+        for(int i = 0; i < cartItemsSize; i++){
+            CartItem item = cartItems.get(itemIdx);
+
             Product product = productService.getProductById(item.getProductId());
             int itemQty = item.getQty();
             int productStock = product.getStock();
 
             if(itemQty > productStock){
                 outOfStockProducts.add(product.getName());
-                removeItemFromCart(userEmail, product.getProductId());
                 cartItems.remove(item);
+                itemIdx--;
             }else{
-                totPrice += item.getProductPrice();
+                totPrice += item.getProductPrice() * itemQty;
                 totItem++;
                 product.setStock(productStock - itemQty);
                 productService.updateProductById(product.getProductId(), product);
             }
+
+            removeItemFromCart(userEmail, product.getProductId());
+            itemIdx++;
         }
 
-        Order newOrder = Order.builder()
-                              .usrEmail(userEmail)
-                              .ordDate(ordDate)
-                              .ordItems(cartItems)
-                              .totItem(totItem)
-                              .totPrice(totPrice)
-                              .ordStatus(Status.WAIT.getStatus())
-                              .build();
+        Order order = null;
+        try {
+            order = Order.builder()
+                          .ordId(orderIdGenerator.generate(ordDate))
+                          .userEmail(userEmail)
+                          .ordDate(ordDate)
+                          .ordItems(cartItems)
+                          .totItem(totItem)
+                          .totPrice(totPrice)
+                          .ordStatus(Status.WAIT.getStatus())
+                          .build();
+        } catch (Exception e) {
+            throw new CustomException(
+                ErrorCode.NOT_FOUND.getCode(),
+                ErrorCode.NOT_FOUND.getMessage()
+            );
+        }
 
-        return orderService.createOrder(newOrder);
+        orderService.createOrder(order);
+
+        CheckoutDto checkoutDet = CheckoutDto.builder()
+                .order(order)
+                .outOfStockProducts(outOfStockProducts)
+                .build();
+
+        return checkoutDet;
     }
 
     @Override
-    public boolean removeUserCart(String userEmail) {
-        return cartRepository.deleteByUserEmail(userEmail);
+    public Boolean removeUserCart(String userEmail) {
+        return (cartRepository.deleteByUserEmail(userEmail) == 1) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     //Private Method
@@ -159,7 +198,7 @@ public class CartServiceImpl implements CartService {
         }
     }
 
-    private boolean checkUserCartExistence(String userEmail){
+    private Boolean checkUserCartExistence(String userEmail){
         return cartRepository.existsByUserEmail(userEmail);
     }
 

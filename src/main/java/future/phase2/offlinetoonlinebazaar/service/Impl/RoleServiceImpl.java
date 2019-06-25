@@ -1,6 +1,6 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
-import future.phase2.offlinetoonlinebazaar.exception.ResourceNotFoundException;
+import future.phase2.offlinetoonlinebazaar.exception.CustomException;
 import future.phase2.offlinetoonlinebazaar.generator.IdGenerator;
 import future.phase2.offlinetoonlinebazaar.model.dto.RoleDto;
 import future.phase2.offlinetoonlinebazaar.model.entity.Role;
@@ -34,7 +34,7 @@ public class RoleServiceImpl implements RoleService {
 
             return roleRepository.save(role);
         }catch(Exception e){
-            throw new ResourceNotFoundException(
+            throw new CustomException(
                 ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
                 ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
             );

@@ -34,8 +34,8 @@ public class GlobalExceptionHandler {
 //                .build();
 //    }
 
-    @ExceptionHandler(value = ResourceNotFoundException.class)
-    public Response resourceNotFoundException(ResourceNotFoundException ex){
+    @ExceptionHandler(value = CustomException.class)
+    public Response customException(CustomException ex){
         return Response.builder()
                 .code(ex.getErrorCode())
                 .message(ex.getMessage())
