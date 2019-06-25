@@ -41,8 +41,8 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getUserAllOrder(String userEmail) {
         if(!userService.checkUser(userEmail)){
             throw new CustomException(
-                    ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage()
+                ErrorCode.USER_NOT_FOUND.getCode(),
+                ErrorCode.USER_NOT_FOUND.getMessage()
             );
         }
 
@@ -53,8 +53,8 @@ public class OrderServiceImpl implements OrderService {
     public Order acceptOrder(String ordId) {
         if(!orderRepository.existsByOrdId(ordId)){
             throw new CustomException(
-                ErrorCode.NOT_FOUND.getCode(),
-                ErrorCode.NOT_FOUND.getMessage()
+                ErrorCode.ORDER_NOT_FOUND.getCode(),
+                ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
@@ -68,8 +68,8 @@ public class OrderServiceImpl implements OrderService {
     public Order rejectOrder(String ordId) {
         if(!orderRepository.existsByOrdId(ordId)){
             throw new CustomException(
-                    ErrorCode.NOT_FOUND.getCode(),
-                    ErrorCode.NOT_FOUND.getMessage()
+                ErrorCode.ORDER_NOT_FOUND.getCode(),
+                ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 

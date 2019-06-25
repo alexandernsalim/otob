@@ -22,21 +22,26 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(Product _product) {
-        try {
-            _product.setProductId(idGenerator.getNextId("productid"));
-            productRepository.save(_product);
- 
-            return _product;
-        }catch(Exception e){
-            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+        if(productRepository.existsByName(_product.getName())){
+            return productRepository.save(_product);
+        }else{
+            try{
+                _product.setProductId(idGenerator.getNextId("productid"));
+
+                return productRepository.save(_product);
+            }catch(Exception e){
+                throw new CustomException(
+                    ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                    ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+                );
+            }
         }
     }
 
-
-    public List<Product> bacthUpload(List<Product> _product) {
+    public List<Product> batchUpload(List<Product> _product) {
         List<Product> productList = new ArrayList<>();
 
-        for (Product product: _product) {
+        for (Product product : _product) {
             if(productRepository.existsByName(product.getName())){
                 updateProductByName(product);
             }else {
@@ -44,11 +49,16 @@ public class ProductServiceImpl implements ProductService {
                     product.setProductId(idGenerator.getNextId("productid"));
                     productRepository.save(product);
                 } catch (Exception e) {
-                    throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+                    throw new CustomException(
+                        ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                        ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+                    );
                 }
             }
+
             productList.add(product);
         }
+
         return productList;
     }
 
@@ -57,8 +67,12 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = productRepository.findAll();
 
         if (products.isEmpty()){
-            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(
+                ErrorCode.PRODUCT_NOT_FOUND.getCode(),
+                ErrorCode.PRODUCT_NOT_FOUND.getMessage()
+            );
         }
+
         return products;
     }
 
@@ -67,15 +81,23 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByProductId(productId);
 
         if (product == null){
-            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(
+                ErrorCode.PRODUCT_NOT_FOUND.getCode(),
+                ErrorCode.PRODUCT_NOT_FOUND.getMessage()
+            );
         }
+
         return product;
     }
 
     public List<Product> getAllProductByName(String name){
         if(!productRepository.existsByNameContaining(name)){
-            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
+            throw new CustomException(
+                ErrorCode.PRODUCT_NOT_FOUND.getCode(),
+                ErrorCode.PRODUCT_NOT_FOUND.getMessage()
+            );
         }
+
         return productRepository.findAllByNameContaining(name);
     }
 
@@ -83,43 +105,52 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByProductId(productId);
 
         if(product == null){
-            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
-        }else{
-            product.setName(_product.getName());
-            product.setDescription(_product.getDescription());
-            product.setListPrice(_product.getListPrice());
-            product.setOfferPrice(_product.getOfferPrice());
-            product.setStock(_product.getStock());
-
-            productRepository.save(product);
+            throw new CustomException(
+                ErrorCode.BAD_REQUEST.getCode(),
+                ErrorCode.BAD_REQUEST.getMessage()
+            );
         }
 
-        return product;
-    }
+        product.setName(_product.getName());
+        product.setDescription(_product.getDescription());
+        product.setListPrice(_product.getListPrice());
+        product.setOfferPrice(_product.getOfferPrice());
+        product.setStock(_product.getStock());
 
-    public boolean deleteProductById(Long productId) {
-        Product product = productRepository.findByProductId(productId);
-
-        if (product == null){
-            throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
-        }
-
-        productRepository.delete(product);
- 
-        return true;
+        return productRepository.save(product);
     }
 
     public Product updateProductByName(Product _product) {
         Product product = productRepository.findByName(_product.getName());
+
+        if(product == null){
+            throw new CustomException(
+                ErrorCode.BAD_REQUEST.getCode(),
+                ErrorCode.BAD_REQUEST.getMessage()
+            );
+        }
 
         product.setDescription(_product.getDescription());
         product.setListPrice(_product.getListPrice());
         product.setOfferPrice(_product.getOfferPrice());
         product.setStock(_product.getStock());
 
-        productRepository.save(product);
+        return productRepository.save(product);
+    }
 
-        return product;
+    public boolean deleteProductById(Long productId) {
+        Product product = productRepository.findByProductId(productId);
+
+        if (product == null){
+            throw new CustomException(
+                ErrorCode.BAD_REQUEST.getCode(),
+                ErrorCode.BAD_REQUEST.getMessage()
+            );
+        }
+
+        productRepository.delete(product);
+ 
+        return true;
     }
 
 }

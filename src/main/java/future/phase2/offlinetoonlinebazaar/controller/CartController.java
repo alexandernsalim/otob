@@ -30,11 +30,6 @@ public class CartController extends GlobalController{
         return toResponse(mapper.map(cartService.getUserCart(principal.getName()), CartDto.class));
     }
 
-    @GetMapping("/checkout")
-    public Response<CheckoutDto> checkout(Principal principal){
-        return toResponse(cartService.checkout(principal.getName()));
-    }
-
     @PostMapping("/add/{productId}/{qty}")
     public Response<Cart> addItemToCart(Principal principal,
                                         @PathVariable Long productId,
@@ -55,39 +50,9 @@ public class CartController extends GlobalController{
         return toResponse(mapper.map(cartService.removeItemFromCart(principal.getName(), productId), CartDto.class));
     }
 
-    @DeleteMapping(value="/remove/user/{userEmail}", produces={MediaType.APPLICATION_JSON_VALUE})
-    public Response<Boolean> removeUserCart(@PathVariable String userEmail){
-        return toResponse(cartService.removeUserCart(userEmail));
-    }
-
-    @GetMapping("/{userEmail}")
-    public Response<List<Cart>> getCartItems(@PathVariable @Valid String userEmail){
-        return toResponse(mapper.map(cartService.getUserCart(userEmail), CartDto.class));
-    }
-
-    @PostMapping("/{userEmail}/add/{productId}/{qty}")
-    public Response<Cart> addItemToCart(@PathVariable String userEmail,
-                                        @PathVariable Long productId,
-                                        @PathVariable int qty){
-        return toResponse(mapper.map(cartService.addItemToCart(userEmail, productId, qty), CartDto.class));
-    }
-
-    @PutMapping("/{userEmail}/update/{productId}/{qty}")
-    public Response<Cart> updateItemQty (@PathVariable String userEmail,
-                                         @PathVariable Long productId,
-                                         @PathVariable int qty) {
-        return toResponse(mapper.map(cartService.updateItemQty(userEmail, productId, qty), CartDto.class));
-    }
-
-    @DeleteMapping("/{userEmail}/remove/{productId}")
-    public Response<Cart> removeItemFromCart(@PathVariable String userEmail,
-                                             @PathVariable Long productId){
-        return toResponse(mapper.map(cartService.removeItemFromCart(userEmail, productId), CartDto.class));
-    }
-
-    @GetMapping("/{userEmail}/checkout")
-    public Response<OrderDto> checkout(@PathVariable String userEmail){
-        return toResponse(cartService.checkout(userEmail));
+    @GetMapping("/checkout")
+    public Response<CheckoutDto> checkout(Principal principal){
+        return toResponse(cartService.checkout(principal.getName()));
     }
 
 }

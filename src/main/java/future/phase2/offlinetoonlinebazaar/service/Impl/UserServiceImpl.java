@@ -22,7 +22,6 @@ import java.util.List;
     @Autowired
     private UserRepository userRepository;
 
-
     @Autowired
     private RoleService roleService;
 
@@ -47,8 +46,8 @@ import java.util.List;
     public User registerNewUser(User userRequest, String role){
         if(userRepository.existsByEmail(userRequest.getEmail())){
             throw new EmailExistsException(
-                    ErrorCode.EMAIL_EXISTS.getCode(),
-                    ErrorCode.EMAIL_EXISTS.getMessage()
+                ErrorCode.EMAIL_EXISTS.getCode(),
+                ErrorCode.EMAIL_EXISTS.getMessage()
             );
         }
 

@@ -7,7 +7,7 @@ import java.util.List;
 public interface ProductService {
     Product createProduct(Product product);
 
-    List<Product> bacthUpload(List<Product> product);
+    List<Product> batchUpload(List<Product> product);
 
     List<Product> getAllProduct();
 

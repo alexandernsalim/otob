@@ -61,7 +61,7 @@ public class ProductController extends GlobalController {
             productList.add(product);
         }
 
-        List<Product> productListResult = productService.bacthUpload(productList);
+        List<Product> productListResult = productService.batchUpload(productList);
 
         return toResponse(mapper.mapAsList(productListResult, ProductDto.class));
     }
