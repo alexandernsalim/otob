@@ -47,7 +47,7 @@ public class ProductController extends GlobalController {
         XSSFWorkbook workbook = new XSSFWorkbook(dataFile.getInputStream());
         XSSFSheet worksheet = workbook.getSheetAt(0);
 
-        for(int i=1;i<worksheet.getPhysicalNumberOfRows() ;i++) {
+        for(int i=2;i<worksheet.getPhysicalNumberOfRows() ;i++) {
             XSSFRow row = worksheet.getRow(i);
 
             Product product = new Product();

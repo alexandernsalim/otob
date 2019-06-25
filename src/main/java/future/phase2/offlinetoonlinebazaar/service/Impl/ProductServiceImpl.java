@@ -25,7 +25,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             _product.setProductId(idGenerator.getNextId("productid"));
             productRepository.save(_product);
-
+ 
             return _product;
         }catch(Exception e){
             throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
@@ -103,8 +103,9 @@ public class ProductServiceImpl implements ProductService {
         if (product == null){
             throw new CustomException(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMessage());
         }
-        productRepository.deleteByProductId(productId);
 
+        productRepository.delete(product);
+ 
         return true;
     }
 
