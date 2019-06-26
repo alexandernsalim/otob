@@ -1,6 +1,6 @@
 package future.phase2.offlinetoonlinebazaar.service.Impl;
 
-import future.phase2.offlinetoonlinebazaar.exception.EmailExistsException;
+import future.phase2.offlinetoonlinebazaar.exception.CustomException;
 import future.phase2.offlinetoonlinebazaar.generator.RandomPasswordGenerator;
 import future.phase2.offlinetoonlinebazaar.model.entity.User;
 import future.phase2.offlinetoonlinebazaar.model.enumerator.ErrorCode;
@@ -45,7 +45,7 @@ import java.util.List;
     @Override
     public User registerNewUser(User userRequest, String role){
         if(userRepository.existsByEmail(userRequest.getEmail())){
-            throw new EmailExistsException(
+            throw new CustomException(
                 ErrorCode.EMAIL_EXISTS.getCode(),
                 ErrorCode.EMAIL_EXISTS.getMessage()
             );
