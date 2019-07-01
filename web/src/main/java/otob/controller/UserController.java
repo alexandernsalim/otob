@@ -6,7 +6,7 @@ import otob.dto.UserDto;
 import otob.entity.User;
 import otob.mapper.BeanMapper;
 import otob.response.Response;
-import otob.service.UserService;
+import otob.service.impl.UserService;
 
 import javax.validation.Valid;
 import java.util.List;

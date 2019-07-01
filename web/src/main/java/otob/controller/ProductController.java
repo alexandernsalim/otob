@@ -12,7 +12,7 @@ import otob.dto.ProductDto;
 import otob.entity.Product;
 import otob.mapper.BeanMapper;
 import otob.response.Response;
-import otob.service.ProductService;
+import otob.service.impl.ProductService;
 
 import javax.validation.Valid;
 import java.io.IOException;
