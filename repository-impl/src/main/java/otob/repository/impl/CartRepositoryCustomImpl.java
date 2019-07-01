@@ -13,7 +13,6 @@ import otob.entity.Product;
 import otob.enumerator.ErrorCode;
 import otob.exception.CustomException;
 import otob.repository.CartRepositoryCustom;
-import otob.service.impl.ProductService;
 
 import java.util.List;
 
@@ -22,30 +21,28 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    @Autowired
-    private ProductService productService;
-
     @Override
-    public Cart addToCart(String email, int qty, Long productId) {
+    public Cart addToCart(String email, int qty, Product product) {
         Query query = new Query();
         Update update = new Update();
 
-        Cart cart = checkItemExistsInCart(email, productId);
-        Product product = productService.getProductById(productId);
+        Cart cart = checkItemExistsInCart(email, product.getProductId());
 
         if(cart == null){
+            checkStock(qty, product.getStock());
+
             query.addCriteria(Criteria.where("userEmail").is(email));
             update.push("cartItems", new BasicDBObject()
-                .append("productId", productId)
+                .append("productId", product.getProductId())
                 .append("productName", product.getName())
                 .append("productPrice", product.getOfferPrice())
                 .append("qty", qty)
             );
         }else{
-            int currQty = getExistingItemQty(cart, productId);
+            int currQty = getExistingItemQty(cart, product.getProductId());
 
-            this.checkStock(currQty + qty, product.getStock());
-            query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(productId));
+            checkStock(currQty + qty, product.getStock());
+            query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(product.getProductId()));
             update.inc("cartItems.$.qty", qty);
         }
 
@@ -53,16 +50,15 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
     }
 
     @Override
-    public Cart updateQty(String email, int qty, Long productId) {
+    public Cart updateQty(String email, int qty, Product product) {
         Query query = new Query();
         Update update = new Update();
 
-        Cart cart = checkItemExistsInCart(email, productId);
-        Product product = productService.getProductById(productId);
+        Cart cart = checkItemExistsInCart(email, product.getProductId());
 
         if(cart != null){
             checkStock(qty, product.getStock());
-            query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(productId));
+            query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(product.getProductId()));
             update.set("cartItems.$.qty", qty);
 
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);

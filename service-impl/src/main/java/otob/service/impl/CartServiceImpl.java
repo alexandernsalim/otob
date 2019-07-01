@@ -67,9 +67,7 @@ public class CartServiceImpl implements CartService {
 
         Product product = productService.getProductById(productId);
 
-        this.checkStock(qty, product.getStock());
-
-        return cartRepository.addToCart(userEmail, qty, productId);
+        return cartRepository.addToCart(userEmail, qty, product);
     }
 
     @Override
@@ -81,7 +79,9 @@ public class CartServiceImpl implements CartService {
             );
         }
 
-        return cartRepository.updateQty(userEmail, qty, productId);
+        Product product = productService.getProductById(productId);
+
+        return cartRepository.updateQty(userEmail, qty, product);
     }
 
     @Override
@@ -172,15 +172,6 @@ public class CartServiceImpl implements CartService {
     }
 
     //Private Method
-    private void checkStock(int qty, int stock){
-        if(qty > stock){
-            throw new CustomException(
-                ErrorCode.STOCK_INSUFFICIENT.getCode(),
-                ErrorCode.STOCK_INSUFFICIENT.getMessage()
-            );
-        }
-    }
-
     private Boolean checkUserCartExistence(String userEmail){
         return cartRepository.existsByUserEmail(userEmail);
     }
