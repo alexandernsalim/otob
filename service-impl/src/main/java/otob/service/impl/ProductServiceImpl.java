@@ -7,6 +7,7 @@ import otob.enumerator.ErrorCode;
 import otob.exception.CustomException;
 import otob.generator.IdGenerator;
 import otob.repository.ProductRepository;
+import otob.service.api.ProductService;
 
 import java.util.ArrayList;
 import java.util.List;

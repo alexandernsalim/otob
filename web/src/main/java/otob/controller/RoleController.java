@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import otob.dto.RoleDto;
 import otob.mapper.BeanMapper;
 import otob.response.Response;
-import otob.service.impl.RoleService;
+import otob.service.api.RoleService;
 
 @RestController
 @RequestMapping("/api/roles")
