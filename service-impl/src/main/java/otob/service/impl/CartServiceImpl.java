@@ -157,7 +157,7 @@ public class CartServiceImpl implements CartService {
                 .ordItems(cartItems)
                 .totItem(totItem)
                 .totPrice(totPrice)
-                .ordStatus(Status.WAIT.getStatus())
+                .ordStatus(Status.ORD_WAIT.getStatus())
                 .build();
 
         orderService.createOrder(order);

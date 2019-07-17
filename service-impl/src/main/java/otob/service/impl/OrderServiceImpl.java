@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = orderRepository.findByOrdId(ordId);
-        order.setOrdStatus(Status.ACCEPT.getStatus());
+        order.setOrdStatus(Status.ORD_ACCEPT.getStatus());
 
         return orderRepository.save(order);
     }
@@ -82,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
             );
         }
 
-        order.setOrdStatus(Status.REJECT.getStatus());
+        order.setOrdStatus(Status.ORD_REJECT.getStatus());
 
         List<CartItem> ordItems = order.getOrdItems();
 

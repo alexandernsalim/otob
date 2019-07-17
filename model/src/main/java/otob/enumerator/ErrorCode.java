@@ -1,6 +1,7 @@
 package otob.enumerator;
 
 public enum ErrorCode {
+    UNAUTHORIZED("403", "Forbidden"),
     NOT_FOUND("404", "Not Found"),
     BAD_REQUEST("400", "Bad Request"),
     INTERNAL_SERVER_ERROR("500", "Internal Server Error"),

@@ -1,9 +1,11 @@
 package otob.enumerator;
 
 public enum Status {
-    WAIT("Waiting"),
-    ACCEPT("Accepted"),
-    REJECT("Rejected");
+    ORD_WAIT("Waiting"),
+    ORD_ACCEPT("Accepted"),
+    ORD_REJECT("Rejected"),
+    LOGIN_TRUE("true"),
+    LOGIN_FALSE("false");
 
     private String status;
 

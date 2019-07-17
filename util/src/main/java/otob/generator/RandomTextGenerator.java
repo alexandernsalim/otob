@@ -1,5 +1,6 @@
 package otob.generator;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
@@ -7,9 +8,13 @@ import org.passay.PasswordGenerator;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RandomPasswordGenerator {
+public class RandomTextGenerator {
     public static final String ALLOWED_SPECIAL_CHARS = "!@#$%^&*()_+";
     public static final String ERROR_CODE = "ERRONEOUS_SPECIAL_CHARS";
+
+    public String generateRandomUserId() {
+        return RandomStringUtils.randomAlphabetic(10);
+    }
 
     public String generateRandomPassword() {
         PasswordGenerator gen = new PasswordGenerator();
