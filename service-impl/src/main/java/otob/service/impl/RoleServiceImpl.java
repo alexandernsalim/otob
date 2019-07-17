@@ -8,6 +8,7 @@ import otob.enumerator.ErrorCode;
 import otob.exception.CustomException;
 import otob.generator.IdGenerator;
 import otob.repository.RoleRepository;
+import otob.service.api.RoleService;
 
 @Service
 public class RoleServiceImpl implements RoleService {

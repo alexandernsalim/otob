@@ -19,12 +19,6 @@
         </dependency>
         <dependency>
             <groupId>future.phase2</groupId>
-            <artifactId>repository</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>future.phase2</groupId>
             <artifactId>repository-impl</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>

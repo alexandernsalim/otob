@@ -1,4 +1,4 @@
-package otob.service.impl;
+package otob.service.api;
 
 import otob.entity.Product;
 

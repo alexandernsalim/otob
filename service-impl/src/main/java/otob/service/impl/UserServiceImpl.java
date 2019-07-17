@@ -8,6 +8,10 @@ import otob.enumerator.ErrorCode;
 import otob.exception.CustomException;
 import otob.generator.RandomPasswordGenerator;
 import otob.repository.UserRepository;
+import otob.service.api.CartService;
+import otob.service.api.EmailService;
+import otob.service.api.RoleService;
+import otob.service.api.UserService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +40,11 @@ import java.util.List;
     @Override
     public List<User> getAllUser() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
