@@ -2,10 +2,15 @@ package otob.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import otob.dto.AuthDto;
+import otob.entity.User;
+import otob.enumerator.ErrorCode;
 import otob.enumerator.Status;
+import otob.exception.CustomException;
 import otob.generator.RandomTextGenerator;
 import otob.response.Response;
 import otob.service.api.AuthService;
+import otob.service.api.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,6 +23,9 @@ public class AuthController extends GlobalController {
     private AuthService authService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private RandomTextGenerator textGenerator;
 
     private HttpSession session;
@@ -28,7 +36,8 @@ public class AuthController extends GlobalController {
         @RequestParam("email") String email,
         @RequestParam("password") String password){
 
-        String response;
+        AuthDto response;
+        User user = userService.getUserByEmail(email);
         session = request.getSession();
 
         if(!isAuthorized(request)){
@@ -36,12 +45,23 @@ public class AuthController extends GlobalController {
                 session.setAttribute("userId", email);
                 session.setAttribute("isLogin", Status.LOGIN_TRUE.getStatus());
 
-                response = "Login Success";
+                response = AuthDto.builder()
+                        .userId(email)
+                        .role(user.getRoles().get(0).getName())
+                        .isLogin(true)
+                        .build();
             }else{
-                response = "Login Failed";
+                response = AuthDto.builder()
+                        .userId(session.getAttribute("userId").toString())
+                        .role("ROLE_GUEST")
+                        .isLogin(false)
+                        .build();
             }
         }else{
-            response = "Already Logged In";
+            throw new CustomException(
+                ErrorCode.LOGGED_IN.getCode(),
+                ErrorCode.LOGGED_IN.getMessage()
+            );
         }
 
         return toResponse(response);
