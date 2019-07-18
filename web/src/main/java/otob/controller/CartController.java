@@ -14,7 +14,6 @@ import otob.service.api.CartService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -29,7 +28,7 @@ public class CartController extends GlobalController {
 
     @GetMapping
     public Response<List<CartItem>> getCartItems(HttpServletRequest request) {
-        if (!isAuthorized(request)) {
+        if (!isAuthenticated(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
@@ -48,7 +47,7 @@ public class CartController extends GlobalController {
     public Response<Cart> addItemToCart(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        if (!isAuthorized(request)) {
+        if (!isAuthenticated(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
@@ -67,7 +66,7 @@ public class CartController extends GlobalController {
     public Response<Cart> updateItemQty(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        if (!isAuthorized(request)) {
+        if (!isAuthenticated(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
@@ -85,7 +84,7 @@ public class CartController extends GlobalController {
     @DeleteMapping("/remove/{productId}")
     public Response<Cart> removeItemFromCart(HttpServletRequest request,
                                              @PathVariable Long productId) {
-        if (!isAuthorized(request)) {
+        if (!isAuthenticated(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
@@ -102,7 +101,7 @@ public class CartController extends GlobalController {
 
     @GetMapping("/checkout")
     public Response<CheckoutDto> checkout(HttpServletRequest request) {
-        if (!isAuthorized(request)) {
+        if (!isAuthenticated(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
