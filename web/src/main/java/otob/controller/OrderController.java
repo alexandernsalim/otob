@@ -2,6 +2,7 @@ package otob.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import otob.constant.OrderApiPath;
 import otob.dto.OrderDto;
 import otob.enumerator.ErrorCode;
 import otob.exception.CustomException;
@@ -14,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping(OrderApiPath.BASE_PATH)
 public class OrderController extends GlobalController {
 
     @Autowired
@@ -23,9 +24,9 @@ public class OrderController extends GlobalController {
     @Autowired
     private BeanMapper mapper;
 
-    @GetMapping("/all")
+    @GetMapping(OrderApiPath.GET_ALL_ORDER)
     public Response<List<OrderDto>> getAllOrder(HttpServletRequest request){
-        if(!isAuthorized(request)){
+        if(!isAuthenticated(request) || !isAuthorized(request)){
             throw new CustomException(
                 ErrorCode.UNAUTHORIZED.getCode(),
                 ErrorCode.UNAUTHORIZED.getMessage()
@@ -35,12 +36,12 @@ public class OrderController extends GlobalController {
         return toResponse(mapper.mapAsList(orderService.getAllOrder(), OrderDto.class));
     }
 
-    @GetMapping("/user/all")
+    @GetMapping(OrderApiPath.GET_USER_ALL_ORDER)
     public Response<List<OrderDto>> getUserAllOrder(HttpServletRequest request){
-        if(!isAuthorized(request)){
+        if(!isAuthenticated(request) || !isAuthorized(request)){
             throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
             );
         }
 
@@ -49,18 +50,39 @@ public class OrderController extends GlobalController {
         return toResponse(mapper.mapAsList(orderService.getUserAllOrder(session.getAttribute("userId").toString()), OrderDto.class));
     }
 
-    @GetMapping("/{orderId}")
-    public Response<OrderDto> findOrder(@PathVariable String orderId){
+    @GetMapping(OrderApiPath.FIND_ORDER)
+    public Response<OrderDto> findOrder(HttpServletRequest request, @PathVariable String orderId){
+        if(!isAuthenticated(request) || !isAuthorized(request)){
+            throw new CustomException(
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
+            );
+        }
+
         return toResponse(mapper.map(orderService.findOrder(orderId), OrderDto.class));
     }
 
-    @GetMapping("/{orderId}/accept")
-    public Response<OrderDto> acceptOrder(@PathVariable String orderId){
+    @GetMapping(OrderApiPath.ACCEPT_ORDER)
+    public Response<OrderDto> acceptOrder(HttpServletRequest request, @PathVariable String orderId){
+        if(!isAuthenticated(request) || !isAuthorized(request)){
+            throw new CustomException(
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
+            );
+        }
+
         return toResponse(mapper.map(orderService.acceptOrder(orderId), OrderDto.class));
     }
 
-    @GetMapping("/{orderId}/reject")
-    public Response<OrderDto> rejectOrder(@PathVariable String orderId){
+    @GetMapping(OrderApiPath.REJECT_ORDER)
+    public Response<OrderDto> rejectOrder(HttpServletRequest request, @PathVariable String orderId){
+        if(!isAuthenticated(request) || !isAuthorized(request)){
+            throw new CustomException(
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
+            );
+        }
+
         return toResponse(mapper.map(orderService.rejectOrder(orderId), OrderDto.class));
     }
 

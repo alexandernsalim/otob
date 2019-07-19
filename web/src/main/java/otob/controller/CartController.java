@@ -28,10 +28,10 @@ public class CartController extends GlobalController {
 
     @GetMapping
     public Response<List<CartItem>> getCartItems(HttpServletRequest request) {
-        if (!isAuthenticated(request)) {
+        if(!isAuthenticated(request) || !isAuthorized(request)){
             throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
             );
         }
 
@@ -47,10 +47,10 @@ public class CartController extends GlobalController {
     public Response<Cart> addItemToCart(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        if (!isAuthenticated(request)) {
+        if(!isAuthenticated(request) || !isAuthorized(request)){
             throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
             );
         }
 
@@ -66,10 +66,10 @@ public class CartController extends GlobalController {
     public Response<Cart> updateItemQty(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        if (!isAuthenticated(request)) {
+        if(!isAuthenticated(request) || !isAuthorized(request)){
             throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
             );
         }
 
@@ -84,10 +84,10 @@ public class CartController extends GlobalController {
     @DeleteMapping("/remove/{productId}")
     public Response<Cart> removeItemFromCart(HttpServletRequest request,
                                              @PathVariable Long productId) {
-        if (!isAuthenticated(request)) {
+        if(!isAuthenticated(request) || !isAuthorized(request)){
             throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
             );
         }
 
@@ -101,10 +101,10 @@ public class CartController extends GlobalController {
 
     @GetMapping("/checkout")
     public Response<CheckoutDto> checkout(HttpServletRequest request) {
-        if (!isAuthenticated(request)) {
+        if(!isAuthenticated(request) || !isAuthorized(request)){
             throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
             );
         }
 

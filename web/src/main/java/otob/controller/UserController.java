@@ -22,8 +22,9 @@ public class UserController extends GlobalController {
     @Autowired
     private BeanMapper mapper;
 
-    @GetMapping(UserApiPath.GET_ALL)
+    @GetMapping(UserApiPath.GET_ALL_USER)
     public Response<List<UserDto>> getAllUser() {
+
         return toResponse(mapper.mapAsList(userService.getAllUser(), UserDto.class));
     }
 

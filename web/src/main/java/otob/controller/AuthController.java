@@ -13,7 +13,9 @@ import otob.response.Response;
 import otob.service.api.AuthService;
 import otob.service.api.UserService;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
@@ -32,14 +34,17 @@ public class AuthController extends GlobalController {
     private HttpSession session;
 
     @PostMapping("/login")
-    public Response<String> login(
+    public Response<AuthDto> login(
             HttpServletRequest request,
             @RequestParam("email") String email,
             @RequestParam("password") String password) {
 
         AuthDto response;
         User user;
-        session = request.getSession();
+        session = request.getSession(false);
+
+//        request.getRequestedSessionId();
+//        request.getCookies();
 
         if (!isAuthenticated(request)) {
             if (authService.login(email, password)) {
@@ -68,6 +73,11 @@ public class AuthController extends GlobalController {
             );
         }
 
+//        servletResponse.addCookie(new Cookie("cook1", "1"));
+//        servletResponse.addCookie(new Cookie("cook2", "2"));
+//        servletResponse.addCookie(new Cookie("cook3", "3"));
+//        servletResponse.addCookie(new Cookie("cook4", "4"));
+
         return toResponse(response);
     }
 
@@ -81,6 +91,7 @@ public class AuthController extends GlobalController {
             response = "Not Logged In";
         } else {
             session.setAttribute("userId", textGenerator.generateRandomUserId());
+            session.setAttribute("role", Role.GUEST);
             session.setAttribute("isLogin", Status.LOGIN_FALSE);
             response = "Logout Success";
         }
@@ -97,3 +108,6 @@ public class AuthController extends GlobalController {
 
 
 }
+
+//OWRjOGViOGQtZDAwYy00MTZjLTk1MWYtZDRmZDk0N2ZhYzc0
+//OWRjOGViOGQtZDAwYy00MTZjLTk1MWYtZDRmZDk0N2ZhYzc0
