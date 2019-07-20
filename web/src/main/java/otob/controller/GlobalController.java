@@ -20,7 +20,7 @@ public abstract class GlobalController {
     private RandomTextGenerator textGenerator;
 
     public boolean isAuthenticated(HttpServletRequest request){
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
 
         if(session.getAttribute("isLogin") != null &&
            session.getAttribute("isLogin").equals(Status.LOGIN_TRUE)){
@@ -38,7 +38,7 @@ public abstract class GlobalController {
     }
 
     public boolean isAuthorized(HttpServletRequest request){
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
 
         List<String> access = roleAccessService.getAccessByRole(session.getAttribute("role").toString());
 

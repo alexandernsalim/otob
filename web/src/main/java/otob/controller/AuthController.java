@@ -39,7 +39,7 @@ public class AuthController extends GlobalController {
 
         AuthDto response;
         User user;
-        session = request.getSession();
+        session = request.getSession(false);
 
         if (!isAuthenticated(request)) {
             if (authService.login(email, password)) {
