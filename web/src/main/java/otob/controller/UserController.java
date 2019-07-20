@@ -2,7 +2,7 @@ package otob.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import otob.constant.UserApiPath;
+import otob.constant.path.UserApiPath;
 import otob.dto.UserDto;
 import otob.entity.User;
 import otob.mapper.BeanMapper;
@@ -22,8 +22,9 @@ public class UserController extends GlobalController {
     @Autowired
     private BeanMapper mapper;
 
-    @GetMapping(UserApiPath.GET_ALL)
+    @GetMapping(UserApiPath.GET_ALL_USER)
     public Response<List<UserDto>> getAllUser() {
+
         return toResponse(mapper.mapAsList(userService.getAllUser(), UserDto.class));
     }
 

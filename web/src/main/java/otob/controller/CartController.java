@@ -2,6 +2,7 @@ package otob.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import otob.constant.path.CartApiPath;
 import otob.dto.CartDto;
 import otob.dto.CheckoutDto;
 import otob.entity.Cart;
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/carts")
+@RequestMapping(CartApiPath.BASE_PATH)
 public class CartController extends GlobalController {
 
     @Autowired
@@ -28,7 +29,7 @@ public class CartController extends GlobalController {
 
     @GetMapping
     public Response<List<CartItem>> getCartItems(HttpServletRequest request) {
-        if (!isAuthenticated(request)) {
+        if (!isAuthenticated(request) || !isAuthorized(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
@@ -38,16 +39,16 @@ public class CartController extends GlobalController {
         HttpSession session = request.getSession();
 
         return toResponse(mapper.map(
-            cartService.getUserCart(session.getAttribute("userId").toString()),
-            CartDto.class)
+                cartService.getUserCart(session.getAttribute("userId").toString()),
+                CartDto.class)
         );
     }
 
-    @PostMapping("/add/{productId}/{qty}")
+    @PostMapping(CartApiPath.ADD_ITEM)
     public Response<Cart> addItemToCart(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        if (!isAuthenticated(request)) {
+        if (!isAuthenticated(request) || !isAuthorized(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
@@ -57,16 +58,16 @@ public class CartController extends GlobalController {
         HttpSession session = request.getSession();
 
         return toResponse(mapper.map(
-            cartService.addItemToCart(session.getAttribute("userId").toString(), productId, qty),
-            CartDto.class)
+                cartService.addItemToCart(session.getAttribute("userId").toString(), productId, qty),
+                CartDto.class)
         );
     }
 
-    @PutMapping("/update/{productId}/{qty}")
+    @PutMapping(CartApiPath.UPDATE_ITEM_QTY)
     public Response<Cart> updateItemQty(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        if (!isAuthenticated(request)) {
+        if (!isAuthenticated(request) || !isAuthorized(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
@@ -76,15 +77,15 @@ public class CartController extends GlobalController {
         HttpSession session = request.getSession();
 
         return toResponse(mapper.map(
-            cartService.updateItemQty(session.getAttribute("userId").toString(), productId, qty),
-            CartDto.class)
+                cartService.updateItemQty(session.getAttribute("userId").toString(), productId, qty),
+                CartDto.class)
         );
     }
 
-    @DeleteMapping("/remove/{productId}")
+    @DeleteMapping(CartApiPath.REMOVE_ITEM)
     public Response<Cart> removeItemFromCart(HttpServletRequest request,
                                              @PathVariable Long productId) {
-        if (!isAuthenticated(request)) {
+        if (!isAuthenticated(request) || !isAuthorized(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()
@@ -94,14 +95,14 @@ public class CartController extends GlobalController {
         HttpSession session = request.getSession();
 
         return toResponse(mapper.map(
-            cartService.removeItemFromCart(session.getAttribute("userId").toString(), productId),
-            CartDto.class)
+                cartService.removeItemFromCart(session.getAttribute("userId").toString(), productId),
+                CartDto.class)
         );
     }
 
-    @GetMapping("/checkout")
+    @GetMapping(CartApiPath.CHECKOUT)
     public Response<CheckoutDto> checkout(HttpServletRequest request) {
-        if (!isAuthenticated(request)) {
+        if (!isAuthenticated(request) || !isAuthorized(request)) {
             throw new CustomException(
                     ErrorCode.UNAUTHORIZED.getCode(),
                     ErrorCode.UNAUTHORIZED.getMessage()

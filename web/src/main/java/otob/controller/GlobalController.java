@@ -19,15 +19,17 @@ public abstract class GlobalController {
     @Autowired
     private RandomTextGenerator textGenerator;
 
-    public boolean isAuthenticated(HttpServletRequest request){
-        HttpSession session = request.getSession(false);
+    private HttpSession session;
 
-        if(session.getAttribute("isLogin") != null &&
-           session.getAttribute("isLogin").equals(Status.LOGIN_TRUE)){
+    public boolean isAuthenticated(HttpServletRequest request) {
+        session = request.getSession(true);
+
+        if (session.getAttribute("isLogin") != null &&
+                session.getAttribute("isLogin").equals(Status.LOGIN_TRUE)) {
 
             return true;
-        }else{
-            if(session.getAttribute("userId") == null){
+        } else {
+            if (session.getAttribute("userId") == null) {
                 session.setAttribute("userId", textGenerator.generateRandomUserId());
                 session.setAttribute("role", Role.GUEST);
                 session.setAttribute("isLogin", Status.LOGIN_FALSE);
@@ -37,19 +39,19 @@ public abstract class GlobalController {
         }
     }
 
-    public boolean isAuthorized(HttpServletRequest request){
-        HttpSession session = request.getSession(false);
+    public boolean isAuthorized(HttpServletRequest request) {
+        session = request.getSession(true);
 
         List<String> access = roleAccessService.getAccessByRole(session.getAttribute("role").toString());
 
-        if(access.contains(request.getServletPath())){
+        if (access.contains(request.getServletPath())) {
             return true;
         }
 
         return false;
     }
 
-    public <T> Response toResponse(T value){
+    public <T> Response toResponse(T value) {
         return Response.builder()
                 .code("200")
                 .message("Success")

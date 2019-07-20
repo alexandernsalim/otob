@@ -1,13 +1,15 @@
 package otob.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import otob.constant.Role;
 import otob.constant.Status;
+import otob.constant.path.AuthApiPath;
 import otob.dto.AuthDto;
 import otob.entity.User;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
 import otob.generator.RandomTextGenerator;
 import otob.response.Response;
 import otob.service.api.AuthService;
@@ -17,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(AuthApiPath.BASE_PATH)
 public class AuthController extends GlobalController {
 
     @Autowired
@@ -31,15 +33,15 @@ public class AuthController extends GlobalController {
 
     private HttpSession session;
 
-    @PostMapping("/login")
-    public Response<String> login(
+    @PostMapping(AuthApiPath.LOGIN)
+    public Response<AuthDto> login(
             HttpServletRequest request,
             @RequestParam("email") String email,
             @RequestParam("password") String password) {
 
         AuthDto response;
         User user;
-        session = request.getSession(false);
+        session = request.getSession(true);
 
         if (!isAuthenticated(request)) {
             if (authService.login(email, password)) {
@@ -62,38 +64,35 @@ public class AuthController extends GlobalController {
                         .build();
             }
         } else {
-            throw new CustomException(
-                    ErrorCode.LOGGED_IN.getCode(),
-                    ErrorCode.LOGGED_IN.getMessage()
-            );
+            user = userService.getUserByEmail(email);
+
+            response = AuthDto.builder()
+                    .userId(email)
+                    .role(user.getRoles().get(0).getName())
+                    .isLogin(true)
+                    .build();
         }
 
         return toResponse(response);
     }
 
-    @PostMapping("/logout")
+    @PostMapping(AuthApiPath.LOGOUT)
     private Response<String> logout(HttpServletRequest request) {
         String response;
 
-        session = request.getSession();
+        session = request.getSession(true);
 
         if (!isAuthenticated(request)) {
             response = "Not Logged In";
         } else {
             session.setAttribute("userId", textGenerator.generateRandomUserId());
+            session.setAttribute("role", Role.GUEST);
             session.setAttribute("isLogin", Status.LOGIN_FALSE);
+
             response = "Logout Success";
         }
 
         return toResponse(response);
     }
-
-    @GetMapping("/userId")
-    public Response<String> getUserId(HttpServletRequest request) {
-        Object user = request.getSession().getAttribute("userId");
-
-        return toResponse((user != null) ? user.toString() : "No logged user");
-    }
-
 
 }
