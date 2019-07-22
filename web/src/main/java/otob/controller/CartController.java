@@ -7,8 +7,6 @@ import otob.dto.CartDto;
 import otob.dto.CheckoutDto;
 import otob.entity.Cart;
 import otob.entity.CartItem;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
 import otob.mapper.BeanMapper;
 import otob.response.Response;
 import otob.service.api.CartService;
@@ -29,13 +27,6 @@ public class CartController extends GlobalController {
 
     @GetMapping
     public Response<List<CartItem>> getCartItems(HttpServletRequest request) {
-        if (!isAuthenticated(request) || !isAuthorized(request)) {
-            throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        }
-
         HttpSession session = request.getSession();
 
         return toResponse(mapper.map(
@@ -48,13 +39,6 @@ public class CartController extends GlobalController {
     public Response<Cart> addItemToCart(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        if (!isAuthenticated(request) || !isAuthorized(request)) {
-            throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        }
-
         HttpSession session = request.getSession();
 
         return toResponse(mapper.map(
@@ -67,13 +51,6 @@ public class CartController extends GlobalController {
     public Response<Cart> updateItemQty(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        if (!isAuthenticated(request) || !isAuthorized(request)) {
-            throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        }
-
         HttpSession session = request.getSession();
 
         return toResponse(mapper.map(
@@ -85,13 +62,6 @@ public class CartController extends GlobalController {
     @DeleteMapping(CartApiPath.REMOVE_ITEM)
     public Response<Cart> removeItemFromCart(HttpServletRequest request,
                                              @PathVariable Long productId) {
-        if (!isAuthenticated(request) || !isAuthorized(request)) {
-            throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        }
-
         HttpSession session = request.getSession();
 
         return toResponse(mapper.map(
@@ -102,13 +72,6 @@ public class CartController extends GlobalController {
 
     @GetMapping(CartApiPath.CHECKOUT)
     public Response<CheckoutDto> checkout(HttpServletRequest request) {
-        if (!isAuthenticated(request) || !isAuthorized(request)) {
-            throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        }
-
         HttpSession session = request.getSession();
 
         return toResponse(cartService.checkout(session.getAttribute("userId").toString()));

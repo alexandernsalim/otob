@@ -9,13 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 import otob.constant.path.ProductApiPath;
 import otob.dto.ProductDto;
 import otob.entity.Product;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
 import otob.mapper.BeanMapper;
 import otob.response.Response;
 import otob.service.api.ProductService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,14 +48,7 @@ public class ProductController extends GlobalController {
     }
 
     @PostMapping
-    public Response<ProductDto> addProduct(HttpServletRequest request, @Valid @RequestBody ProductDto productDto) {
-        if (!isAuthenticated(request) || !isAuthorized(request)) {
-            throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        }
-
+    public Response<ProductDto> addProduct(@Valid @RequestBody ProductDto productDto) {
         Product product = mapper.map(productDto, Product.class);
 
         return toResponse(mapper.map(productService.createProduct(product), ProductDto.class));
@@ -91,27 +81,14 @@ public class ProductController extends GlobalController {
     }
 
     @PutMapping(ProductApiPath.PRODUCTID_PLACEHOLDER)
-    public Response<ProductDto> updateById(HttpServletRequest request, @PathVariable Long productId, @Valid @RequestBody ProductDto productDto) {
-        if (!isAuthenticated(request) || !isAuthorized(request)) {
-            throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        }
-
+    public Response<ProductDto> updateById(@PathVariable Long productId, @Valid @RequestBody ProductDto productDto) {
         Product product = mapper.map(productDto, Product.class);
 
         return toResponse(mapper.map(productService.updateProductById(productId, product), ProductDto.class));
     }
 
     @DeleteMapping(ProductApiPath.PRODUCTID_PLACEHOLDER)
-    public Response<Boolean> deleteById(HttpServletRequest request, @PathVariable Long productId) {
-        if (!isAuthenticated(request) || !isAuthorized(request)) {
-            throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        }
+    public Response<Boolean> deleteById(@PathVariable Long productId) {
 
         return toResponse(productService.deleteProductById(productId));
     }

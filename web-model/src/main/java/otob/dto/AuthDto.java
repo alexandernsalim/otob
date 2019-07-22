@@ -8,7 +8,6 @@ import lombok.Data;
 public class AuthDto {
 
     private String userId;
-    private boolean isLogin;
     private String role;
 
 }

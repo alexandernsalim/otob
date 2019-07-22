@@ -1,6 +1,7 @@
 package otob.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,33 +44,21 @@ public class AuthController extends GlobalController {
         User user;
         session = request.getSession(true);
 
-        if (!isAuthenticated(request)) {
-            if (authService.login(email, password)) {
-                user = userService.getUserByEmail(email);
-
-                session.setAttribute("userId", email);
-                session.setAttribute("role", user.getRoles().get(0).getName());
-                session.setAttribute("isLogin", Status.LOGIN_TRUE);
-
-                response = AuthDto.builder()
-                        .userId(email)
-                        .role(user.getRoles().get(0).getName())
-                        .isLogin(true)
-                        .build();
-            } else {
-                response = AuthDto.builder()
-                        .userId(session.getAttribute("userId").toString())
-                        .role(Role.GUEST)
-                        .isLogin(false)
-                        .build();
-            }
-        } else {
+        if (authService.login(email, password)) {
             user = userService.getUserByEmail(email);
+
+            session.setAttribute("userId", email);
+            session.setAttribute("role", user.getRoles().get(0).getName());
+            session.setAttribute("isLogin", Status.LOGIN_TRUE);
 
             response = AuthDto.builder()
                     .userId(email)
                     .role(user.getRoles().get(0).getName())
-                    .isLogin(true)
+                    .build();
+        } else {
+            response = AuthDto.builder()
+                    .userId(session.getAttribute("userId").toString())
+                    .role(Role.GUEST)
                     .build();
         }
 
@@ -78,21 +67,13 @@ public class AuthController extends GlobalController {
 
     @PostMapping(AuthApiPath.LOGOUT)
     private Response<String> logout(HttpServletRequest request) {
-        String response;
-
         session = request.getSession(true);
 
-        if (!isAuthenticated(request)) {
-            response = "Not Logged In";
-        } else {
-            session.setAttribute("userId", textGenerator.generateRandomUserId());
-            session.setAttribute("role", Role.GUEST);
-            session.setAttribute("isLogin", Status.LOGIN_FALSE);
+        session.setAttribute("userId", textGenerator.generateRandomUserId());
+        session.setAttribute("role", Role.GUEST);
+        session.setAttribute("isLogin", Status.LOGIN_FALSE);
 
-            response = "Logout Success";
-        }
-
-        return toResponse(response);
+        return toResponse(HttpStatus.OK);
     }
 
 }
