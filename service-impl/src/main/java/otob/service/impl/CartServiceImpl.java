@@ -1,5 +1,7 @@
 package otob.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import otob.constant.Status;
@@ -41,8 +43,10 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private IdGenerator idGenerator;
 
+    private static Logger logger = LoggerFactory.getLogger(CartServiceImpl.class);
+
     @Override
-    public Cart createUserCart(String userEmail){
+    public Cart createUserCart(String userEmail) {
         Cart cart = new Cart(userEmail);
 
         return cartRepository.save(cart);
@@ -50,10 +54,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getUserCart(String userEmail) {
-        if(!userService.checkUser(userEmail)){
+        if (!userService.checkUser(userEmail)) {
             throw new CustomException(
-                ErrorCode.USER_NOT_FOUND.getCode(),
-                ErrorCode.USER_NOT_FOUND.getMessage()
+                    ErrorCode.USER_NOT_FOUND.getCode(),
+                    ErrorCode.USER_NOT_FOUND.getMessage()
             );
         }
 
@@ -62,12 +66,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart addItemToCart(String userEmail, Long productId, int qty) {
-        if(!userService.checkUser(userEmail)){
+        if (!userService.checkUser(userEmail)) {
             throw new CustomException(
-                ErrorCode.USER_NOT_FOUND.getCode(),
-                ErrorCode.USER_NOT_FOUND.getMessage()
+                    ErrorCode.USER_NOT_FOUND.getCode(),
+                    ErrorCode.USER_NOT_FOUND.getMessage()
             );
-        }else if(!checkUserCartExistence(userEmail)){
+        } else if (!checkUserCartExistence(userEmail)) {
+            logger.info("User cart not found, create new cart");
             createUserCart(userEmail);
         }
 
@@ -78,10 +83,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart updateItemQty(String userEmail, Long productId, int qty) {
-        if(!userService.checkUser(userEmail)){
+        if (!userService.checkUser(userEmail)) {
             throw new CustomException(
-                ErrorCode.USER_NOT_FOUND.getCode(),
-                ErrorCode.USER_NOT_FOUND.getMessage()
+                    ErrorCode.USER_NOT_FOUND.getCode(),
+                    ErrorCode.USER_NOT_FOUND.getMessage()
             );
         }
 
@@ -92,10 +97,10 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart removeItemFromCart(String userEmail, Long productId) {
-        if(!userService.checkUser(userEmail)){
+        if (!userService.checkUser(userEmail)) {
             throw new CustomException(
-                ErrorCode.USER_NOT_FOUND.getCode(),
-                ErrorCode.USER_NOT_FOUND.getMessage()
+                    ErrorCode.USER_NOT_FOUND.getCode(),
+                    ErrorCode.USER_NOT_FOUND.getMessage()
             );
         }
 
@@ -114,25 +119,25 @@ public class CartServiceImpl implements CartService {
         List<String> outOfStockProducts = new ArrayList<>();
 
         int cartItemsSize = cartItems.size();
-        if(cartItemsSize == 0){
+        if (cartItemsSize == 0) {
             throw new CustomException(
-                ErrorCode.BAD_REQUEST.getCode(),
-                ErrorCode.BAD_REQUEST.getMessage()
+                    ErrorCode.BAD_REQUEST.getCode(),
+                    ErrorCode.BAD_REQUEST.getMessage()
             );
         }
 
         int itemIdx = 0;
-        for(int i = 0; i < cartItemsSize; i++){
+        for (int i = 0; i < cartItemsSize; i++) {
             CartItem item = cartItems.get(itemIdx);
             Product product = productService.getProductById(item.getProductId());
             int itemQty = item.getQty();
             int productStock = product.getStock();
 
-            if(itemQty > productStock){
+            if (itemQty > productStock) {
                 outOfStockProducts.add(product.getName());
                 cartItems.remove(item);
                 itemIdx--;
-            }else{
+            } else {
                 totPrice += item.getProductPrice() * itemQty;
                 totItem++;
                 product.setStock(productStock - itemQty);
@@ -143,9 +148,9 @@ public class CartServiceImpl implements CartService {
             itemIdx++;
         }
 
-        try{
+        try {
             ordId = idGenerator.generateOrderId(ordDate);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new CustomException(
                     ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
                     ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
@@ -178,7 +183,7 @@ public class CartServiceImpl implements CartService {
     }
 
     //Private Method
-    private Boolean checkUserCartExistence(String userEmail){
+    private Boolean checkUserCartExistence(String userEmail) {
         return cartRepository.existsByUserEmail(userEmail);
     }
 

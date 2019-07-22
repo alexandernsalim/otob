@@ -1,5 +1,7 @@
 package otob.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +35,8 @@ public class AuthController extends GlobalController {
     @Autowired
     private RandomTextGenerator textGenerator;
 
+    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     private HttpSession session;
 
     @PostMapping(AuthApiPath.LOGIN)
@@ -54,9 +58,11 @@ public class AuthController extends GlobalController {
 
             Cookie userId = new Cookie("user-id", email);
             userId.setHttpOnly(false);
+            userId.setSecure(false);
 
             Cookie userRole = new Cookie("user-role", user.getRoles().get(0).getName());
             userRole.setHttpOnly(false);
+            userRole.setSecure(false);
 
             response.addCookie(userId);
             response.addCookie(userRole);
@@ -65,9 +71,12 @@ public class AuthController extends GlobalController {
         } else {
             Cookie userId = new Cookie("user-id", textGenerator.generateRandomUserId());
             userId.setHttpOnly(false);
+            userId.setSecure(false);
+
 
             Cookie userRole = new Cookie("user-role", Role.GUEST);
             userRole.setHttpOnly(false);
+            userRole.setSecure(false);
 
             response.addCookie(userId);
             response.addCookie(userRole);
@@ -77,15 +86,9 @@ public class AuthController extends GlobalController {
     }
 
     @PostMapping(AuthApiPath.LOGOUT)
-    private Response<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        session = request.getSession(true);
-
-        session.setAttribute("userId", textGenerator.generateRandomUserId());
-        session.setAttribute("role", Role.GUEST);
-        session.setAttribute("isLogin", Status.LOGIN_FALSE);
-
-        response.addCookie(new Cookie("user-id", session.getAttribute("userId").toString()));
-        response.addCookie(new Cookie("user-role", Role.GUEST));
+    private Response<String> logout(HttpServletRequest request) {
+        request.getSession(true).invalidate();
+        logger.info("Session invalidated");
 
         return toResponse(HttpStatus.OK);
     }

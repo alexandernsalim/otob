@@ -35,7 +35,7 @@ public class CartController extends GlobalController {
         );
     }
 
-    @PostMapping(CartApiPath.ADD_ITEM)
+    @PostMapping(CartApiPath.ADD_OR_UPDATE_ITEM)
     public Response<Cart> addItemToCart(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
@@ -47,7 +47,7 @@ public class CartController extends GlobalController {
         );
     }
 
-    @PutMapping(CartApiPath.UPDATE_ITEM_QTY)
+    @PutMapping(CartApiPath.ADD_OR_UPDATE_ITEM)
     public Response<Cart> updateItemQty(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
