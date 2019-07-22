@@ -20,14 +20,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
-    @Bean
-    RequestInterceptor requestInterceptor(){
-        return new RequestInterceptor();
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(requestInterceptor());
-    }
+//    @Bean
+//    RequestInterceptor requestInterceptor(){
+//        return new RequestInterceptor();
+//    }
+//
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(requestInterceptor());
+//    }
 
 }
