@@ -33,17 +33,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order findOrder(String ordId) {
-        return orderRepository.findByOrdId(ordId);
-    }
-
-    @Override
     public List<Order> getAllOrder() {
         return orderRepository.findAll();
     }
 
     @Override
-    public List<Order> getUserAllOrder(String userEmail) {
+    public Order getOrderByOrderId(String orderId) {
+        if(!orderRepository.existsByOrderId(orderId)){
+            throw new CustomException(
+                ErrorCode.ORDER_NOT_FOUND.getCode(),
+                ErrorCode.ORDER_NOT_FOUND.getMessage()
+            );
+        }
+
+        return orderRepository.findByOrderId(orderId);
+    }
+
+    @Override
+    public List<Order> getAllOrderByUserEmail(String userEmail) {
         if (!userService.checkUser(userEmail)) {
             throw new CustomException(
                     ErrorCode.USER_NOT_FOUND.getCode(),
@@ -56,14 +63,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order acceptOrder(String ordId) {
-        if (!orderRepository.existsByOrdId(ordId)) {
+        if (!orderRepository.existsByOrderId(ordId)) {
             throw new CustomException(
                     ErrorCode.ORDER_NOT_FOUND.getCode(),
                     ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
-        Order order = orderRepository.findByOrdId(ordId);
+        Order order = orderRepository.findByOrderId(ordId);
         order.setOrdStatus(Status.ORD_ACCEPT);
 
         return orderRepository.save(order);
@@ -71,14 +78,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order rejectOrder(String ordId) {
-        if (!orderRepository.existsByOrdId(ordId)) {
+        if (!orderRepository.existsByOrderId(ordId)) {
             throw new CustomException(
                     ErrorCode.ORDER_NOT_FOUND.getCode(),
                     ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
-        Order order = orderRepository.findByOrdId(ordId);
+        Order order = orderRepository.findByOrderId(ordId);
 
         if (!order.getOrdStatus().equals("Waiting")) {
             throw new CustomException(

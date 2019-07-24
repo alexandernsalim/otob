@@ -35,13 +35,13 @@ public class OrderController extends GlobalController {
     public Response<List<OrderDto>> getUserAllOrder(HttpServletRequest request) {
         HttpSession session = request.getSession();
 
-        return toResponse(mapper.mapAsList(orderService.getUserAllOrder(session.getAttribute("userId").toString()), OrderDto.class));
+        return toResponse(mapper.mapAsList(orderService.getAllOrderByUserEmail(session.getAttribute("userId").toString()), OrderDto.class));
     }
 
     @GetMapping(OrderApiPath.FIND_ORDER)
     public Response<OrderDto> findOrder(@PathVariable String orderId) {
 
-        return toResponse(mapper.map(orderService.findOrder(orderId), OrderDto.class));
+        return toResponse(mapper.map(orderService.getOrderByOrderId(orderId), OrderDto.class));
     }
 
     @GetMapping(OrderApiPath.ACCEPT_ORDER)
