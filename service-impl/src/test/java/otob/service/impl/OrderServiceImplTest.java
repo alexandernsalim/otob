@@ -8,10 +8,11 @@ import org.mockito.Mock;
 import otob.constant.Status;
 import otob.entity.CartItem;
 import otob.entity.Order;
+import otob.entity.Product;
 import otob.enumerator.ErrorCode;
 import otob.exception.CustomException;
 import otob.repository.OrderRepository;
-import otob.repository.ProductRepository;
+import otob.service.api.ProductService;
 import otob.service.api.UserService;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class OrderServiceImplTest {
 
     @Mock
-    private ProductRepository productRepository;
+    private ProductService productService;
 
     @Mock
     private OrderRepository orderRepository;
@@ -43,8 +44,11 @@ public class OrderServiceImplTest {
     private String orderId;
     private String userEmail;
     private Order order;
-    private Order orderProcessed;
+    private Order orderAccepted;
+    private Order orderRejected;
     private List<Order> orders;
+    private Product product;
+    private Product productUpdated;
 
     @Before
     public void setUp() {
@@ -72,7 +76,7 @@ public class OrderServiceImplTest {
                 .ordStatus(Status.ORD_WAIT)
                 .build();
 
-        orderProcessed = Order.builder()
+        orderAccepted = Order.builder()
                 .orderId(orderId)
                 .userEmail(userEmail)
                 .ordDate("2019/06/25 11:14")
@@ -82,8 +86,36 @@ public class OrderServiceImplTest {
                 .ordStatus(Status.ORD_ACCEPT)
                 .build();
 
+        orderRejected = Order.builder()
+            .orderId(orderId)
+            .userEmail(userEmail)
+            .ordDate("2019/06/25 11:14")
+            .ordItems(items)
+            .totItem(1)
+            .totPrice(5000000L)
+            .ordStatus(Status.ORD_REJECT)
+            .build();
+
         orders = new ArrayList<>();
         orders.add(order);
+
+        product = Product.builder()
+            .productId(1L)
+            .name("Asus")
+            .description("Laptop")
+            .listPrice(7500000)
+            .offerPrice(5000000)
+            .stock(0)
+            .build();
+
+        productUpdated = Product.builder()
+            .productId(1L)
+            .name("Asus")
+            .description("Laptop")
+            .listPrice(7500000)
+            .offerPrice(5000000)
+            .stock(1)
+            .build();
 
     }
 
@@ -191,15 +223,28 @@ public class OrderServiceImplTest {
         }
     }
 
-//    @Test
-//    public void rejectOrder() {
-//        when(orderRepository.existsByOrderId(orderId))
-//                .thenReturn(true);
-//        when(orderRepository.findByOrderId(orderId))
-//                .thenReturn(order);
-//
-//
-//    }
+    @Test
+    public void rejectOrder() {
+        when(orderRepository.existsByOrderId(orderId))
+                .thenReturn(true);
+        when(orderRepository.findByOrderId(orderId))
+                .thenReturn(order);
+        when(productService.getProductById(product.getProductId()))
+            .thenReturn(product);
+        when(productService.updateProductById(product.getProductId(), product))
+            .thenReturn(productUpdated);
+        when(orderRepository.save(orderRejected))
+            .thenReturn(orderRejected);
+
+        Order result = orderServiceImpl.rejectOrder(orderId);
+
+        verify(orderRepository).existsByOrderId(orderId);
+        verify(orderRepository).findByOrderId(orderId);
+        verify(productService).getProductById(productUpdated.getProductId());
+        verify(productService).updateProductById(product.getProductId(), product);
+        verify(orderRepository).save(orderRejected);
+        assertTrue(result.getOrdStatus().equals(Status.ORD_REJECT));
+    }
 
     @Test
     public void rejectOrderFailNotFoundTest() {
@@ -219,10 +264,10 @@ public class OrderServiceImplTest {
         when(orderRepository.existsByOrderId(orderId))
                 .thenReturn(true);
         when(orderRepository.findByOrderId(orderId))
-                .thenReturn(orderProcessed);
+                .thenReturn(orderAccepted);
 
         try {
-
+            orderServiceImpl.rejectOrder(orderId);
         } catch (CustomException ex) {
             verify(orderRepository).existsByOrderId(orderId);
             verify(orderRepository).findByOrderId(orderId);
@@ -233,7 +278,7 @@ public class OrderServiceImplTest {
 
     @After
     public void teardown() {
-        verifyNoMoreInteractions(productRepository);
+        verifyNoMoreInteractions(productService);
         verifyNoMoreInteractions(orderRepository);
         verifyNoMoreInteractions(userService);
     }

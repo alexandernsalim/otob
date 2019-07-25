@@ -81,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
         if (!orderRepository.existsByOrderId(ordId)) {
             throw new CustomException(
                     ErrorCode.ORDER_NOT_FOUND.getCode(),
-                    ErrorCode.ORDER_NOT_FOUND.getMessage()
+                    ErrorCode   .ORDER_NOT_FOUND.getMessage()
             );
         }
 

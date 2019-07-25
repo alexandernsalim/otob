@@ -35,23 +35,23 @@ public class ProductController extends GlobalController {
         return toResponse(mapper.mapAsList(products, ProductDto.class));
     }
 
-    @GetMapping(ProductApiPath.GET_PRODUCT_BY_ID)
-    public Response<ProductDto> getProductById(@PathVariable Long productId) {
-        return toResponse(mapper.map(productService.getProductById(productId), ProductDto.class));
-    }
-
     @GetMapping(ProductApiPath.GET_PRODUCT_BY_NAME)
-    public Response<List<ProductDto>> getProductByName(@PathVariable String productName) {
+    public Response<List<ProductDto>> getAllProductByName(@PathVariable String productName) {
         List<Product> products = productService.getAllProductByName(productName);
 
         return toResponse(mapper.mapAsList(products, ProductDto.class));
+    }
+
+    @GetMapping(ProductApiPath.GET_PRODUCT_BY_ID)
+    public Response<ProductDto> getProductById(@PathVariable Long productId) {
+        return toResponse(mapper.map(productService.getProductById(productId), ProductDto.class));
     }
 
     @PostMapping
     public Response<ProductDto> addProduct(@Valid @RequestBody ProductDto productDto) {
         Product product = mapper.map(productDto, Product.class);
 
-        return toResponse(mapper.map(productService.createProduct(product), ProductDto.class));
+        return toResponse(mapper.map(productService.addProduct(product), ProductDto.class));
     }
 
     @PostMapping(ProductApiPath.ADD_PRODUCT_FROM_EXCEL)
@@ -75,7 +75,7 @@ public class ProductController extends GlobalController {
             productList.add(product);
         }
 
-        List<Product> productListResult = productService.batchUpload(productList);
+        List<Product> productListResult = productService.addProductFromExcel(productList);
 
         return toResponse(mapper.mapAsList(productListResult, ProductDto.class));
     }
