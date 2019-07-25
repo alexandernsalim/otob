@@ -26,135 +26,216 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class OrderServiceImplTest {
 
-  @Mock
-  private ProductRepository productRepository;
+    @Mock
+    private ProductRepository productRepository;
 
-  @Mock
-  private OrderRepository orderRepository;
+    @Mock
+    private OrderRepository orderRepository;
 
-  @Mock
-  private UserService userService;
+    @Mock
+    private UserService userService;
 
-  @InjectMocks
-  private OrderServiceImpl orderServiceImpl;
+    @InjectMocks
+    private OrderServiceImpl orderServiceImpl;
 
-  private CartItem item1;
-  private List<CartItem> items;
-  private String orderId;
-  private String userEmail;
-  private Order order;
-  private List<Order> orders;
+    private CartItem item1;
+    private List<CartItem> items;
+    private String orderId;
+    private String userEmail;
+    private Order order;
+    private Order orderProcessed;
+    private List<Order> orders;
 
-  @Before
-  public void setUp() {
-    initMocks(this);
+    @Before
+    public void setUp() {
+        initMocks(this);
 
-    item1 = CartItem.builder()
-        .productId(1L)
-        .productName("Asus")
-        .productPrice(5000000)
-        .qty(1)
-        .build();
+        item1 = CartItem.builder()
+                .productId(1L)
+                .productName("Asus")
+                .productPrice(5000000)
+                .qty(1)
+                .build();
 
-    items = new ArrayList<>();
-    items.add(item1);
+        items = new ArrayList<>();
+        items.add(item1);
 
-    orderId = "ORD1561436040000";
-    userEmail = "alexandernsalim@gmail.com";
-    order = Order.builder()
-        .orderId(orderId)
-        .userEmail(userEmail)
-        .ordDate("2019/06/25 11:14")
-        .ordItems(items)
-        .totItem(1)
-        .totPrice(5000000L)
-        .ordStatus(Status.ORD_WAIT)
-        .build();
+        orderId = "ORD1561436040000";
+        userEmail = "alexandernsalim@gmail.com";
+        order = Order.builder()
+                .orderId(orderId)
+                .userEmail(userEmail)
+                .ordDate("2019/06/25 11:14")
+                .ordItems(items)
+                .totItem(1)
+                .totPrice(5000000L)
+                .ordStatus(Status.ORD_WAIT)
+                .build();
 
-    orders = new ArrayList<>();
-    orders.add(order);
+        orderProcessed = Order.builder()
+                .orderId(orderId)
+                .userEmail(userEmail)
+                .ordDate("2019/06/25 11:14")
+                .ordItems(items)
+                .totItem(1)
+                .totPrice(5000000L)
+                .ordStatus(Status.ORD_ACCEPT)
+                .build();
 
-  }
+        orders = new ArrayList<>();
+        orders.add(order);
 
-  @Test
-  public void getOrderByOrderIdTest() {
-    when(orderRepository.existsByOrderId(orderId)).thenReturn(true);
-    when(orderRepository.findByOrderId(orderId))
-        .thenReturn(order);
-
-    Order result = orderServiceImpl.getOrderByOrderId(orderId);
-
-    verify(orderRepository).existsByOrderId(orderId);
-    verify(orderRepository).findByOrderId(orderId);
-    assertEquals(order.getOrderId(), result.getOrderId());
-    assertTrue(order.getOrdItems().size() == 1);
-  }
-
-  @Test
-  public void getOrderByOrderIdNotExistsTest() {
-    when(orderRepository.existsByOrderId(orderId)).thenReturn(false);
-
-    try {
-      orderServiceImpl.getOrderByOrderId(orderId);
-    } catch (CustomException ex) {
-      verify(orderRepository).existsByOrderId(orderId);
-      assertTrue(ex.getMessage().equals(ErrorCode.ORDER_NOT_FOUND.getMessage()));
     }
-  }
 
-  @Test
-  public void getAllOrderByUserEmailTest() {
-    when(userService.checkUser(userEmail)).thenReturn(true);
-    when(orderRepository.findAllByUserEmail(userEmail))
-        .thenReturn(orders);
+    @Test
+    public void getOrderByOrderIdTest() {
+        when(orderRepository.existsByOrderId(orderId)).thenReturn(true);
+        when(orderRepository.findByOrderId(orderId))
+                .thenReturn(order);
 
-    List<Order> userOrders = orderServiceImpl.getAllOrderByUserEmail(userEmail);
+        Order result = orderServiceImpl.getOrderByOrderId(orderId);
 
-    verify(userService).checkUser(userEmail);
-    verify(orderRepository).findAllByUserEmail(userEmail);
-    assertTrue(userOrders.size() >= 1);
-  }
-
-  @Test
-  public void getAllOrderByUserEmailNotExistsTest() {
-    when(userService.checkUser(userEmail)).thenReturn(false);
-
-    try {
-      orderServiceImpl.getAllOrderByUserEmail(userEmail);
-    } catch (CustomException ex) {
-      verify(userService).checkUser(userEmail);
-      assertTrue(ex.getMessage().equals(ErrorCode.USER_NOT_FOUND.getMessage()));
+        verify(orderRepository).existsByOrderId(orderId);
+        verify(orderRepository).findByOrderId(orderId);
+        assertEquals(order.getOrderId(), result.getOrderId());
+        assertTrue(order.getOrdItems().size() == 1);
     }
-  }
 
-  @Test
-  public void getAllOrderTest() {
-    when(orderRepository.findAll())
-        .thenReturn(orders);
+    @Test
+    public void getOrderByOrderIdNotExistsTest() {
+        when(orderRepository.existsByOrderId(orderId)).thenReturn(false);
 
-    List<Order> orders = orderServiceImpl.getAllOrder();
+        try {
+            orderServiceImpl.getOrderByOrderId(orderId);
+        } catch (CustomException ex) {
+            verify(orderRepository).existsByOrderId(orderId);
+            assertTrue(ex.getMessage().equals(ErrorCode.ORDER_NOT_FOUND.getMessage()));
+        }
+    }
 
-    verify(orderRepository).findAll();
-    assertTrue(orders.size() >= 1);
-  }
+    @Test
+    public void getAllOrderByUserEmailTest() {
+        when(userService.checkUser(userEmail)).thenReturn(true);
+        when(orderRepository.findAllByUserEmail(userEmail))
+                .thenReturn(orders);
 
-  @Test
-  public void createOrder() {
-    when(orderRepository.save(order))
-        .thenReturn(order);
+        List<Order> userOrders = orderServiceImpl.getAllOrderByUserEmail(userEmail);
 
-    Order result = orderServiceImpl.createOrder(order);
+        verify(userService).checkUser(userEmail);
+        verify(orderRepository).findAllByUserEmail(userEmail);
+        assertTrue(userOrders.size() >= 1);
+    }
 
-    verify(orderRepository).save(order);
-    assertTrue(result.getOrdItems().size() >= 1);
-    assertTrue(result.getUserEmail().equals(userEmail));
-  }
+    @Test
+    public void getAllOrderByUserEmailNotExistsTest() {
+        when(userService.checkUser(userEmail)).thenReturn(false);
 
-  @After
-  public void teardown() {
-    verifyNoMoreInteractions(productRepository);
-    verifyNoMoreInteractions(orderRepository);
-    verifyNoMoreInteractions(userService);
-  }
+        try {
+            orderServiceImpl.getAllOrderByUserEmail(userEmail);
+        } catch (CustomException ex) {
+            verify(userService).checkUser(userEmail);
+            assertTrue(ex.getMessage().equals(ErrorCode.USER_NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Test
+    public void getAllOrderTest() {
+        when(orderRepository.findAll())
+                .thenReturn(orders);
+
+        List<Order> orders = orderServiceImpl.getAllOrder();
+
+        verify(orderRepository).findAll();
+        assertTrue(orders.size() >= 1);
+    }
+
+    @Test
+    public void createOrderTest() {
+        when(orderRepository.save(order))
+                .thenReturn(order);
+
+        Order result = orderServiceImpl.createOrder(order);
+
+        verify(orderRepository).save(order);
+        assertTrue(result.getOrdItems().size() >= 1);
+        assertTrue(result.getUserEmail().equals(userEmail));
+    }
+
+    @Test
+    public void acceptOrderTest() {
+        when(orderRepository.existsByOrderId(orderId))
+                .thenReturn(true);
+        when(orderRepository.findByOrderId(orderId))
+                .thenReturn(order);
+        when(orderRepository.save(order))
+                .thenReturn(order);
+
+        Order result = orderServiceImpl.acceptOrder(orderId);
+
+        verify(orderRepository).existsByOrderId(orderId);
+        verify(orderRepository).findByOrderId(orderId);
+        verify(orderRepository).save(order);
+        assertTrue(result.getOrdStatus().equals(Status.ORD_ACCEPT));
+    }
+
+    @Test
+    public void acceptOrderFailTest() {
+        when(orderRepository.existsByOrderId(orderId))
+                .thenReturn(false);
+
+        try {
+            orderServiceImpl.acceptOrder(orderId);
+        } catch (CustomException ex) {
+            verify(orderRepository).existsByOrderId(orderId);
+            assertTrue(ex.getMessage().equals(ErrorCode.ORDER_NOT_FOUND.getMessage()));
+        }
+    }
+
+//    @Test
+//    public void rejectOrder() {
+//        when(orderRepository.existsByOrderId(orderId))
+//                .thenReturn(true);
+//        when(orderRepository.findByOrderId(orderId))
+//                .thenReturn(order);
+//
+//
+//    }
+
+    @Test
+    public void rejectOrderFailNotFoundTest() {
+        when(orderRepository.existsByOrderId(orderId))
+                .thenReturn(false);
+
+        try {
+            orderServiceImpl.rejectOrder(orderId);
+        } catch (CustomException ex) {
+            verify(orderRepository).existsByOrderId(orderId);
+            assertTrue(ex.getMessage().equals(ErrorCode.ORDER_NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Test
+    public void rejectOrderFailOrderProcessedTest() {
+        when(orderRepository.existsByOrderId(orderId))
+                .thenReturn(true);
+        when(orderRepository.findByOrderId(orderId))
+                .thenReturn(orderProcessed);
+
+        try {
+
+        } catch (CustomException ex) {
+            verify(orderRepository).existsByOrderId(orderId);
+            verify(orderRepository).findByOrderId(orderId);
+            assertTrue(ex.getMessage().equals(ErrorCode.ORDER_PROCESSED.getMessage()));
+        }
+
+    }
+
+    @After
+    public void teardown() {
+        verifyNoMoreInteractions(productRepository);
+        verifyNoMoreInteractions(orderRepository);
+        verifyNoMoreInteractions(userService);
+    }
 
 }
