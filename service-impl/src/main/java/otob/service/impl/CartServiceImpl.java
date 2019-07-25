@@ -47,7 +47,9 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart createUserCart(String userEmail) {
-        Cart cart = new Cart(userEmail);
+        Cart cart = Cart.builder()
+                .userEmail(userEmail)
+                .build();
 
         return cartRepository.save(cart);
     }
@@ -111,7 +113,7 @@ public class CartServiceImpl implements CartService {
     public CheckoutDto checkout(String userEmail) {
         Cart cart = getUserCart(userEmail);
         List<CartItem> cartItems = cart.getCartItems();
-        String ordId = "";
+        String orderId = "";
         int totItem = 0;
         long totPrice = 0;
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
@@ -149,7 +151,7 @@ public class CartServiceImpl implements CartService {
         }
 
         try {
-            ordId = idGenerator.generateOrderId(ordDate);
+            orderId = idGenerator.generateOrderId(ordDate);
         } catch (Exception e) {
             throw new CustomException(
                     ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
@@ -158,7 +160,7 @@ public class CartServiceImpl implements CartService {
         }
 
         Order order = Order.builder()
-                .orderId(ordId)
+                .orderId(orderId)
                 .userEmail(userEmail)
                 .ordDate(ordDate)
                 .ordItems(cartItems)
