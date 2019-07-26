@@ -150,6 +150,13 @@ public class CartServiceImpl implements CartService {
             itemIdx++;
         }
 
+        if (cartItems.size() == 0) {
+            throw new CustomException(
+                ErrorCode.STOCK_INSUFFICIENT.getCode(),
+                ErrorCode.STOCK_INSUFFICIENT.getMessage()
+            );
+        }
+
         try {
             orderId = idGenerator.generateOrderId(ordDate);
         } catch (Exception e) {
