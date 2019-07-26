@@ -17,9 +17,7 @@ import java.util.List;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ProductServiceImplTest {
@@ -156,8 +154,115 @@ public class ProductServiceImplTest {
   }
 
   @Test
-  public void addProductTest() {
+  public void addProductTest() throws Exception {
+    when(productRepository.existsByName(product1.getName()))
+            .thenReturn(false);
+    when(idGenerator.getNextId("productid"))
+            .thenReturn(1L);
+    when(productRepository.save(product1))
+            .thenReturn(product1);
 
+    Product result = productServiceImpl.addProduct(product1);
+
+    verify(productRepository).existsByName(product1.getName());
+    verify(idGenerator).getNextId("productid");
+    verify(productRepository).save(product1);
+    assertEquals(product1.getName(), result.getName());
+  }
+
+  @Test
+  public void addProductExistsTest() throws Exception {
+    when(productRepository.existsByName(product1.getName()))
+            .thenReturn(true);
+    when(productRepository.save(product1))
+            .thenReturn(product1);
+
+    Product result = productServiceImpl.addProduct(product1);
+
+    verify(productRepository).existsByName(product1.getName());
+    verify(productRepository).save(product1);
+    assertEquals(product1.getName(), result.getName());
+  }
+
+  @Test
+  public void addProductGenerateIdErrorTest() throws Exception {
+    when(productRepository.existsByName(product1.getName()))
+            .thenReturn(false);
+    when(idGenerator.getNextId("productid"))
+            .thenThrow(new Exception());
+
+    try {
+      productServiceImpl.addProduct(product1);
+    }catch (CustomException ex){
+      verify(productRepository).existsByName(product1.getName());
+      verify(idGenerator).getNextId("productid");
+      assertEquals(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), ex.getMessage());
+    }
+  }
+
+  @Test
+  public void addProductFromExcelTest() throws Exception {
+    when(productRepository.existsByName(product1.getName()))
+            .thenReturn(false);
+    when(productRepository.existsByName(product2.getName()))
+            .thenReturn(false);
+    when(idGenerator.getNextId("productid"))
+            .thenReturn(1L, 2L);
+    when(productRepository.save(product1))
+            .thenReturn(product1);
+    when(productRepository.save(product2))
+            .thenReturn(product2);
+
+    List<Product> result = productServiceImpl.addProductFromExcel(products);
+
+    verify(productRepository).existsByName(product1.getName());
+    verify(productRepository).existsByName(product2.getName());
+    verify(idGenerator, times(2)).getNextId("productid");
+    verify(productRepository).save(product1);
+    verify(productRepository).save(product2);
+    assertEquals(2, result.size());
+  }
+
+  @Test
+  public void addProductFromExcelExistsTest() throws Exception {
+    when(productRepository.existsByName(product1.getName()))
+            .thenReturn(true);
+    when(productRepository.findByName(product1.getName()))
+            .thenReturn(product1);
+    when(productRepository.save(product1))
+            .thenReturn(product1);
+    when(productRepository.existsByName(product2.getName()))
+            .thenReturn(false);
+    when(idGenerator.getNextId("productid"))
+            .thenReturn(2L);
+    when(productRepository.save(product2))
+            .thenReturn(product2);
+
+    List<Product> result = productServiceImpl.addProductFromExcel(products);
+
+    verify(productRepository).existsByName(product1.getName());
+    verify(productRepository).findByName(product1.getName());
+    verify(productRepository).save(product1);
+    verify(productRepository).existsByName(product2.getName());
+    verify(idGenerator).getNextId("productid");
+    verify(productRepository).save(product2);
+    assertEquals(2, result.size());
+  }
+
+  @Test
+  public void addProductFromExcelGenerateIdErrorTest() throws Exception {
+    when(productRepository.existsByName(product1.getName()))
+            .thenReturn(false);
+    when(idGenerator.getNextId("productid"))
+            .thenThrow(new Exception());
+
+    try {
+      productServiceImpl.addProductFromExcel(products);
+    }catch (CustomException ex){
+      verify(productRepository).existsByName(product1.getName());
+      verify(idGenerator).getNextId("productid");
+      assertEquals(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), ex.getMessage());
+    }
   }
 
   @Test
