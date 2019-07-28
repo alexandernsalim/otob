@@ -14,53 +14,12 @@ import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
+
     @Autowired
     private ProductRepository productRepository;
 
     @Autowired
     private IdGenerator idGenerator;
-
-    @Override
-    public Product createProduct(Product _product) {
-        if(productRepository.existsByName(_product.getName())){
-            return productRepository.save(_product);
-        }else{
-            try{
-                _product.setProductId(idGenerator.getNextId("productid"));
-
-                return productRepository.save(_product);
-            }catch(Exception e){
-                throw new CustomException(
-                    ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-                    ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
-                );
-            }
-        }
-    }
-
-    public List<Product> batchUpload(List<Product> _product) {
-        List<Product> productList = new ArrayList<>();
-
-        for (Product product : _product) {
-            if(productRepository.existsByName(product.getName())){
-                updateProductByName(product);
-            }else {
-                try {
-                    product.setProductId(idGenerator.getNextId("productid"));
-                    productRepository.save(product);
-                } catch (Exception e) {
-                    throw new CustomException(
-                        ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-                        ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
-                    );
-                }
-            }
-
-            productList.add(product);
-        }
-
-        return productList;
-    }
 
     @Override
     public List<Product> getAllProduct() {
@@ -101,7 +60,49 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAllByNameContaining(name);
     }
 
-    public Product updateProductById(Long productId, Product _product) {
+    @Override
+    public Product addProduct(Product product) {
+        if(productRepository.existsByName(product.getName())){
+            return productRepository.save(product);
+        }else{
+            try{
+                product.setProductId(idGenerator.getNextId("productid"));
+
+                return productRepository.save(product);
+            }catch(Exception e){
+                throw new CustomException(
+                    ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                    ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+                );
+            }
+        }
+    }
+
+    public List<Product> addProductFromExcel(List<Product> products) {
+        List<Product> productList = new ArrayList<>();
+
+        for (Product product : products) {
+            if(productRepository.existsByName(product.getName())){
+                updateProductByName(product);
+            }else {
+                try {
+                    product.setProductId(idGenerator.getNextId("productid"));
+                    productRepository.save(product);
+                } catch (Exception e) {
+                    throw new CustomException(
+                        ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                        ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+                    );
+                }
+            }
+
+            productList.add(product);
+        }
+
+        return productList;
+    }
+
+    public Product updateProductById(Long productId, Product productReq) {
         Product product = productRepository.findByProductId(productId);
 
         if(product == null){
@@ -111,17 +112,17 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
-        product.setName(_product.getName());
-        product.setDescription(_product.getDescription());
-        product.setListPrice(_product.getListPrice());
-        product.setOfferPrice(_product.getOfferPrice());
-        product.setStock(_product.getStock());
+        product.setName(productReq.getName());
+        product.setDescription(productReq.getDescription());
+        product.setListPrice(productReq.getListPrice());
+        product.setOfferPrice(productReq.getOfferPrice());
+        product.setStock(productReq.getStock());
 
         return productRepository.save(product);
     }
 
-    public Product updateProductByName(Product _product) {
-        Product product = productRepository.findByName(_product.getName());
+    public Product updateProductByName(Product productReq) {
+        Product product = productRepository.findByName(productReq.getName());
 
         if(product == null){
             throw new CustomException(
@@ -130,10 +131,10 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
-        product.setDescription(_product.getDescription());
-        product.setListPrice(_product.getListPrice());
-        product.setOfferPrice(_product.getOfferPrice());
-        product.setStock(_product.getStock());
+        product.setDescription(productReq.getDescription());
+        product.setListPrice(productReq.getListPrice());
+        product.setOfferPrice(productReq.getOfferPrice());
+        product.setStock(productReq.getStock());
 
         return productRepository.save(product);
     }

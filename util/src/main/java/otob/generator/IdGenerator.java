@@ -9,6 +9,7 @@ import java.util.Date;
 
 @Component
 public class IdGenerator {
+
     private final String ORD_PRE = "ORD";
 
     public Long getNextId(String name) throws Exception {

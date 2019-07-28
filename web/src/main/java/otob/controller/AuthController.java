@@ -1,13 +1,17 @@
 package otob.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import otob.constant.Role;
 import otob.constant.Status;
-import otob.dto.AuthDto;
+import otob.constant.path.AuthApiPath;
 import otob.entity.User;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
 import otob.generator.RandomTextGenerator;
 import otob.response.Response;
 import otob.service.api.AuthService;
@@ -19,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(AuthApiPath.BASE_PATH)
 public class AuthController extends GlobalController {
 
     @Autowired
@@ -31,83 +35,62 @@ public class AuthController extends GlobalController {
     @Autowired
     private RandomTextGenerator textGenerator;
 
+    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     private HttpSession session;
 
-    @PostMapping("/login")
-    public Response<AuthDto> login(
+    @PostMapping(AuthApiPath.LOGIN)
+    public Response<String> login(
             HttpServletRequest request,
+            HttpServletResponse response,
             @RequestParam("email") String email,
             @RequestParam("password") String password) {
 
-        AuthDto response;
         User user;
-        session = request.getSession(false);
+        session = request.getSession(true);
 
-//        request.getRequestedSessionId();
-//        request.getCookies();
+        if (authService.login(email, password)) {
+            user = userService.getUserByEmail(email);
 
-        if (!isAuthenticated(request)) {
-            if (authService.login(email, password)) {
-                user = userService.getUserByEmail(email);
+            session.setAttribute("userId", email);
+            session.setAttribute("role", user.getRoles().get(0).getName());
+            session.setAttribute("isLogin", Status.LOGIN_TRUE);
 
-                session.setAttribute("userId", email);
-                session.setAttribute("role", user.getRoles().get(0).getName());
-                session.setAttribute("isLogin", Status.LOGIN_TRUE);
+            Cookie userId = new Cookie("user-id", email);
+            userId.setHttpOnly(false);
+            userId.setSecure(false);
 
-                response = AuthDto.builder()
-                        .userId(email)
-                        .role(user.getRoles().get(0).getName())
-                        .isLogin(true)
-                        .build();
-            } else {
-                response = AuthDto.builder()
-                        .userId(session.getAttribute("userId").toString())
-                        .role(Role.GUEST)
-                        .isLogin(false)
-                        .build();
-            }
+            Cookie userRole = new Cookie("user-role", user.getRoles().get(0).getName());
+            userRole.setHttpOnly(false);
+            userRole.setSecure(false);
+
+            response.addCookie(userId);
+            response.addCookie(userRole);
+
+            return toResponse(HttpStatus.ACCEPTED);
         } else {
-            throw new CustomException(
-                    ErrorCode.LOGGED_IN.getCode(),
-                    ErrorCode.LOGGED_IN.getMessage()
-            );
+            Cookie userId = new Cookie("user-id", textGenerator.generateRandomUserId());
+            userId.setHttpOnly(false);
+            userId.setSecure(false);
+
+
+            Cookie userRole = new Cookie("user-role", Role.GUEST);
+            userRole.setHttpOnly(false);
+            userRole.setSecure(false);
+
+            response.addCookie(userId);
+            response.addCookie(userRole);
+
+            return toResponse(HttpStatus.BAD_REQUEST);
         }
-
-//        servletResponse.addCookie(new Cookie("cook1", "1"));
-//        servletResponse.addCookie(new Cookie("cook2", "2"));
-//        servletResponse.addCookie(new Cookie("cook3", "3"));
-//        servletResponse.addCookie(new Cookie("cook4", "4"));
-
-        return toResponse(response);
     }
 
-    @PostMapping("/logout")
+    @PostMapping(AuthApiPath.LOGOUT)
     private Response<String> logout(HttpServletRequest request) {
-        String response;
+        request.getSession(true).invalidate();
+        logger.info("Session invalidated");
 
-        session = request.getSession();
-
-        if (!isAuthenticated(request)) {
-            response = "Not Logged In";
-        } else {
-            session.setAttribute("userId", textGenerator.generateRandomUserId());
-            session.setAttribute("role", Role.GUEST);
-            session.setAttribute("isLogin", Status.LOGIN_FALSE);
-            response = "Logout Success";
-        }
-
-        return toResponse(response);
+        return toResponse(HttpStatus.OK);
     }
-
-    @GetMapping("/userId")
-    public Response<String> getUserId(HttpServletRequest request) {
-        Object user = request.getSession().getAttribute("userId");
-
-        return toResponse((user != null) ? user.toString() : "No logged user");
-    }
-
 
 }
-
-//OWRjOGViOGQtZDAwYy00MTZjLTk1MWYtZDRmZDk0N2ZhYzc0
-//OWRjOGViOGQtZDAwYy00MTZjLTk1MWYtZDRmZDk0N2ZhYzc0

@@ -28,17 +28,17 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
         Cart cart = checkItemExistsInCart(email, product.getProductId());
 
-        if(cart == null){
+        if (cart == null) {
             checkStock(qty, product.getStock());
 
             query.addCriteria(Criteria.where("userEmail").is(email));
             update.push("cartItems", new BasicDBObject()
-                .append("productId", product.getProductId())
-                .append("productName", product.getName())
-                .append("productPrice", product.getOfferPrice())
-                .append("qty", qty)
+                    .append("productId", product.getProductId())
+                    .append("productName", product.getName())
+                    .append("productPrice", product.getOfferPrice())
+                    .append("qty", qty)
             );
-        }else{
+        } else {
             int currQty = getExistingItemQty(cart, product.getProductId());
 
             checkStock(currQty + qty, product.getStock());
@@ -56,16 +56,16 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
         Cart cart = checkItemExistsInCart(email, product.getProductId());
 
-        if(cart != null){
+        if (cart != null) {
             checkStock(qty, product.getStock());
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(product.getProductId()));
             update.set("cartItems.$.qty", qty);
 
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
-        }else{
+        } else {
             throw new CustomException(
-                ErrorCode.NOT_FOUND.getCode(),
-                ErrorCode.NOT_FOUND.getMessage()
+                    ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage()
             );
         }
     }
@@ -77,35 +77,35 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
         Cart cart = checkItemExistsInCart(email, productId);
 
-        if(cart != null){
+        if (cart != null) {
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(productId));
             update.pull("cartItems", new BasicDBObject()
-                .append("productId", productId)
+                    .append("productId", productId)
             );
 
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
-        }else{
+        } else {
             throw new CustomException(
-                ErrorCode.NOT_FOUND.getCode(),
-                ErrorCode.NOT_FOUND.getMessage()
+                    ErrorCode.NOT_FOUND.getCode(),
+                    ErrorCode.NOT_FOUND.getMessage()
             );
         }
     }
 
     //Private Method
-    private Cart checkItemExistsInCart(String email, Long productId){
+    private Cart checkItemExistsInCart(String email, Long productId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(productId));
 
         return mongoTemplate.findOne(query, Cart.class);
     }
 
-    private int getExistingItemQty(Cart cart, Long productId){
+    private int getExistingItemQty(Cart cart, Long productId) {
         List<CartItem> cartItems = cart.getCartItems();
         int currStock = 0;
 
-        for(CartItem item : cartItems){
-            if(item.getProductId().equals(productId)){
+        for (CartItem item : cartItems) {
+            if (item.getProductId().equals(productId)) {
                 currStock = item.getQty();
                 break;
             }
@@ -114,11 +114,11 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
         return currStock;
     }
 
-    private void checkStock(int qty, int stock){
-        if(qty > stock){
+    private void checkStock(int qty, int stock) {
+        if (qty > stock) {
             throw new CustomException(
-                ErrorCode.STOCK_INSUFFICIENT.getCode(),
-                ErrorCode.STOCK_INSUFFICIENT.getMessage()
+                    ErrorCode.STOCK_INSUFFICIENT.getCode(),
+                    ErrorCode.STOCK_INSUFFICIENT.getMessage()
             );
         }
     }

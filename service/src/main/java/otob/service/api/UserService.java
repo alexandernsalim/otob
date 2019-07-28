@@ -11,6 +11,5 @@ public interface UserService {
     User registerNewUser(User user, String role);
     Boolean checkUser(String email);
     Boolean removeUser(String email);
-    String forgetPassword(String email);
 
 }

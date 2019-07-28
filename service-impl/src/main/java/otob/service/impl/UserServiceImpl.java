@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
- public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -44,15 +44,22 @@ import java.util.List;
 
     @Override
     public User getUserByEmail(String email) {
+        if (!checkUser(email)) {
+            throw new CustomException(
+                    ErrorCode.USER_NOT_FOUND.getCode(),
+                    ErrorCode.USER_NOT_FOUND.getMessage()
+            );
+        }
+
         return userRepository.findByEmail(email);
     }
 
     @Override
-    public User registerNewUser(User userRequest, String role){
-        if(userRepository.existsByEmail(userRequest.getEmail())){
+    public User registerNewUser(User userRequest, String role) {
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new CustomException(
-                ErrorCode.EMAIL_EXISTS.getCode(),
-                ErrorCode.EMAIL_EXISTS.getMessage()
+                    ErrorCode.EMAIL_EXISTS.getCode(),
+                    ErrorCode.EMAIL_EXISTS.getMessage()
             );
         }
 
@@ -80,12 +87,14 @@ import java.util.List;
 
     @Override
     public Boolean removeUser(String email) {
-        return (userRepository.deleteByEmail(email) == 1 && cartService.removeUserCart(email)) ? Boolean.TRUE : Boolean.FALSE;
-    }
+        if (!checkUser(email)) {
+            throw new CustomException(
+                    ErrorCode.USER_NOT_FOUND.getCode(),
+                    ErrorCode.USER_NOT_FOUND.getMessage()
+            );
+        }
 
-    @Override
-    public String forgetPassword(String email) {
-        return null;
+        return (userRepository.deleteByEmail(email) == 1 && cartService.removeUserCart(email)) ? Boolean.TRUE : Boolean.FALSE;
     }
 
 }

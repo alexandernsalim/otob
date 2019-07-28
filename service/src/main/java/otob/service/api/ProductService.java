@@ -5,9 +5,9 @@ import otob.entity.Product;
 import java.util.List;
 
 public interface ProductService {
-    Product createProduct(Product product);
+    Product addProduct(Product product);
 
-    List<Product> batchUpload(List<Product> product);
+    List<Product> addProductFromExcel(List<Product> product);
 
     List<Product> getAllProduct();
 
