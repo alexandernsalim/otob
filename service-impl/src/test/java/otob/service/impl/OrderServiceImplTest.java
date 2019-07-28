@@ -20,9 +20,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class OrderServiceImplTest {
@@ -87,35 +85,35 @@ public class OrderServiceImplTest {
                 .build();
 
         orderRejected = Order.builder()
-            .orderId(orderId)
-            .userEmail(userEmail)
-            .ordDate("2019/06/25 11:14")
-            .ordItems(items)
-            .totItem(1)
-            .totPrice(5000000L)
-            .ordStatus(Status.ORD_REJECT)
-            .build();
+                .orderId(orderId)
+                .userEmail(userEmail)
+                .ordDate("2019/06/25 11:14")
+                .ordItems(items)
+                .totItem(1)
+                .totPrice(5000000L)
+                .ordStatus(Status.ORD_REJECT)
+                .build();
 
         orders = new ArrayList<>();
         orders.add(order);
 
         product = Product.builder()
-            .productId(1L)
-            .name("Asus")
-            .description("Laptop")
-            .listPrice(7500000)
-            .offerPrice(5000000)
-            .stock(0)
-            .build();
+                .productId(1L)
+                .name("Asus")
+                .description("Laptop")
+                .listPrice(7500000)
+                .offerPrice(5000000)
+                .stock(0)
+                .build();
 
         productUpdated = Product.builder()
-            .productId(1L)
-            .name("Asus")
-            .description("Laptop")
-            .listPrice(7500000)
-            .offerPrice(5000000)
-            .stock(1)
-            .build();
+                .productId(1L)
+                .name("Asus")
+                .description("Laptop")
+                .listPrice(7500000)
+                .offerPrice(5000000)
+                .stock(1)
+                .build();
 
     }
 
@@ -230,11 +228,11 @@ public class OrderServiceImplTest {
         when(orderRepository.findByOrderId(orderId))
                 .thenReturn(order);
         when(productService.getProductById(product.getProductId()))
-            .thenReturn(product);
+                .thenReturn(product);
         when(productService.updateProductById(product.getProductId(), product))
-            .thenReturn(productUpdated);
+                .thenReturn(productUpdated);
         when(orderRepository.save(orderRejected))
-            .thenReturn(orderRejected);
+                .thenReturn(orderRejected);
 
         Order result = orderServiceImpl.rejectOrder(orderId);
 
@@ -277,7 +275,7 @@ public class OrderServiceImplTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         verifyNoMoreInteractions(productService);
         verifyNoMoreInteractions(orderRepository);
         verifyNoMoreInteractions(userService);

@@ -81,7 +81,7 @@ public class RoleAccessServiceImplTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         verifyNoMoreInteractions(roleAccessRepository);
     }
 

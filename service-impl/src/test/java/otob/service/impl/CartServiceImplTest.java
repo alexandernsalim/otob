@@ -390,7 +390,7 @@ public class CartServiceImplTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         verifyNoMoreInteractions(cartRepository);
         verifyNoMoreInteractions(productService);
         verifyNoMoreInteractions(userService);

@@ -104,7 +104,7 @@ public class RoleServiceImplTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         verifyNoMoreInteractions(roleRepository);
         verifyNoMoreInteractions(idGenerator);
     }

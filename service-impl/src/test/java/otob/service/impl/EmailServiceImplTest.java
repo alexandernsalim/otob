@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import javax.mail.Message;
@@ -19,8 +18,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EmailServiceImplTest {
-
-
 
     @Mock
     private JavaMailSender mailSender;
@@ -58,7 +55,7 @@ public class EmailServiceImplTest {
     }
 
     @After
-    public void teardown(){
+    public void tearDown(){
         greenMail.stop();
         verifyNoMoreInteractions(mailSender);
     }

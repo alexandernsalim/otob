@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean login(String email, String password) {
-        if (userService.checkUser(email).equals(Boolean.FALSE)) {
+        if (!userService.checkUser(email)) {
             throw new CustomException(
                     ErrorCode.USER_NOT_FOUND.getCode(),
                     ErrorCode.USER_NOT_FOUND.getMessage()
@@ -61,8 +61,6 @@ public class AuthServiceImpl implements AuthService {
         return access.stream().anyMatch(s -> {
             Pattern pattern = Pattern.compile(s);
             Matcher matcher = pattern.matcher(request.getServletPath());
-
-            System.out.println(pattern.toString());
 
             return matcher.matches();
         });
