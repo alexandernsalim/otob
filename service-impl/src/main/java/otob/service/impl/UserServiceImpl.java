@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import otob.entity.User;
 import otob.enumerator.ErrorCode;
 import otob.exception.CustomException;
-import otob.generator.RandomPasswordGenerator;
+import otob.generator.RandomTextGenerator;
 import otob.repository.UserRepository;
 import otob.service.api.CartService;
 import otob.service.api.EmailService;
@@ -35,7 +35,7 @@ import java.util.List;
     private PasswordEncoder encoder;
 
     @Autowired
-    private RandomPasswordGenerator passwordGenerator;
+    private RandomTextGenerator textGenerator;
 
     @Override
     public List<User> getAllUser() {
@@ -57,7 +57,7 @@ import java.util.List;
         }
 
         User user = new User();
-        String password = passwordGenerator.generateRandomPassword();
+        String password = textGenerator.generateRandomPassword();
 
         user.setEmail(userRequest.getEmail());
         user.setPassword(encoder.encode(password));

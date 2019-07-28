@@ -22,8 +22,8 @@ public class AuthServiceImpl implements AuthService {
     public boolean login(String email, String password) {
         if(userService.checkUser(email).equals(Boolean.FALSE)) {
             throw new CustomException(
-                ErrorCode.USER_NOT_FOUND.getCode()
-                , ErrorCode.USER_NOT_FOUND.getMessage()
+                ErrorCode.USER_NOT_FOUND.getCode(),
+                ErrorCode.USER_NOT_FOUND.getMessage()
             );
         }
 

@@ -2,16 +2,16 @@ package otob.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import otob.constant.Status;
 import otob.dto.CheckoutDto;
 import otob.entity.Cart;
 import otob.entity.CartItem;
 import otob.entity.Order;
 import otob.entity.Product;
 import otob.enumerator.ErrorCode;
-import otob.enumerator.Status;
 import otob.exception.CustomException;
-import otob.repository.CartRepository;
 import otob.generator.IdGenerator;
+import otob.repository.CartRepository;
 import otob.service.api.CartService;
 import otob.service.api.OrderService;
 import otob.service.api.ProductService;
@@ -19,7 +19,9 @@ import otob.service.api.UserService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -157,7 +159,7 @@ public class CartServiceImpl implements CartService {
                 .ordItems(cartItems)
                 .totItem(totItem)
                 .totPrice(totPrice)
-                .ordStatus(Status.WAIT.getStatus())
+                .ordStatus(Status.ORD_WAIT)
                 .build();
 
         orderService.createOrder(order);

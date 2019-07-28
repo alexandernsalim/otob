@@ -31,6 +31,7 @@
 		<passay.version>1.4.0</passay.version>
 		<poi.xml.version>3.10-FINAL</poi.xml.version>
 		<jedis.version>2.9.0</jedis.version>
+		<commons.lang3>3.9</commons.lang3>
 		<spring.mail.version>2.0.1.RELEASE</spring.mail.version>
 		<spring.web.version>5.1.5.RELEASE</spring.web.version>
 		<spring.data.redis.version>2.1.7.RELEASE</spring.data.redis.version>
@@ -99,6 +100,10 @@
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -140,6 +145,11 @@
 				<groupId>redis.clients</groupId>
 				<artifactId>jedis</artifactId>
 				<version>${jedis.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons.lang3}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

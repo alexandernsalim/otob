@@ -8,12 +8,16 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import otob.constant.ProductApiPath;
 import otob.dto.ProductDto;
 import otob.entity.Product;
+import otob.enumerator.ErrorCode;
+import otob.exception.CustomException;
 import otob.mapper.BeanMapper;
 import otob.response.Response;
 import otob.service.api.ProductService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,23 +33,47 @@ public class ProductController extends GlobalController {
     @Autowired
     private BeanMapper mapper;
 
-    private MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
+    @GetMapping
+    public Response<List<ProductDto>> getAllProduct(){
+        List<Product> products = productService.getAllProduct();
 
-    @PostMapping("/")
-    public Response<ProductDto> create(@Valid @RequestBody ProductDto productDto){
+        return toResponse(mapper.mapAsList(products, ProductDto.class));
+    }
+
+    @GetMapping(ProductApiPath.GET_PRODUCT_BY_ID)
+    public Response<ProductDto> getProductById(@PathVariable Long productId){
+        return toResponse(mapper.map(productService.getProductById(productId), ProductDto.class));
+    }
+
+    @GetMapping(ProductApiPath.GET_PRODUCT_BY_NAME)
+    public Response<List<ProductDto>> getProductByName(@PathVariable String productName){
+        List<Product> products = productService.getAllProductByName(productName);
+
+        return toResponse(mapper.mapAsList(products, ProductDto.class));
+    }
+
+    @PostMapping
+    public Response<ProductDto> addProduct(HttpServletRequest request, @Valid @RequestBody ProductDto productDto){
+        if(!isAuthenticated(request) || !isAuthorized(request)){
+            throw new CustomException(
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
+            );
+        }
+
         Product product = mapper.map(productDto, Product.class);
 
         return toResponse(mapper.map(productService.createProduct(product), ProductDto.class));
     }
 
-    @PostMapping("/import")
-    public Response<List<ProductDto>> batchUpload(@RequestParam("file") MultipartFile dataFile) throws IOException {
-        List<Product> productList = new ArrayList<Product>();
+    @PostMapping(ProductApiPath.ADD_PRODUCT_FROM_EXCEL)
+    public Response<List<ProductDto>> addProductFromExcel(@RequestParam("file") MultipartFile dataFile) throws IOException {
+        List<Product> productList = new ArrayList<>();
 
         XSSFWorkbook workbook = new XSSFWorkbook(dataFile.getInputStream());
         XSSFSheet worksheet = workbook.getSheetAt(0);
 
-        for(int i=2;i<worksheet.getPhysicalNumberOfRows() ;i++) {
+        for(int i = 2; i < worksheet.getPhysicalNumberOfRows(); i++) {
             XSSFRow row = worksheet.getRow(i);
 
             Product product = new Product();
@@ -64,34 +92,29 @@ public class ProductController extends GlobalController {
         return toResponse(mapper.mapAsList(productListResult, ProductDto.class));
     }
 
-    @GetMapping("/")
-    public Response<List<ProductDto>> getAll(){
-        List<Product> products = productService.getAllProduct();
+    @PutMapping(ProductApiPath.PRODUCTID_PLACEHOLDER)
+    public Response<ProductDto> updateById(HttpServletRequest request, @PathVariable Long productId, @Valid @RequestBody ProductDto productDto) {
+        if(!isAuthenticated(request) || !isAuthorized(request)){
+            throw new CustomException(
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
+            );
+        }
 
-        return toResponse(mapper.mapAsList(products, ProductDto.class));
-    }
-
-    @GetMapping("/getById/{productId}")
-    public Response<ProductDto> getById(@PathVariable Long productId){
-        return toResponse(mapper.map(productService.getProductById(productId), ProductDto.class));
-    }
-
-    @GetMapping("/getByName/{name}")
-    public Response<List<ProductDto>> getByName(@PathVariable String name){
-        List<Product> products = productService.getAllProductByName(name);
-
-        return toResponse(mapper.mapAsList(products, ProductDto.class));
-    }
-
-    @PutMapping("/updateById/{productId}")
-    public Response<ProductDto> updateById(@PathVariable Long productId, @Valid @RequestBody ProductDto productDto) {
         Product product = mapper.map(productDto, Product.class);
 
         return toResponse(mapper.map(productService.updateProductById(productId, product), ProductDto.class));
     }
 
-    @DeleteMapping("/deleteById/{productId}")
-    public Response<Boolean> deleteById(@PathVariable Long productId) {
+    @DeleteMapping(ProductApiPath.PRODUCTID_PLACEHOLDER)
+    public Response<Boolean> deleteById(HttpServletRequest request, @PathVariable Long productId) {
+        if(!isAuthenticated(request) || !isAuthorized(request)){
+            throw new CustomException(
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
+            );
+        }
+
         return toResponse(productService.deleteProductById(productId));
     }
 

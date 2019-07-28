@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface OrderService {
 
+    List<Order> getAllOrder();
     List<Order> getUserAllOrder(String userEmail);
     Order findOrder(String ordId);
     Order createOrder(Order order);
