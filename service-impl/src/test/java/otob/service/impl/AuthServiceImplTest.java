@@ -1,26 +1,26 @@
 package otob.service.impl;
 
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import otob.constant.Status;
-import otob.constant.path.AuthApiPath;
-import otob.entity.Role;
-import otob.entity.User;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
-import otob.service.api.RoleAccessService;
-import otob.service.api.UserService;
+import otob.model.constant.Role;
+import otob.model.constant.Status;
+import otob.model.constant.path.AuthApiPath;
+import otob.model.entity.User;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.service.RoleAccessService;
+import otob.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,16 +46,16 @@ public class AuthServiceImplTest {
     @InjectMocks
     private AuthServiceImpl authServiceImpl;
 
-    private List<Role> roles;
+    private List<otob.model.entity.Role> roles;
     private List<String> roleAccess;
-    private Role roleCustomer;
+    private otob.model.entity.Role roleCustomer;
     private User user;
 
     @Before
     public void setUp() {
         initMocks(this);
 
-        roleCustomer = Role.builder()
+        roleCustomer = otob.model.entity.Role.builder()
                 .roleId(1L)
                 .name("ROLE_CUSTOMER")
                 .build();
@@ -99,7 +99,7 @@ public class AuthServiceImplTest {
             authServiceImpl.login(user.getEmail(), user.getPassword());
         } catch (CustomException ex) {
             verify(userService).checkUser(user.getEmail());
-            assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
+            TestCase.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
         }
     }
 
@@ -138,8 +138,8 @@ public class AuthServiceImplTest {
         when(request.getSession(true))
                 .thenReturn(session);
         when(session.getAttribute("role"))
-                .thenReturn(otob.constant.Role.CUSTOMER);
-        when(roleAccessService.getAccessByRole(otob.constant.Role.CUSTOMER))
+                .thenReturn(Role.CUSTOMER);
+        when(roleAccessService.getAccessByRole(Role.CUSTOMER))
                 .thenReturn(roleAccess);
         when(request.getServletPath())
                 .thenReturn(AuthApiPath.BASE_PATH + AuthApiPath.LOGIN);
@@ -148,7 +148,7 @@ public class AuthServiceImplTest {
 
         verify(request).getSession(true);
         verify(session).getAttribute("role");
-        verify(roleAccessService).getAccessByRole(otob.constant.Role.CUSTOMER);
+        verify(roleAccessService).getAccessByRole(Role.CUSTOMER);
         verify(request).getServletPath();
         assertTrue(result);
     }
@@ -161,8 +161,8 @@ public class AuthServiceImplTest {
         when(request.getSession(true))
                 .thenReturn(session);
         when(session.getAttribute("role"))
-                .thenReturn(otob.constant.Role.CUSTOMER);
-        when(roleAccessService.getAccessByRole(otob.constant.Role.CUSTOMER))
+                .thenReturn(Role.CUSTOMER);
+        when(roleAccessService.getAccessByRole(Role.CUSTOMER))
                 .thenReturn(roleAccess);
         when(request.getServletPath())
                 .thenReturn(AuthApiPath.BASE_PATH + AuthApiPath.LOGIN);
@@ -171,7 +171,7 @@ public class AuthServiceImplTest {
 
         verify(request).getSession(true);
         verify(session).getAttribute("role");
-        verify(roleAccessService).getAccessByRole(otob.constant.Role.CUSTOMER);
+        verify(roleAccessService).getAccessByRole(Role.CUSTOMER);
         verify(request).getServletPath();
         assertTrue(!result);
     }

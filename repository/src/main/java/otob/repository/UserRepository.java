@@ -1,7 +1,7 @@
 package otob.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import otob.entity.User;
+import otob.model.entity.User;
 
 public interface UserRepository extends MongoRepository<User, String> {
     User findByEmail(String email);

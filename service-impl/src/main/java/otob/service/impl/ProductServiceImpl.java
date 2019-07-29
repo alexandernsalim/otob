@@ -2,12 +2,12 @@ package otob.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import otob.entity.Product;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
-import otob.generator.IdGenerator;
+import otob.model.entity.Product;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.util.generator.IdGenerator;
+import otob.service.ProductService;
 import otob.repository.ProductRepository;
-import otob.service.api.ProductService;
 
 import java.util.ArrayList;
 import java.util.List;
