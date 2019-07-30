@@ -48,7 +48,6 @@ public class ProductControllerTest {
     private Product product2;
     private Product product1Updated;
     private List<Product> products;
-//    private List<ProductDto> productsResponse;
 
     @Before
     public void setUp() {
@@ -90,28 +89,6 @@ public class ProductControllerTest {
         products = new ArrayList<>();
         products.add(product1);
         products.add(product2);
-
-//        ProductDto productRes1 = ProductDto.builder()
-//                .productId(1)
-//                .name("Redmi Note 7")
-//                .description("4/64 GB")
-//                .listPrice(2700000)
-//                .offerPrice(2000000)
-//                .stock(1)
-//                .build();
-//
-//        ProductDto productRes2 = ProductDto.builder()
-//                .productId(2)
-//                .name("Acer Aspire E5")
-//                .description("i5")
-//                .listPrice(6000000)
-//                .offerPrice(4500000)
-//                .stock(1)
-//                .build();
-//
-//        productsResponse = new ArrayList<>();
-//        productsResponse.add(productRes1);
-//        productsResponse.add(productRes2);
 
     }
 

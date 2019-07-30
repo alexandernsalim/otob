@@ -13,7 +13,6 @@ import otob.model.constant.path.RoleApiPath;
 import otob.model.entity.Role;
 import otob.model.exception.GlobalExceptionHandler;
 import otob.service.RoleService;
-import otob.web.controller.RoleController;
 import otob.web.model.RoleDto;
 
 import static org.mockito.Mockito.*;
