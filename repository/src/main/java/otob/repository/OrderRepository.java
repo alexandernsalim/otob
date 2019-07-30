@@ -1,7 +1,7 @@
 package otob.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import otob.entity.Order;
+import otob.model.entity.Order;
 
 import java.util.List;
 

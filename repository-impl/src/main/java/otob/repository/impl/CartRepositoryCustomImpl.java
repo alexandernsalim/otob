@@ -7,15 +7,17 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import otob.entity.Cart;
-import otob.entity.CartItem;
-import otob.entity.Product;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
+import org.springframework.stereotype.Repository;
+import otob.model.entity.Cart;
+import otob.model.entity.CartItem;
+import otob.model.entity.Product;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
 import otob.repository.CartRepositoryCustom;
 
 import java.util.List;
 
+@Repository
 public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
     @Autowired

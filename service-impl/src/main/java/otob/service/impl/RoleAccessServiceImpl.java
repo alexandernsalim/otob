@@ -2,11 +2,11 @@ package otob.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import otob.entity.RoleAccess;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
+import otob.model.entity.RoleAccess;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.service.RoleAccessService;
 import otob.repository.RoleAccessRepository;
-import otob.service.api.RoleAccessService;
 
 import java.util.List;
 

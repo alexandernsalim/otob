@@ -1,7 +1,7 @@
 package otob.repository;
 
-import otob.entity.Cart;
-import otob.entity.Product;
+import otob.model.entity.Cart;
+import otob.model.entity.Product;
 
 public interface CartRepositoryCustom {
 

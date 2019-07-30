@@ -1,23 +1,24 @@
 package otob.service.impl;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import otob.constant.Status;
-import otob.dto.CheckoutDto;
-import otob.entity.Cart;
-import otob.entity.CartItem;
-import otob.entity.Order;
-import otob.entity.Product;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
-import otob.generator.IdGenerator;
+import otob.model.constant.Status;
+import otob.web.model.CheckoutDto;
+import otob.model.entity.Cart;
+import otob.model.entity.CartItem;
+import otob.model.entity.Order;
+import otob.model.entity.Product;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.util.generator.IdGenerator;
+import otob.service.OrderService;
+import otob.service.ProductService;
+import otob.service.UserService;
 import otob.repository.CartRepository;
-import otob.service.api.OrderService;
-import otob.service.api.ProductService;
-import otob.service.api.UserService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -155,7 +156,7 @@ public class CartServiceImplTest {
             cartServiceImpl.getUserCart(userEmail);
         } catch (CustomException ex) {
             verify(userService).checkUser(userEmail);
-            assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
+            Assert.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
         }
     }
 
@@ -322,7 +323,7 @@ public class CartServiceImplTest {
         verify(cartRepository).removeFromCart(userEmail, 1L);
         verify(idGenerator).generateOrderId(orderDate);
         verify(orderService).createOrder(order);
-        assertEquals(checkoutResult.getOrder(), result.getOrder());
+        Assert.assertEquals(checkoutResult.getOrder(), result.getOrder());
     }
 
     @Test

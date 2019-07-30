@@ -2,16 +2,16 @@ package otob.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import otob.constant.Status;
-import otob.entity.CartItem;
-import otob.entity.Order;
-import otob.entity.Product;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
+import otob.model.constant.Status;
+import otob.model.entity.CartItem;
+import otob.model.entity.Order;
+import otob.model.entity.Product;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.service.OrderService;
+import otob.service.ProductService;
+import otob.service.UserService;
 import otob.repository.OrderRepository;
-import otob.service.api.OrderService;
-import otob.service.api.ProductService;
-import otob.service.api.UserService;
 
 import java.util.List;
 

@@ -1,13 +1,14 @@
 package otob.service.impl;
 
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import otob.entity.RoleAccess;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
+import otob.model.entity.RoleAccess;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
 import otob.repository.RoleAccessRepository;
 
 import java.util.Arrays;
@@ -75,7 +76,7 @@ public class RoleAccessServiceImplTest {
             roleAccessServiceImpl.getAccessByRole(roleNotExists);
         } catch (CustomException ex) {
             verify(roleAccessRepository).existsById(roleNotExists);
-            assertEquals(ErrorCode.BAD_REQUEST.getCode(), ex.getErrorCode());
+            TestCase.assertEquals(ErrorCode.BAD_REQUEST.getCode(), ex.getErrorCode());
             assertEquals(ErrorCode.BAD_REQUEST.getMessage(), ex.getMessage());
         }
     }

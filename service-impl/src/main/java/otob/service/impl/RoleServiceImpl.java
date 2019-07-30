@@ -2,13 +2,13 @@ package otob.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import otob.dto.RoleDto;
-import otob.entity.Role;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
-import otob.generator.IdGenerator;
+import otob.web.model.RoleDto;
+import otob.model.entity.Role;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.util.generator.IdGenerator;
+import otob.service.RoleService;
 import otob.repository.RoleRepository;
-import otob.service.api.RoleService;
 
 @Service
 public class RoleServiceImpl implements RoleService {

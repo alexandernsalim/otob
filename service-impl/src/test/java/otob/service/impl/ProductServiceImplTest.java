@@ -1,14 +1,15 @@
 package otob.service.impl;
 
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import otob.entity.Product;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
-import otob.generator.IdGenerator;
+import otob.model.entity.Product;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.util.generator.IdGenerator;
 import otob.repository.ProductRepository;
 
 import java.util.ArrayList;
@@ -98,7 +99,7 @@ public class ProductServiceImplTest {
             productServiceImpl.getAllProduct();
         } catch (CustomException ex) {
             verify(productRepository).findAll();
-            assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
+            TestCase.assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
         }
     }
 
