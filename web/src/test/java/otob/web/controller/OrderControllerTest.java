@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import otob.model.constant.Status;
@@ -35,17 +37,14 @@ public class OrderControllerTest {
     @Mock
     private OrderService orderService;
 
-    @Mock
-    private HttpServletRequest request;
-
-    @Mock
-    private HttpSession session;
-
     @InjectMocks
     private OrderController orderController;
 
     private MockMvc mvc;
+    private MockHttpServletRequest request;
+    private MockHttpSession session;
     private ObjectMapper objectMapper;
+
     private CartItem item1;
     private List<CartItem> items;
     private String orderId;
@@ -62,7 +61,9 @@ public class OrderControllerTest {
         mvc = MockMvcBuilders.standaloneSetup(orderController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
-
+        request = new MockHttpServletRequest();
+        session = new MockHttpSession();
+        request.setSession(session);
         objectMapper = new ObjectMapper();
 
         item1 = CartItem.builder()
@@ -71,10 +72,8 @@ public class OrderControllerTest {
                 .productPrice(5000000)
                 .qty(1)
                 .build();
-
         items = new ArrayList<>();
         items.add(item1);
-
         orderId = "ORD1561436040000";
         userEmail = "alexandernsalim@gmail.com";
         order = Order.builder()
@@ -86,7 +85,6 @@ public class OrderControllerTest {
                 .totPrice(5000000L)
                 .ordStatus(Status.ORD_WAIT)
                 .build();
-
         orderAccepted = Order.builder()
                 .orderId(orderId)
                 .userEmail(userEmail)
@@ -96,7 +94,6 @@ public class OrderControllerTest {
                 .totPrice(5000000L)
                 .ordStatus(Status.ORD_ACCEPT)
                 .build();
-
         orderRejected = Order.builder()
                 .orderId(orderId)
                 .userEmail(userEmail)
@@ -106,7 +103,6 @@ public class OrderControllerTest {
                 .totPrice(5000000L)
                 .ordStatus(Status.ORD_REJECT)
                 .build();
-
         orders = new ArrayList<>();
         orders.add(order);
     }
@@ -127,23 +123,16 @@ public class OrderControllerTest {
 
     @Test
     public void getUserAllOrderTest() throws Exception {
-        session.setAttribute("userId", userEmail);
-
-        when(request.getSession())
-                .thenReturn(session);
-        when(session.getAttribute("userId"))
-                .thenReturn(userEmail);
         when(orderService.getAllOrderByUserEmail(userEmail))
                 .thenReturn(orders);
 
         mvc.perform(
-                get(OrderApiPath.BASE_PATH + OrderApiPath.GET_USER_ALL_ORDER)
+            get(OrderApiPath.BASE_PATH + OrderApiPath.GET_USER_ALL_ORDER)
+                .sessionAttr("userId", userEmail)
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data", hasSize(1)));
 
-        verify(request).getSession(true);
-        verify(session).getAttribute("userId");
         verify(orderService).getAllOrderByUserEmail(userEmail);
     }
 

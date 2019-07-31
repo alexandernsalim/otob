@@ -25,6 +25,8 @@ public class OrderController extends GlobalController {
     @Autowired
     private BeanMapper mapper;
 
+    private HttpSession session;
+
     @GetMapping
     public Response<List<OrderDto>> getAllOrder() {
 
@@ -33,7 +35,7 @@ public class OrderController extends GlobalController {
 
     @GetMapping(OrderApiPath.GET_USER_ALL_ORDER)
     public Response<List<OrderDto>> getUserAllOrder(HttpServletRequest request) {
-        HttpSession session = request.getSession();
+        session = request.getSession(true);
 
         return toResponse(mapper.mapAsList(orderService.getAllOrderByUserEmail(session.getAttribute("userId").toString()), OrderDto.class));
     }

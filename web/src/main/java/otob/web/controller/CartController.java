@@ -25,9 +25,11 @@ public class CartController extends GlobalController {
     @Autowired
     private BeanMapper mapper;
 
+    private HttpSession session;
+
     @GetMapping
     public Response<List<CartItem>> getCartItems(HttpServletRequest request) {
-        HttpSession session = request.getSession();
+        session = request.getSession(true);
 
         return toResponse(mapper.map(
                 cartService.getUserCart(session.getAttribute("userId").toString()),
@@ -39,7 +41,7 @@ public class CartController extends GlobalController {
     public Response<Cart> addItemToCart(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        HttpSession session = request.getSession();
+        session = request.getSession(true);
 
         return toResponse(mapper.map(
                 cartService.addItemToCart(session.getAttribute("userId").toString(), productId, qty),
@@ -51,7 +53,7 @@ public class CartController extends GlobalController {
     public Response<Cart> updateItemQty(HttpServletRequest request,
                                         @PathVariable Long productId,
                                         @PathVariable int qty) {
-        HttpSession session = request.getSession();
+        session = request.getSession(true);
 
         return toResponse(mapper.map(
                 cartService.updateItemQty(session.getAttribute("userId").toString(), productId, qty),
@@ -62,7 +64,7 @@ public class CartController extends GlobalController {
     @DeleteMapping(CartApiPath.REMOVE_ITEM)
     public Response<Cart> removeItemFromCart(HttpServletRequest request,
                                              @PathVariable Long productId) {
-        HttpSession session = request.getSession();
+        session = request.getSession(true);
 
         return toResponse(mapper.map(
                 cartService.removeItemFromCart(session.getAttribute("userId").toString(), productId),
@@ -72,7 +74,7 @@ public class CartController extends GlobalController {
 
     @GetMapping(CartApiPath.CHECKOUT)
     public Response<CheckoutDto> checkout(HttpServletRequest request) {
-        HttpSession session = request.getSession();
+        session = request.getSession(true);
 
         return toResponse(cartService.checkout(session.getAttribute("userId").toString()));
     }

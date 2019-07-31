@@ -4,8 +4,10 @@ import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import otob.model.constant.Role;
 import otob.model.constant.Status;
@@ -16,14 +18,16 @@ import otob.model.exception.CustomException;
 import otob.service.RoleAccessService;
 import otob.service.UserService;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class AuthServiceImplTest {
@@ -39,6 +43,9 @@ public class AuthServiceImplTest {
 
     @Mock
     private HttpServletRequest request;
+
+    @Mock
+    private HttpServletResponse response;
 
     @Mock
     private HttpSession session;
@@ -104,16 +111,33 @@ public class AuthServiceImplTest {
     }
 
     @Test
+    public void logoutTest() {
+        ArgumentCaptor<Cookie> captor = ArgumentCaptor.forClass(Cookie.class);
+
+        when(request.getSession(true))
+            .thenReturn(session);
+
+        HttpStatus result = authServiceImpl.logout(request, response);
+
+        verify(request).getSession(true);
+        verify(session).invalidate();
+        verify(response, times(2)).addCookie(captor.capture());
+        assertEquals(HttpStatus.OK, result);
+    }
+
+    @Test
     public void isAuthenticatedTest() {
         session.setAttribute("isLogin", Status.LOGIN_TRUE);
 
         when(request.getSession(true))
-                .thenReturn(session);
+            .thenReturn(session);
         when(session.getAttribute("isLogin"))
-                .thenReturn(Status.LOGIN_TRUE);
+            .thenReturn(Status.LOGIN_TRUE);
 
         boolean result = authServiceImpl.isAuthenticated(request);
 
+        verify(request).getSession(true);
+        verify(session).setAttribute("isLogin", Status.LOGIN_TRUE);
         verify(session).getAttribute("isLogin");
         assertTrue(result);
     }
@@ -129,6 +153,8 @@ public class AuthServiceImplTest {
 
         boolean result = authServiceImpl.isAuthenticated(request);
 
+        verify(request).getSession(true);
+        verify(session).setAttribute("isLogin", Status.LOGIN_FALSE);
         verify(session).getAttribute("isLogin");
         assertTrue(!result);
     }
@@ -178,7 +204,17 @@ public class AuthServiceImplTest {
 
     @After
     public void tearDown() {
-
+        verifyNoMoreInteractions(userService);
+        verifyNoMoreInteractions(roleAccessService);
+        verifyNoMoreInteractions(encoder);
+        verifyNoMoreInteractions(request);
+        verifyNoMoreInteractions(response);
+        verifyNoMoreInteractions(session);
     }
+
+//    private Cookie catchCookie() {
+//        ArgumentCaptor<Cookie> captor = ArgumentCaptor.forClass(Cookie.class);
+//
+//    }
 
 }

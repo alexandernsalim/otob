@@ -1,6 +1,9 @@
 package otob.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import otob.model.constant.Status;
@@ -11,7 +14,9 @@ import otob.service.RoleAccessService;
 import otob.service.AuthService;
 import otob.service.UserService;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -30,13 +35,14 @@ public class AuthServiceImpl implements AuthService {
     private PasswordEncoder encoder;
 
     private HttpSession session;
+    private static Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     @Override
     public boolean login(String email, String password) {
         if (!userService.checkUser(email)) {
             throw new CustomException(
-                    ErrorCode.USER_NOT_FOUND.getCode(),
-                    ErrorCode.USER_NOT_FOUND.getMessage()
+                ErrorCode.USER_NOT_FOUND.getCode(),
+                ErrorCode.USER_NOT_FOUND.getMessage()
             );
         }
 
@@ -44,6 +50,25 @@ public class AuthServiceImpl implements AuthService {
         String dbPassword = user.getPassword();
 
         return encoder.matches(password, dbPassword);
+    }
+
+    @Override
+    public HttpStatus logout(HttpServletRequest request, HttpServletResponse response) {
+        session = request.getSession(true);
+
+        Cookie userId = new Cookie("user-id", "");
+        userId.setMaxAge(0);
+
+        Cookie userRole = new Cookie("user-role", "");
+        userRole.setMaxAge(0);
+
+        session.invalidate();
+        response.addCookie(userId);
+        response.addCookie(userRole);
+
+        logger.info("Session invalidated");
+
+        return HttpStatus.OK;
     }
 
     @Override
