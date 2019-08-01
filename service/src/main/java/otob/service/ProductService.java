@@ -1,5 +1,6 @@
 package otob.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import otob.model.entity.Product;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 public interface ProductService {
     Product addProduct(Product product);
 
-    List<Product> addProductFromExcel(List<Product> product);
+    List<Product> addProducts(MultipartFile file);
 
     List<Product> getAllProduct();
 

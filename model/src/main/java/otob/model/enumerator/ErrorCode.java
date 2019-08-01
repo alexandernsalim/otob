@@ -13,7 +13,10 @@ public enum ErrorCode {
     STOCK_INSUFFICIENT("400", "Insufficient stock"),
 
     ORDER_NOT_FOUND("404", "Sorry, order not found"),
-    ORDER_PROCESSED("400", "Order already processed");
+    ORDER_PROCESSED("400", "Order already processed"),
+
+    GENERATE_ID_FAIL("500", "Failed to generate id"),
+    EXCEL_FORMAT_ERROR("400", "Wrong format in file");
 
     private String code;
     private String message;

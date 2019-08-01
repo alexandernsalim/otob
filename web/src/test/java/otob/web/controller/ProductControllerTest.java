@@ -163,7 +163,7 @@ public class ProductControllerTest {
 //
 //        MockMultipartFile file = new MockMultipartFile("products", "products.xlsx", null, content.getBytes());
 //
-//        when(productService.addProductFromExcel(products))
+//        when(productService.addProducts(products))
 //            .thenReturn(products);
 //
 //        mvc.perform(

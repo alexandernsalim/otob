@@ -1,14 +1,19 @@
 package otob.service.impl;
 
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
-import otob.util.generator.IdGenerator;
-import otob.service.ProductService;
 import otob.repository.ProductRepository;
+import otob.service.ProductService;
+import otob.util.generator.IdGenerator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product addProduct(Product product) {
         if(productRepository.existsByName(product.getName())){
-            return productRepository.save(product);
+            return updateProductByName(product);
         }else{
             try{
                 product.setProductId(idGenerator.getNextId("productid"));
@@ -78,28 +83,66 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    public List<Product> addProductFromExcel(List<Product> products) {
-        List<Product> productList = new ArrayList<>();
+    public List<Product> addProducts(MultipartFile file) {
+        try {
+            List<Product> products = new ArrayList<>();
 
-        for (Product product : products) {
-            if(productRepository.existsByName(product.getName())){
-                updateProductByName(product);
-            }else {
-                try {
-                    product.setProductId(idGenerator.getNextId("productid"));
-                    productRepository.save(product);
-                } catch (Exception e) {
+            XSSFWorkbook workBook = new XSSFWorkbook(file.getInputStream());
+            XSSFSheet workSheet = workBook.getSheetAt(0);
+
+            for (int i = 1; i < workSheet.getPhysicalNumberOfRows(); i++) {
+                XSSFRow row = workSheet.getRow(i);
+
+                if(row.getCell(2).getCellType() != 0 ||
+                   row.getCell(3).getCellType() != 0 ||
+                   row.getCell(4).getCellType() != 0 ){
                     throw new CustomException(
-                        ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-                        ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+                        ErrorCode.EXCEL_FORMAT_ERROR.getCode(),
+                        ErrorCode.EXCEL_FORMAT_ERROR.getMessage()
                     );
                 }
+
+                String productName = row.getCell(0).getStringCellValue();
+                String productDescription = row.getCell(1).getStringCellValue();
+                double productListPrice = row.getCell(2).getNumericCellValue();
+                double productOfferPrice = row.getCell(3).getNumericCellValue();
+                int productStock = (int) row.getCell(4).getNumericCellValue();
+
+                Product product = Product.builder()
+                    .name(productName)
+                    .description(productDescription)
+                    .listPrice(productListPrice)
+                    .offerPrice(productOfferPrice)
+                    .stock(productStock)
+                    .build();
+
+                if(productRepository.existsByName(product.getName())){
+                    updateProductByName(product);
+                }else{
+                    product.setProductId(idGenerator.getNextId("productid"));
+                    productRepository.save(product);
+                }
+
+                products.add(product);
             }
 
-            productList.add(product);
+            return products;
+        } catch (IOException ex) {
+            throw new CustomException(
+                ErrorCode.BAD_REQUEST.getCode(),
+                ErrorCode.BAD_REQUEST.getMessage()
+            );
+        } catch (CustomException ex) {
+            throw new CustomException(
+                ErrorCode.EXCEL_FORMAT_ERROR.getCode(),
+                ErrorCode.EXCEL_FORMAT_ERROR.getMessage()
+            );
+        } catch (Exception ex) {
+            throw new CustomException(
+                ErrorCode.GENERATE_ID_FAIL.getCode(),
+                ErrorCode.GENERATE_ID_FAIL.getMessage()
+            );
         }
-
-        return productList;
     }
 
     public Product updateProductById(Long productId, Product productReq) {

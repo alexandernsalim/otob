@@ -1,6 +1,5 @@
 package otob.web.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,9 +22,14 @@ import otob.web.model.CheckoutDto;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +44,6 @@ public class CartControllerTest {
     private MockMvc mvc;
     private MockHttpServletRequest request;
     private MockHttpSession session;
-    private ObjectMapper objectMapper;
 
     private String userEmail;
     private String  orderId;
@@ -59,7 +62,6 @@ public class CartControllerTest {
         request = new MockHttpServletRequest();
         session = new MockHttpSession();
         request.setSession(session);
-        objectMapper = new ObjectMapper();
 
         userEmail = "user@mail.com";
         orderId = "ORD1561436040000";

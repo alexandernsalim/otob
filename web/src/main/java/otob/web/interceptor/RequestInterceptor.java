@@ -8,8 +8,8 @@ import otob.model.constant.Role;
 import otob.model.constant.Status;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
-import otob.util.generator.RandomTextGenerator;
 import otob.service.AuthService;
+import otob.util.generator.RandomTextGenerator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

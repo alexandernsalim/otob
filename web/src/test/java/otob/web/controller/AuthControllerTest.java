@@ -17,9 +17,11 @@ import otob.model.entity.User;
 import otob.model.exception.GlobalExceptionHandler;
 import otob.service.AuthService;
 import otob.service.UserService;
+import otob.util.generator.RandomTextGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -34,6 +36,9 @@ public class AuthControllerTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private RandomTextGenerator textGenerator;
 
     @InjectMocks
     private AuthController authController;
@@ -90,7 +95,7 @@ public class AuthControllerTest {
                 .param("password", password)
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data").value("ACCEPTED"));
+        .andExpect(jsonPath("$.data").value(HttpStatus.ACCEPTED.getReasonPhrase()));
 
         verify(authService).login(email, password);
         verify(userService).getUserByEmail(email);
@@ -100,6 +105,8 @@ public class AuthControllerTest {
     public void loginFailTest() throws Exception {
         when(authService.login(email, password))
             .thenReturn(false);
+        when(textGenerator.generateRandomUserId())
+            .thenReturn(UUID.randomUUID().toString());
 
         mvc.perform(
             post(AuthApiPath.BASE_PATH + AuthApiPath.LOGIN)
@@ -107,29 +114,31 @@ public class AuthControllerTest {
                 .param("password", password)
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data").value("ACCEPTED"));
+        .andExpect(jsonPath("$.data").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
 
         verify(authService).login(email, password);
+        verify(textGenerator).generateRandomUserId();
     }
 
     @Test
     public void logoutTest() throws Exception {
-        when(authService.logout(request, response))
+        when(authService.logout(any(MockHttpServletRequest.class), any(MockHttpServletResponse.class)))
                 .thenReturn(HttpStatus.OK);
 
         mvc.perform(
             post(AuthApiPath.BASE_PATH + AuthApiPath.LOGOUT)
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data").value(HttpStatus.OK));
+        .andExpect(jsonPath("$.data").value(HttpStatus.OK.getReasonPhrase()));
 
-        verify(authService).login(email, password);
+        verify(authService).logout(any(MockHttpServletRequest.class), any(MockHttpServletResponse.class));
     }
 
     @After
     public void tearDown() {
         verifyNoMoreInteractions(authService);
         verifyNoMoreInteractions(userService);
+        verifyNoMoreInteractions(textGenerator);
     }
 
 }

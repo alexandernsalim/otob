@@ -69,7 +69,7 @@ public class AuthController extends GlobalController {
 
             logger.info("Login Success");
 
-            return toResponse(HttpStatus.ACCEPTED);
+            return toResponse(HttpStatus.ACCEPTED.getReasonPhrase());
         } else {
             Cookie userId = new Cookie("user-id", textGenerator.generateRandomUserId());
             userId.setHttpOnly(false);
@@ -85,13 +85,13 @@ public class AuthController extends GlobalController {
 
             logger.info("Login Failed");
 
-            return toResponse(HttpStatus.BAD_REQUEST);
+            return toResponse(HttpStatus.BAD_REQUEST.getReasonPhrase());
         }
     }
 
     @PostMapping(AuthApiPath.LOGOUT)
     private Response<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        return toResponse(authService.logout(request, response));
+        return toResponse(authService.logout(request, response).getReasonPhrase());
     }
 
 }
