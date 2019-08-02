@@ -201,8 +201,8 @@ public class ProductServiceImplTest {
         }
     }
 
-//    @Test
-//    public void addProductFromExcelTest() throws Exception {
+    @Test
+    public void addProductFromExcelTest() throws Exception {
 //        when(productRepository.existsByName(product1.getName()))
 //                .thenReturn(false);
 //        when(productRepository.existsByName(product2.getName()))
@@ -222,7 +222,7 @@ public class ProductServiceImplTest {
 //        verify(productRepository).save(product1);
 //        verify(productRepository).save(product2);
 //        assertEquals(2, result.size());
-//    }
+    }
 
 //    @Test
 //    public void addProductFromExcelExistsTest() throws Exception {

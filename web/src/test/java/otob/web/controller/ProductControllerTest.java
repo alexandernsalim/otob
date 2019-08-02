@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -17,20 +16,16 @@ import otob.model.constant.path.ProductApiPath;
 import otob.model.entity.Product;
 import otob.model.exception.GlobalExceptionHandler;
 import otob.service.ProductService;
+import otob.util.mapper.BeanMapper;
 import otob.web.model.ProductDto;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,6 +39,7 @@ public class ProductControllerTest {
 
     private MockMvc mvc;
     private ObjectMapper objectMapper;
+
     private Product product1;
     private Product product2;
     private Product product1Updated;
@@ -158,18 +154,22 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void addProductFromExcelTest() throws Exception {
-//        String content = "";
-//
-//        MockMultipartFile file = new MockMultipartFile("products", "products.xlsx", null, content.getBytes());
-//
-//        when(productService.addProducts(products))
-//            .thenReturn(products);
-//
-//        mvc.perform(
-//            MockMvcRequestBuilders.multipart(ProductApiPath.BASE_PATH)
-//                .file(file)
-//        )
+    public void addProductsTest() throws Exception {
+        String content = "";
+        MockMultipartFile file = new MockMultipartFile("file", "products.xlsx", null, content.getBytes());
+        List<ProductDto> productResponse = BeanMapper.mapAsList(products, ProductDto.class);
+
+        when(productService.addProducts(file))
+            .thenReturn(products);
+
+        mvc.perform(
+            MockMvcRequestBuilders.multipart(ProductApiPath.BASE_PATH + ProductApiPath.ADD_PRODUCT_FROM_EXCEL)
+                .file(file)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data", hasSize(2)));
+
+        verify(productService).addProducts(file);
     }
 
     @Test

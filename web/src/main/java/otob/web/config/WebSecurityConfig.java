@@ -39,6 +39,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .and()
                 .formLogin();
+
+        http.cors();
 //            .loginPage("/login.html")
 //            .failureHandler(authenticationFailureHandler())
 //            .and()

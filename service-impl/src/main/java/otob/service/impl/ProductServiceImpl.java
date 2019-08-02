@@ -116,14 +116,16 @@ public class ProductServiceImpl implements ProductService {
                     .stock(productStock)
                     .build();
 
+                products.add(product);
+            }
+
+            for(Product product : products) {
                 if(productRepository.existsByName(product.getName())){
                     updateProductByName(product);
                 }else{
                     product.setProductId(idGenerator.getNextId("productid"));
                     productRepository.save(product);
                 }
-
-                products.add(product);
             }
 
             return products;
@@ -193,7 +195,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.delete(product);
- 
+
         return true;
     }
 
