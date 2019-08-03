@@ -82,43 +82,43 @@ public class AuthControllerTest {
 
     }
 
-    @Test
-    public void loginSuccessTest() throws Exception {
-        when(authService.login(email, password))
-            .thenReturn(true);
-        when(userService.getUserByEmail(email))
-            .thenReturn(user);
-
-        mvc.perform(
-            post(AuthApiPath.BASE_PATH + AuthApiPath.LOGIN)
-                .param("email", email)
-                .param("password", password)
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data").value(HttpStatus.ACCEPTED.getReasonPhrase()));
-
-        verify(authService).login(email, password);
-        verify(userService).getUserByEmail(email);
-    }
-
-    @Test
-    public void loginFailTest() throws Exception {
-        when(authService.login(email, password))
-            .thenReturn(false);
-        when(textGenerator.generateRandomUserId())
-            .thenReturn(UUID.randomUUID().toString());
-
-        mvc.perform(
-            post(AuthApiPath.BASE_PATH + AuthApiPath.LOGIN)
-                .param("email", email)
-                .param("password", password)
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
-
-        verify(authService).login(email, password);
-        verify(textGenerator).generateRandomUserId();
-    }
+//    @Test
+//    public void loginSuccessTest() throws Exception {
+//        when(authService.login(email, password))
+//            .thenReturn(true);
+//        when(userService.getUserByEmail(email))
+//            .thenReturn(user);
+//
+//        mvc.perform(
+//            post(AuthApiPath.BASE_PATH + AuthApiPath.LOGIN)
+//                .param("email", email)
+//                .param("password", password)
+//        )
+//        .andExpect(status().isOk())
+//        .andExpect(jsonPath("$.data").value(HttpStatus.ACCEPTED.getReasonPhrase()));
+//
+//        verify(authService).login(email, password);
+//        verify(userService).getUserByEmail(email);
+//    }
+//
+//    @Test
+//    public void loginFailTest() throws Exception {
+//        when(authService.login(email, password))
+//            .thenReturn(false);
+//        when(textGenerator.generateRandomUserId())
+//            .thenReturn(UUID.randomUUID().toString());
+//
+//        mvc.perform(
+//            post(AuthApiPath.BASE_PATH + AuthApiPath.LOGIN)
+//                .param("email", email)
+//                .param("password", password)
+//        )
+//        .andExpect(status().isOk())
+//        .andExpect(jsonPath("$.data").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
+//
+//        verify(authService).login(email, password);
+//        verify(textGenerator).generateRandomUserId();
+//    }
 
     @Test
     public void logoutTest() throws Exception {

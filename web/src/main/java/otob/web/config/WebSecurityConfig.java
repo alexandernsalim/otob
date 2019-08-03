@@ -26,80 +26,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-//            .antMatchers(
-//                    "/api/users/register/admin",
-//                    "/api/users/register/cashier",
-//                    "/api/users/delete/*",
-//                    "/api/users",
-//                    "/api/roles"
-//            ).hasRole("ADMIN")
-//            .antMatchers("/api/users/register/customer").permitAll()
-                .anyRequest().permitAll()
-                .and()
-                .formLogin();
-
         http.cors();
-//            .loginPage("/login.html")
-//            .failureHandler(authenticationFailureHandler())
-//            .and()
-//            .logout()
-//            .logoutUrl("/perform_logout")
-//            .deleteCookies("JSESSIONID");
-//            .logoutSuccessHandler(logoutSuccessHandler());
+        http.csrf().disable()
+            .authorizeRequests()
+            .anyRequest().permitAll();
     }
-
-//    @Override
-//    protected void configure(final HttpSecurity http) throws Exception {
-//        http.csrf().disable()
-//            .authorizeRequests()
-//            .antMatchers(
-//                    "/api/users/register/admin",
-//                    "/api/users/register/cashier",
-//                    "/api/users/delete/*",
-//                    "/api/users",
-//                    "/api/roles",
-//                    "/api/products/*"
-//            ).hasRole("CUSTOMER")
-////            .antMatchers("/api/users/register/customer").permitAll()
-////            .anyRequest().permitAll()
-//            .and()
-//            .formLogin().loginPage("http://localhost:8080/#/register").permitAll();
-////            .failureHandler(authenticationFailureHandler())
-////            .and()
-////            .logout()
-////            .logoutUrl("/perform_logout")
-////            .deleteCookies("JSESSIONID");
-////            .logoutSuccessHandler(logoutSuccessHandler());
-//    }
-
-//    @Override
-//    protected void configure(final HttpSecurity http) throws Exception {
-//        http.csrf().disable()
-//                .authorizeRequests()
-//                .antMatchers(
-////                    "/api/users/register/admin",
-////                    "/api/users/register/cashier",
-////                    "/api/users/delete/*",
-////                    "/api/users",
-////                    "/api/roles",
-//                    "/api/products/*"
-//                ).permitAll()
-//                .antMatchers("/api/users/register/customer").permitAll()
-//                .and()
-//                .formLogin().loginPage("http://localhost:8080/#/login")
-//                .permitAll()
-//                .and()
-//                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-////            .failureHandler(authenticationFailureHandler())
-////            .and()
-////            .logout()
-////            .logoutUrl("/perform_logout")
-////            .deleteCookies("JSESSIONID");
-////            .logoutSuccessHandler(logoutSuccessHandler());
-//    }
-
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider(){

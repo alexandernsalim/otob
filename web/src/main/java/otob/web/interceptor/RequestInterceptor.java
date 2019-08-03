@@ -33,8 +33,8 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
         logger.info("Requesting: " + requestPath);
         if (!authService.isAuthorized(request)) {
             throw new CustomException(
-                    ErrorCode.UNAUTHORIZED.getCode(),
-                    ErrorCode.UNAUTHORIZED.getMessage()
+                ErrorCode.UNAUTHORIZED.getCode(),
+                ErrorCode.UNAUTHORIZED.getMessage()
             );
         } else {
             return true;

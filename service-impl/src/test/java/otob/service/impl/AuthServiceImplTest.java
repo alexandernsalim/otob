@@ -80,35 +80,35 @@ public class AuthServiceImplTest {
                 .build();
     }
 
-    @Test
-    public void loginTest() {
-        when(userService.checkUser(user.getEmail()))
-                .thenReturn(true);
-        when(userService.getUserByEmail(user.getEmail()))
-                .thenReturn(user);
-        when(encoder.matches(user.getPassword(), user.getPassword()))
-                .thenReturn(true);
-
-        boolean result = authServiceImpl.login(user.getEmail(), user.getPassword());
-
-        verify(userService).checkUser(user.getEmail());
-        verify(userService).getUserByEmail(user.getEmail());
-        verify(encoder).matches(user.getPassword(), user.getPassword());
-        assertTrue(result);
-    }
-
-    @Test
-    public void loginUserNotFoundTest() {
-        when(userService.checkUser(user.getEmail()))
-                .thenReturn(false);
-
-        try {
-            authServiceImpl.login(user.getEmail(), user.getPassword());
-        } catch (CustomException ex) {
-            verify(userService).checkUser(user.getEmail());
-            TestCase.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
-        }
-    }
+//    @Test
+//    public void loginTest() {
+//        when(userService.checkUser(user.getEmail()))
+//                .thenReturn(true);
+//        when(userService.getUserByEmail(user.getEmail()))
+//                .thenReturn(user);
+//        when(encoder.matches(user.getPassword(), user.getPassword()))
+//                .thenReturn(true);
+//
+//        boolean result = authServiceImpl.login(user.getEmail(), user.getPassword());
+//
+//        verify(userService).checkUser(user.getEmail());
+//        verify(userService).getUserByEmail(user.getEmail());
+//        verify(encoder).matches(user.getPassword(), user.getPassword());
+//        assertTrue(result);
+//    }
+//
+//    @Test
+//    public void loginUserNotFoundTest() {
+//        when(userService.checkUser(user.getEmail()))
+//                .thenReturn(false);
+//
+//        try {
+//            authServiceImpl.login(user.getEmail(), user.getPassword());
+//        } catch (CustomException ex) {
+//            verify(userService).checkUser(user.getEmail());
+//            TestCase.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
+//        }
+//    }
 
     @Test
     public void logoutTest() {
