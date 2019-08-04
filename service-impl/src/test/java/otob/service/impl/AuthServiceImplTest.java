@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -53,6 +54,8 @@ public class AuthServiceImplTest {
     @InjectMocks
     private AuthServiceImpl authServiceImpl;
 
+    private ArgumentCaptor<Cookie> cookieCaptor = ArgumentCaptor.forClass(Cookie.class);
+
     private List<otob.model.entity.Role> roles;
     private List<String> roleAccess;
     private otob.model.entity.Role roleCustomer;
@@ -80,35 +83,60 @@ public class AuthServiceImplTest {
                 .build();
     }
 
-//    @Test
-//    public void loginTest() {
-//        when(userService.checkUser(user.getEmail()))
-//                .thenReturn(true);
-//        when(userService.getUserByEmail(user.getEmail()))
-//                .thenReturn(user);
-//        when(encoder.matches(user.getPassword(), user.getPassword()))
-//                .thenReturn(true);
-//
-//        boolean result = authServiceImpl.login(user.getEmail(), user.getPassword());
-//
-//        verify(userService).checkUser(user.getEmail());
-//        verify(userService).getUserByEmail(user.getEmail());
-//        verify(encoder).matches(user.getPassword(), user.getPassword());
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    public void loginUserNotFoundTest() {
-//        when(userService.checkUser(user.getEmail()))
-//                .thenReturn(false);
-//
-//        try {
-//            authServiceImpl.login(user.getEmail(), user.getPassword());
-//        } catch (CustomException ex) {
-//            verify(userService).checkUser(user.getEmail());
-//            TestCase.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
-//        }
-//    }
+    @Test
+    public void loginSuccessTest() {
+        when(userService.checkUser(user.getEmail()))
+                .thenReturn(true);
+        when(userService.getUserByEmail(user.getEmail()))
+                .thenReturn(user);
+        when(encoder.matches(user.getPassword(), user.getPassword()))
+                .thenReturn(true);
+
+        HttpStatus result = authServiceImpl.login(request, response, user.getEmail(), user.getPassword());
+
+        verify(userService).checkUser(user.getEmail());
+        verify(userService, times(2)).getUserByEmail(user.getEmail());
+        verify(encoder).matches(user.getPassword(), user.getPassword());
+        verify(session).setAttribute("userId", user.getEmail());
+        verify(session).setAttribute("role", user.getRoles().get(0).getName());
+        verify(session).setAttribute("isLogin", Status.LOGIN_TRUE);
+        verify(response, times(3)).addCookie(cookieCaptor.capture());
+        assertEquals(HttpStatus.ACCEPTED, result);
+    }
+
+    @Test
+    public void loginFailTest() {
+        when(userService.checkUser(user.getEmail()))
+                .thenReturn(true);
+        when(userService.getUserByEmail(user.getEmail()))
+                .thenReturn(user);
+        when(encoder.matches(user.getPassword(), user.getPassword()))
+                .thenReturn(false);
+        when(session.getAttribute("userId"))
+                .thenReturn(UUID.randomUUID().toString());
+
+        HttpStatus result = authServiceImpl.login(request, response, user.getEmail(), user.getPassword());
+
+        verify(userService).checkUser(user.getEmail());
+        verify(userService, times(2)).getUserByEmail(user.getEmail());
+        verify(encoder).matches(user.getPassword(), user.getPassword());
+        verify(session).getAttribute("userId");
+        verify(response, times(3)).addCookie(cookieCaptor.capture());
+        assertEquals(HttpStatus.UNAUTHORIZED, result);
+    }
+
+    @Test
+    public void loginUserNotFoundTest() {
+        when(userService.checkUser(user.getEmail()))
+                .thenReturn(false);
+
+        try {
+            authServiceImpl.login(request, response, user.getEmail(), user.getPassword());
+        } catch (CustomException ex) {
+            verify(userService).checkUser(user.getEmail());
+            TestCase.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
+        }
+    }
 
     @Test
     public void logoutTest() {
@@ -121,7 +149,7 @@ public class AuthServiceImplTest {
 
         verify(request).getSession(true);
         verify(session).invalidate();
-        verify(response, times(2)).addCookie(captor.capture());
+        verify(response, times(3)).addCookie(captor.capture());
         assertEquals(HttpStatus.OK, result);
     }
 

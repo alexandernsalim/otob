@@ -119,8 +119,8 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
     private void checkStock(int qty, int stock) {
         if (qty > stock) {
             throw new CustomException(
-                    ErrorCode.STOCK_INSUFFICIENT.getCode(),
-                    ErrorCode.STOCK_INSUFFICIENT.getMessage()
+                ErrorCode.STOCK_INSUFFICIENT.getCode(),
+                ErrorCode.STOCK_INSUFFICIENT.getMessage()
             );
         }
     }

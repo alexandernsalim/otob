@@ -155,7 +155,24 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void addProductTest() throws Exception {
+    public void addProductExistsTest() {
+        when(productRepository.existsByName(product2.getName()))
+                .thenReturn(true);
+        when(productRepository.findByName(product2.getName()))
+                .thenReturn(product2);
+        when(productRepository.save(product2))
+                .thenReturn(product2);
+
+        Product result = productServiceImpl.addProduct(product2);
+
+        verify(productRepository).existsByName(product2.getName());
+        verify(productRepository).findByName(product2.getName());
+        verify(productRepository).save(product2);
+        assertEquals(product2.getName(), result.getName());
+    }
+
+    @Test
+    public void addProductNotExistsTest() throws Exception {
         when(productRepository.existsByName(product1.getName()))
                 .thenReturn(false);
         when(idGenerator.getNextId("productid"))
@@ -167,20 +184,6 @@ public class ProductServiceImplTest {
 
         verify(productRepository).existsByName(product1.getName());
         verify(idGenerator).getNextId("productid");
-        verify(productRepository).save(product1);
-        assertEquals(product1.getName(), result.getName());
-    }
-
-    @Test
-    public void addProductExistsTest() throws Exception {
-        when(productRepository.existsByName(product1.getName()))
-                .thenReturn(true);
-        when(productRepository.save(product1))
-                .thenReturn(product1);
-
-        Product result = productServiceImpl.addProduct(product1);
-
-        verify(productRepository).existsByName(product1.getName());
         verify(productRepository).save(product1);
         assertEquals(product1.getName(), result.getName());
     }

@@ -1,7 +1,9 @@
 package otob.util.generator;
 
 import com.mongodb.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import otob.model.properties.MongoProperties;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -10,11 +12,14 @@ import java.util.Date;
 @Component
 public class IdGenerator {
 
+    @Autowired
+    private MongoProperties mongoProperties;
+
     private final String ORD_PRE = "ORD";
 
     public Long getNextId(String name) throws Exception {
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
-        DB db = mongoClient.getDB("offline-to-online");
+        MongoClient mongoClient = new MongoClient(mongoProperties.getHost(), mongoProperties.getPort());
+        DB db = mongoClient.getDB(mongoProperties.getDatabase());
         DBCollection collection = db.getCollection("counters");
         BasicDBObject find = new BasicDBObject();
         BasicDBObject update = new BasicDBObject();
