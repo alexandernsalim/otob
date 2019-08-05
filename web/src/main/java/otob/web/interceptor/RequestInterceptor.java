@@ -29,8 +29,15 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String requestPath = request.getServletPath();
 
-        checkSession(request);
         logger.info("Requesting: " + requestPath);
+
+        if(request.getRequestURL().indexOf("/swagger-ui.html") != -1){
+            logger.info("in");
+            return true;
+        }
+
+        checkSession(request);
+
         if (!authService.isAuthorized(request)) {
             throw new CustomException(
                 ErrorCode.UNAUTHORIZED.getCode(),
