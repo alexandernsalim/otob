@@ -8,7 +8,6 @@ import otob.model.constant.Role;
 import otob.model.constant.Status;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
-import otob.service.AuthService;
 import otob.util.generator.RandomTextGenerator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,45 +17,24 @@ import javax.servlet.http.HttpSession;
 public class RequestInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
-    private AuthService authService;
-
-    @Autowired
     private RandomTextGenerator textGenerator;
 
     private static Logger logger = LoggerFactory.getLogger(RequestInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String requestPath = request.getServletPath();
-
-        logger.info("Requesting: " + requestPath);
-
-        if(request.getRequestURL().indexOf("/swagger-ui.html") != -1){
-            logger.info("in");
-            return true;
-        }
-
         checkSession(request);
 
-        if (!authService.isAuthorized(request)) {
-            throw new CustomException(
-                ErrorCode.UNAUTHORIZED.getCode(),
-                ErrorCode.UNAUTHORIZED.getMessage()
-            );
-        } else {
-            return true;
-        }
+        return true;
     }
 
     private void checkSession(HttpServletRequest request) {
         HttpSession session = request.getSession(true);
 
         if (session.isNew()) {
-            logger.info("Init new session");
+            logger.info("New client, init session");
 
             session.setAttribute("userId", textGenerator.generateRandomUserId());
-            session.setAttribute("role", Role.GUEST);
-            session.setAttribute("isLogin", Status.LOGIN_FALSE);
         }
     }
 
