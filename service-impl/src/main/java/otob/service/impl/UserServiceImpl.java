@@ -81,6 +81,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Boolean changePassword(String email, String oldPassword, String newPassword) {
+        if(!userRepository.existsByEmail(email)){
+            throw new CustomException(
+                ErrorCode.USER_NOT_FOUND.getCode(),
+                ErrorCode.USER_NOT_FOUND.getMessage()
+            );
+        }
+
+        User user = userRepository.findByEmail(email);
+
+        if(encoder.matches(oldPassword, user.getPassword())){
+            user.setPassword(encoder.encode(newPassword));
+
+            userRepository.save(user);
+
+            return true;
+        }else{
+            throw new CustomException(
+                ErrorCode.PASSWORD_NOT_MATCH.getCode(),
+                ErrorCode.PASSWORD_NOT_MATCH.getMessage()
+            );
+        }
+    }
+
+    @Override
     public Boolean checkUser(String email) {
         return userRepository.existsByEmail(email);
     }

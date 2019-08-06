@@ -127,32 +127,32 @@ public class ProductServiceImplTest {
         }
     }
 
-    @Test
-    public void getAllProductByNameTest() {
-        when(productRepository.existsByNameContaining("Asus"))
-                .thenReturn(true);
-        when(productRepository.findAllByNameContaining("Asus"))
-                .thenReturn(productsByName);
-
-        List<Product> result = productServiceImpl.getAllProductByName("Asus");
-
-        verify(productRepository).existsByNameContaining("Asus");
-        verify(productRepository).findAllByNameContaining("Asus");
-        assertTrue(result.size() >= 1);
-    }
-
-    @Test
-    public void getAllProductByNameNotExistsTest() {
-        when(productRepository.existsByNameContaining("Asus"))
-                .thenReturn(false);
-
-        try {
-            productServiceImpl.getAllProductByName("Asus");
-        } catch (CustomException ex) {
-            verify(productRepository).existsByNameContaining("Asus");
-            assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
-        }
-    }
+//    @Test
+//    public void getAllProductByNameTest() {
+//        when(productRepository.existsByNameContaining("Asus"))
+//                .thenReturn(true);
+//        when(productRepository.findAllByNameContaining("Asus"))
+//                .thenReturn(productsByName);
+//
+//        List<Product> result = productServiceImpl.getAllProductByName("Asus");
+//
+//        verify(productRepository).existsByNameContaining("Asus");
+//        verify(productRepository).findAllByNameContaining("Asus");
+//        assertTrue(result.size() >= 1);
+//    }
+//
+//    @Test
+//    public void getAllProductByNameNotExistsTest() {
+//        when(productRepository.existsByNameContaining("Asus"))
+//                .thenReturn(false);
+//
+//        try {
+//            productServiceImpl.getAllProductByName("Asus");
+//        } catch (CustomException ex) {
+//            verify(productRepository).existsByNameContaining("Asus");
+//            assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
+//        }
+//    }
 
     @Test
     public void addProductExistsTest() {

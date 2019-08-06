@@ -14,7 +14,7 @@ public interface ProductService {
 
     Product getProductById (Long productId);
 
-    List<Product> getAllProductByName(String name);
+    List<Product> getAllProductByName(String name, int page, int size);
 
     Product updateProductById(Long productId, Product product);
 

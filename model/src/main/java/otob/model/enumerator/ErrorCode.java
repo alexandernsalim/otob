@@ -8,6 +8,7 @@ public enum ErrorCode {
 
     USER_NOT_FOUND("404", "User not found"),
     EMAIL_EXISTS("400", "Email already registered"),
+    PASSWORD_NOT_MATCH("400", "Password not match"),
 
     PRODUCT_NOT_FOUND("404", "Sorry, product not found"),
     STOCK_INSUFFICIENT("400", "Insufficient stock"),

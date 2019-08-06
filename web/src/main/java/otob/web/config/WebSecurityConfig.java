@@ -45,8 +45,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(
                 "/api/users",
                 "/api/admin/register"
-            ).hasRole("ADMIN")
-            .antMatchers(HttpMethod.POST, "/api/products").hasAnyRole("ADMIN", "CASHIER")
+            )
+                .hasRole("ADMIN")
+            .antMatchers(HttpMethod.POST, "/api/products")
+                .hasAnyRole("ADMIN", "CASHIER")
             .antMatchers(
                 "/api/cashier/register",
                 "/api/orders",
@@ -54,24 +56,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/api/orders/{\\w+}/reject",
                 "/api/products/{\\d+}",
                 "/api/products/batch"
-            ).hasAnyRole("ADMIN", "CASHIER")
+            )
+                .hasAnyRole("ADMIN", "CASHIER")
             .antMatchers(
                 "/api/"
-            ).hasAnyRole("")
+            )
+                .hasAnyRole("")
             .antMatchers(
                 "/api/carts",
                 "/api/carts/{\\d+}",
                 "/api/carts/{\\d+}/{\\d+}",
                 "/api/carts/checkout",
-                "/api/orders/user",
+                "/api/orders/user"
+            )
+                .hasRole("CUSTOMER")
+            .antMatchers(
+                "/api/users/change-password",
                 "/api/orders/{\\w+}/search"
-            ).hasRole("CUSTOMER")
-            .antMatchers(HttpMethod.GET, "/api/products").permitAll()
+            )
+                .authenticated()
+            .antMatchers(HttpMethod.GET, "/api/products")
+                .permitAll()
             .antMatchers(
                 "/api/users/customer/register",
                 "/api/products/id/{\\d+}",
                 "/api/products/name/{\\w+}"
-            ).permitAll()
+            )
+                .permitAll()
             .and()
             .formLogin()
                 .loginProcessingUrl("/api/auth/login")

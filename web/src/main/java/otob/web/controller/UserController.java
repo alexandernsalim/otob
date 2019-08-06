@@ -10,6 +10,8 @@ import otob.util.mapper.BeanMapper;
 import otob.model.response.Response;
 import otob.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -48,6 +50,17 @@ public class UserController extends GlobalController {
         User user = mapper.map(userDto, User.class);
 
         return toResponse(mapper.map(userService.registerNewUser(user, Role.CUSTOMER), UserDto.class));
+    }
+
+    @PutMapping(UserApiPath.CHANGE_PASSWORD)
+    public Response<Boolean> changePassword(
+            HttpServletRequest request,
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword) {
+        HttpSession session = request.getSession(true);
+        String email = session.getAttribute("userId").toString();
+
+        return toResponse(userService.changePassword(email, oldPassword, newPassword));
     }
 
     @DeleteMapping(UserApiPath.DELETE_USER)

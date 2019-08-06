@@ -39,8 +39,12 @@ public class ProductController extends GlobalController {
     }
 
     @GetMapping(ProductApiPath.GET_PRODUCT_BY_NAME)
-    public Response<List<ProductDto>> getAllProductByName(@PathVariable String productName) {
-        List<Product> products = productService.getAllProductByName(productName);
+    public Response<List<ProductDto>> getAllProductByName(
+        @PathVariable String productName,
+        @RequestParam int page,
+        @RequestParam int size
+    ) {
+        List<Product> products = productService.getAllProductByName(productName, page, size);
 
         return toResponse(mapper.mapAsList(products, ProductDto.class));
     }

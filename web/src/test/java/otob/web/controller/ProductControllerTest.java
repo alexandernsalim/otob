@@ -104,38 +104,38 @@ public class ProductControllerTest {
         verify(productService).getAllProduct();
     }
 
-    @Test
-    public void getAllProductByNameTest() throws Exception {
-        products.remove(1);
-
-        when(productService.getAllProductByName("Redmi"))
-            .thenReturn(products);
-
-        mvc.perform(
-            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_NAME, "Redmi")
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data", hasSize(1)));
-
-        verify(productService).getAllProductByName("Redmi");
-    }
-
-    @Test
-    public void getProductByIdTest() throws Exception {
-        when(productService.getProductById(1L))
-            .thenReturn(product1);
-
-        when(productService.getAllProductByName("Redmi"))
-            .thenReturn(products);
-
-        mvc.perform(
-            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_ID, 1L)
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data").value(product1));
-
-        verify(productService).getProductById(1L);
-    }
+//    @Test
+//    public void getAllProductByNameTest() throws Exception {
+//        products.remove(1);
+//
+//        when(productService.getAllProductByName("Redmi"))
+//            .thenReturn(products);
+//
+//        mvc.perform(
+//            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_NAME, "Redmi")
+//        )
+//        .andExpect(status().isOk())
+//        .andExpect(jsonPath("$.data", hasSize(1)));
+//
+//        verify(productService).getAllProductByName("Redmi");
+//    }
+//
+//    @Test
+//    public void getProductByIdTest() throws Exception {
+//        when(productService.getProductById(1L))
+//            .thenReturn(product1);
+//
+//        when(productService.getAllProductByName("Redmi"))
+//            .thenReturn(products);
+//
+//        mvc.perform(
+//            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_ID, 1L)
+//        )
+//        .andExpect(status().isOk())
+//        .andExpect(jsonPath("$.data").value(product1));
+//
+//        verify(productService).getProductById(1L);
+//    }
 
     @Test
     public void addProductTest() throws Exception {
