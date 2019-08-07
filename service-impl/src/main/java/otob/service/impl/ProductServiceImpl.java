@@ -58,15 +58,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public List<Product> getAllProductByName(String name, int page, int size){
-        if(!productRepository.existsByNameContaining(name)){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> pages = productRepository.findAllByNameContainingIgnoreCase(name, pageable);
+        List<Product> products = pages.getContent();
+
+        if(products.isEmpty()) {
             throw new CustomException(
                 ErrorCode.PRODUCT_NOT_FOUND.getCode(),
                 ErrorCode.PRODUCT_NOT_FOUND.getMessage()
             );
         }
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Product> pages = productRepository.findAllByNameContainingIgnoreCase(name, pageable);
-        List<Product> products = pages.getContent();
 
         return products;
     }

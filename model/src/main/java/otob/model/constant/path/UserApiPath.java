@@ -6,7 +6,7 @@ public interface UserApiPath {
     String REGISTER_ADMIN = "/admin/register";
     String REGISTER_CASHIER = "/cashier/register";
     String REGISTER_CUSTOMER = "/customer/register";
-    String CHANGE_PASSWORD = "/api/users/change-password";
+    String CHANGE_PASSWORD = "/password/change";
     String DELETE_USER = "/{email}/delete";
 
 }
