@@ -79,29 +79,29 @@ public class ProductServiceImplTest {
         productsByName.add(product1);
     }
 
-    @Test
-    public void getAllProductTest() {
-        when(productRepository.findAll())
-                .thenReturn(products);
-
-        List<Product> result = productServiceImpl.getAllProduct();
-
-        verify(productRepository).findAll();
-        assertTrue(result.size() >= 1);
-    }
-
-    @Test
-    public void getAllProductNotFoundTest() {
-        when(productRepository.findAll())
-                .thenReturn(emptyProducts);
-
-        try {
-            productServiceImpl.getAllProduct();
-        } catch (CustomException ex) {
-            verify(productRepository).findAll();
-            TestCase.assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
-        }
-    }
+//    @Test
+//    public void getAllProductTest() {
+//        when(productRepository.findAll())
+//                .thenReturn(products);
+//
+//        List<Product> result = productServiceImpl.getAllProduct();
+//
+//        verify(productRepository).findAll();
+//        assertTrue(result.size() >= 1);
+//    }
+//
+//    @Test
+//    public void getAllProductNotFoundTest() {
+//        when(productRepository.findAll())
+//                .thenReturn(emptyProducts);
+//
+//        try {
+//            productServiceImpl.getAllProduct();
+//        } catch (CustomException ex) {
+//            verify(productRepository).findAll();
+//            TestCase.assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
+//        }
+//    }
 
     @Test
     public void getProductByIdTest() {

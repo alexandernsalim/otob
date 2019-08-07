@@ -88,21 +88,21 @@ public class ProductControllerTest {
 
     }
 
-    @Test
-    public void getAllProductTest() throws Exception {
-        when(productService.getAllProduct())
-            .thenReturn(products);
-
-        mvc.perform(
-            get(ProductApiPath.BASE_PATH)
-        )
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data").isArray())
-        .andExpect(jsonPath("$.data", hasSize(2)));
-
-        verify(productService).getAllProduct();
-    }
+//    @Test
+//    public void getAllProductTest() throws Exception {
+//        when(productService.getAllProduct())
+//            .thenReturn(products);
+//
+//        mvc.perform(
+//            get(ProductApiPath.BASE_PATH)
+//        )
+//        .andDo(MockMvcResultHandlers.print())
+//        .andExpect(status().isOk())
+//        .andExpect(jsonPath("$.data").isArray())
+//        .andExpect(jsonPath("$.data", hasSize(2)));
+//
+//        verify(productService).getAllProduct();
+//    }
 
 //    @Test
 //    public void getAllProductByNameTest() throws Exception {

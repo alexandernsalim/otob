@@ -15,6 +15,9 @@ import otob.model.exception.CustomException;
 import otob.repository.ProductRepository;
 import otob.service.ProductService;
 import otob.util.generator.IdGenerator;
+import otob.util.mapper.BeanMapper;
+import otob.web.model.PageableProductDto;
+import otob.web.model.ProductDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,17 +33,12 @@ public class ProductServiceImpl implements ProductService {
     private IdGenerator idGenerator;
 
     @Override
-    public List<Product> getAllProduct() {
-        List<Product> products = productRepository.findAll();
+    public PageableProductDto getAllProduct(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> pages = productRepository.findAll(pageable);
+        List<Product> products = pages.getContent();
 
-        if (products.isEmpty()){
-            throw new CustomException(
-                ErrorCode.PRODUCT_NOT_FOUND.getCode(),
-                ErrorCode.PRODUCT_NOT_FOUND.getMessage()
-            );
-        }
-
-        return products;
+        return generateResult(pages, products);
     }
 
     @Override
@@ -57,19 +55,13 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
-    public List<Product> getAllProductByName(String name, int page, int size){
+    @Override
+    public PageableProductDto getAllProductByName(String name, Integer page, Integer size){
         Pageable pageable = PageRequest.of(page, size);
-        Page<Product> pages = productRepository.findAllByNameContainingIgnoreCase(name, pageable);
+        Page<Product> pages = productRepository.findAllByNameContaining(name, pageable);
         List<Product> products = pages.getContent();
 
-        if(products.isEmpty()) {
-            throw new CustomException(
-                ErrorCode.PRODUCT_NOT_FOUND.getCode(),
-                ErrorCode.PRODUCT_NOT_FOUND.getMessage()
-            );
-        }
-
-        return products;
+        return generateResult(pages, products);
     }
 
     @Override
@@ -204,6 +196,27 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(product);
 
         return true;
+    }
+
+    private void checkEmptiness(List<Product> products) throws CustomException{
+        if(products.isEmpty()) {
+            throw new CustomException(
+                    ErrorCode.PRODUCT_NOT_FOUND.getCode(),
+                    ErrorCode.PRODUCT_NOT_FOUND.getMessage()
+            );
+        }
+    }
+
+    private PageableProductDto generateResult(Page<Product> pages, List<Product> products) {
+        checkEmptiness(products);
+
+        List<ProductDto> productsResult = BeanMapper.mapAsList(products, ProductDto.class);
+        PageableProductDto result = PageableProductDto.builder()
+                .totalPage(pages.getTotalPages())
+                .products(productsResult)
+                .build();
+
+        return result;
     }
 
 }

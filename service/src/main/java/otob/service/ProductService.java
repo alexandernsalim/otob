@@ -2,6 +2,7 @@ package otob.service;
 
 import org.springframework.web.multipart.MultipartFile;
 import otob.model.entity.Product;
+import otob.web.model.PageableProductDto;
 
 import java.util.List;
 
@@ -10,11 +11,11 @@ public interface ProductService {
 
     List<Product> addProducts(MultipartFile file);
 
-    List<Product> getAllProduct();
+    PageableProductDto getAllProduct(Integer page, Integer size);
 
     Product getProductById (Long productId);
 
-    List<Product> getAllProductByName(String name, int page, int size);
+    PageableProductDto getAllProductByName(String name, Integer page, Integer size);
 
     Product updateProductById(Long productId, Product product);
 

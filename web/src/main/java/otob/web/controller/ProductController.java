@@ -1,6 +1,8 @@
 package otob.web.controller;
 
+import net.bytebuddy.implementation.bind.annotation.Empty;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +18,7 @@ import otob.model.entity.Product;
 import otob.model.response.Response;
 import otob.service.ProductService;
 import otob.util.mapper.BeanMapper;
+import otob.web.model.PageableProductDto;
 import otob.web.model.ProductDto;
 
 import javax.validation.Valid;
@@ -32,21 +35,26 @@ public class ProductController extends GlobalController {
     private BeanMapper mapper;
 
     @GetMapping
-    public Response<List<ProductDto>> getAllProduct() {
-        List<Product> products = productService.getAllProduct();
+    public Response<PageableProductDto> getAllProduct(
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size
+    ) {
+        page = (page == null) ? 0 : page-1;
+        if(size == null) size = 5;
 
-        return toResponse(mapper.mapAsList(products, ProductDto.class));
+        return toResponse(productService.getAllProduct(page, size));
     }
 
     @GetMapping(ProductApiPath.GET_PRODUCT_BY_NAME)
-    public Response<List<ProductDto>> getAllProductByName(
+    public Response<PageableProductDto> getAllProductByName(
         @PathVariable String productName,
-        @RequestParam int page,
-        @RequestParam int size
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size
     ) {
-        List<Product> products = productService.getAllProductByName(productName, page, size);
+        page = (page == null) ? 0 : page-1;
+        if(size == null) size = 5;
 
-        return toResponse(mapper.mapAsList(products, ProductDto.class));
+        return toResponse(productService.getAllProductByName(productName, page, size));
     }
 
     @GetMapping(ProductApiPath.GET_PRODUCT_BY_ID)
