@@ -107,34 +107,34 @@ public class OrderControllerTest {
         orders.add(order);
     }
 
-    @Test
-    public void getAllOrder() throws Exception {
-        when(orderService.getAllOrder())
-                .thenReturn(orders);
-
-        mvc.perform(
-                get(OrderApiPath.BASE_PATH)
-        )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(1)));
-
-        verify(orderService).getAllOrder();
-    }
-
-    @Test
-    public void getUserAllOrderTest() throws Exception {
-        when(orderService.getAllOrderByUserEmail(userEmail))
-                .thenReturn(orders);
-
-        mvc.perform(
-            get(OrderApiPath.BASE_PATH + OrderApiPath.GET_USER_ALL_ORDER)
-                .sessionAttr("userId", userEmail)
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data", hasSize(1)));
-
-        verify(orderService).getAllOrderByUserEmail(userEmail);
-    }
+//    @Test
+//    public void getAllOrder() throws Exception {
+//        when(orderService.getAllOrder())
+//                .thenReturn(orders);
+//
+//        mvc.perform(
+//                get(OrderApiPath.BASE_PATH)
+//        )
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.data", hasSize(1)));
+//
+//        verify(orderService).getAllOrder();
+//    }
+//
+//    @Test
+//    public void getUserAllOrderTest() throws Exception {
+//        when(orderService.getAllOrderByUserEmail(userEmail))
+//                .thenReturn(orders);
+//
+//        mvc.perform(
+//            get(OrderApiPath.BASE_PATH + OrderApiPath.GET_USER_ALL_ORDER)
+//                .sessionAttr("userId", userEmail)
+//        )
+//        .andExpect(status().isOk())
+//        .andExpect(jsonPath("$.data", hasSize(1)));
+//
+//        verify(orderService).getAllOrderByUserEmail(userEmail);
+//    }
 
     @Test
     public void findOrderTest() throws Exception {

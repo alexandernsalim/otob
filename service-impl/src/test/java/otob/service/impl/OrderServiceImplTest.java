@@ -143,41 +143,41 @@ public class OrderServiceImplTest {
         }
     }
 
-    @Test
-    public void getAllOrderByUserEmailTest() {
-        when(userService.checkUser(userEmail)).thenReturn(true);
-        when(orderRepository.findAllByUserEmail(userEmail))
-                .thenReturn(orders);
-
-        List<Order> userOrders = orderServiceImpl.getAllOrderByUserEmail(userEmail);
-
-        verify(userService).checkUser(userEmail);
-        verify(orderRepository).findAllByUserEmail(userEmail);
-        assertTrue(userOrders.size() >= 1);
-    }
-
-    @Test
-    public void getAllOrderByUserEmailNotExistsTest() {
-        when(userService.checkUser(userEmail)).thenReturn(false);
-
-        try {
-            orderServiceImpl.getAllOrderByUserEmail(userEmail);
-        } catch (CustomException ex) {
-            verify(userService).checkUser(userEmail);
-            assertTrue(ex.getMessage().equals(ErrorCode.USER_NOT_FOUND.getMessage()));
-        }
-    }
-
-    @Test
-    public void getAllOrderTest() {
-        when(orderRepository.findAll())
-                .thenReturn(orders);
-
-        List<Order> orders = orderServiceImpl.getAllOrder();
-
-        verify(orderRepository).findAll();
-        assertTrue(orders.size() >= 1);
-    }
+//    @Test
+//    public void getAllOrderByUserEmailTest() {
+//        when(userService.checkUser(userEmail)).thenReturn(true);
+//        when(orderRepository.findAllByUserEmail(userEmail))
+//                .thenReturn(orders);
+//
+//        List<Order> userOrders = orderServiceImpl.getAllOrderByUserEmail(userEmail);
+//
+//        verify(userService).checkUser(userEmail);
+//        verify(orderRepository).findAllByUserEmail(userEmail);
+//        assertTrue(userOrders.size() >= 1);
+//    }
+//
+//    @Test
+//    public void getAllOrderByUserEmailNotExistsTest() {
+//        when(userService.checkUser(userEmail)).thenReturn(false);
+//
+//        try {
+//            orderServiceImpl.getAllOrderByUserEmail(userEmail);
+//        } catch (CustomException ex) {
+//            verify(userService).checkUser(userEmail);
+//            assertTrue(ex.getMessage().equals(ErrorCode.USER_NOT_FOUND.getMessage()));
+//        }
+//    }
+//
+//    @Test
+//    public void getAllOrderTest() {
+//        when(orderRepository.findAll())
+//                .thenReturn(orders);
+//
+//        List<Order> orders = orderServiceImpl.getAllOrder();
+//
+//        verify(orderRepository).findAll();
+//        assertTrue(orders.size() >= 1);
+//    }
 
     @Test
     public void createOrderTest() {

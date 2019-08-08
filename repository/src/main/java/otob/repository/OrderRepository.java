@@ -1,5 +1,7 @@
 package otob.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import otob.model.entity.Order;
 
@@ -9,6 +11,6 @@ public interface OrderRepository extends MongoRepository<Order, String> {
 
     Boolean existsByOrderId(String ordId);
     Order findByOrderId(String ordId);
-    List<Order> findAllByUserEmail(String userEmail);
+    Page<Order> findAllByUserEmail(String userEmail, Pageable pageable);
 
 }

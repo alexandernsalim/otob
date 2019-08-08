@@ -17,6 +17,7 @@ import otob.model.entity.Product;
 import otob.model.exception.GlobalExceptionHandler;
 import otob.service.ProductService;
 import otob.util.mapper.BeanMapper;
+import otob.web.model.PageableProductDto;
 import otob.web.model.ProductDto;
 
 import java.util.ArrayList;
@@ -40,10 +41,13 @@ public class ProductControllerTest {
     private MockMvc mvc;
     private ObjectMapper objectMapper;
 
+    private Integer page;
+    private Integer size;
     private Product product1;
     private Product product2;
     private Product product1Updated;
     private List<Product> products;
+    private PageableProductDto pageableProductDto;
 
     @Before
     public void setUp() {
@@ -54,6 +58,9 @@ public class ProductControllerTest {
                 .build();
 
         objectMapper = new ObjectMapper();
+
+        page = 1;
+        size = 5;
 
         product1 = Product.builder()
                 .productId(1L)
@@ -86,23 +93,28 @@ public class ProductControllerTest {
         products.add(product1);
         products.add(product2);
 
+        pageableProductDto = PageableProductDto.builder()
+            .totalPage(page)
+            .products(BeanMapper.mapAsList(products, ProductDto.class))
+            .build();
+
     }
 
-//    @Test
-//    public void getAllProductTest() throws Exception {
-//        when(productService.getAllProduct())
-//            .thenReturn(products);
-//
-//        mvc.perform(
-//            get(ProductApiPath.BASE_PATH)
-//        )
-//        .andDo(MockMvcResultHandlers.print())
-//        .andExpect(status().isOk())
-//        .andExpect(jsonPath("$.data").isArray())
-//        .andExpect(jsonPath("$.data", hasSize(2)));
-//
-//        verify(productService).getAllProduct();
-//    }
+    @Test
+    public void getAllProductTest() throws Exception {
+        when(productService.getAllProduct(page, size))
+            .thenReturn(pageableProductDto);
+
+        mvc.perform(
+            get(ProductApiPath.BASE_PATH)
+        )
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.products").isArray())
+        .andExpect(jsonPath("$.data.products", hasSize(2)));
+
+        verify(productService).getAllProduct(page, size);
+    }
 
 //    @Test
 //    public void getAllProductByNameTest() throws Exception {

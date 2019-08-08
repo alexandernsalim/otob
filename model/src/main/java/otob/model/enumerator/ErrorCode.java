@@ -10,10 +10,10 @@ public enum ErrorCode {
     EMAIL_EXISTS("400", "Email already registered"),
     PASSWORD_NOT_MATCH("400", "Password not match"),
 
-    PRODUCT_NOT_FOUND("404", "Sorry, product not found"),
+    PRODUCT_NOT_FOUND("404", "Product not found"),
     STOCK_INSUFFICIENT("400", "Insufficient stock"),
 
-    ORDER_NOT_FOUND("404", "Sorry, order not found"),
+    ORDER_NOT_FOUND("404", "Order not found"),
     ORDER_PROCESSED("400", "Order already processed"),
 
     GENERATE_ID_FAIL("500", "Failed to generate id"),

@@ -201,8 +201,8 @@ public class ProductServiceImpl implements ProductService {
     private void checkEmptiness(List<Product> products) throws CustomException{
         if(products.isEmpty()) {
             throw new CustomException(
-                    ErrorCode.PRODUCT_NOT_FOUND.getCode(),
-                    ErrorCode.PRODUCT_NOT_FOUND.getMessage()
+                ErrorCode.PRODUCT_NOT_FOUND.getCode(),
+                ErrorCode.PRODUCT_NOT_FOUND.getMessage()
             );
         }
     }

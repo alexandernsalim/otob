@@ -6,11 +6,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
-import otob.util.generator.IdGenerator;
 import otob.repository.ProductRepository;
+import otob.util.generator.IdGenerator;
+import otob.web.model.PageableProductDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +36,22 @@ public class ProductServiceImplTest {
     @InjectMocks
     private ProductServiceImpl productServiceImpl;
 
+    private Pageable pageable;
+    private Integer page;
+    private Integer size;
     private Product product1;
     private Product product2;
     private Product productUpdated2;
     private List<Product> products;
     private List<Product> productsByName;
     private List<Product> emptyProducts;
-
     @Before
     public void setUp() {
         initMocks(this);
+
+        page = 0;
+        size = 5;
+        pageable = PageRequest.of(page, size);
 
         product1 = Product.builder()
                 .productId(1L)
@@ -79,29 +89,27 @@ public class ProductServiceImplTest {
         productsByName.add(product1);
     }
 
-//    @Test
-//    public void getAllProductTest() {
-//        when(productRepository.findAll())
-//                .thenReturn(products);
-//
-//        List<Product> result = productServiceImpl.getAllProduct();
-//
-//        verify(productRepository).findAll();
-//        assertTrue(result.size() >= 1);
-//    }
-//
-//    @Test
-//    public void getAllProductNotFoundTest() {
-//        when(productRepository.findAll())
-//                .thenReturn(emptyProducts);
-//
-//        try {
-//            productServiceImpl.getAllProduct();
-//        } catch (CustomException ex) {
-//            verify(productRepository).findAll();
-//            TestCase.assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
-//        }
-//    }
+    @Test
+    public void getAllProductTest() {
+        when(productRepository.findAll(pageable)).thenReturn(new PageImpl<>(products));
+
+        PageableProductDto result = productServiceImpl.getAllProduct(page, size);
+
+        verify(productRepository).findAll(pageable);
+        assertTrue(result.getProducts().size() >= 1);
+    }
+
+    @Test
+    public void getAllProductEmptyTest() {
+        when(productRepository.findAll(pageable)).thenReturn(new PageImpl<>(emptyProducts));
+
+        try {
+            productServiceImpl.getAllProduct(page, size);
+        } catch (CustomException ex) {
+            verify(productRepository).findAll(pageable);
+            TestCase.assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
+        }
+    }
 
     @Test
     public void getProductByIdTest() {
@@ -127,32 +135,29 @@ public class ProductServiceImplTest {
         }
     }
 
-//    @Test
-//    public void getAllProductByNameTest() {
-//        when(productRepository.existsByNameContaining("Asus"))
-//                .thenReturn(true);
-//        when(productRepository.findAllByNameContaining("Asus"))
-//                .thenReturn(productsByName);
-//
-//        List<Product> result = productServiceImpl.getAllProductByName("Asus");
-//
-//        verify(productRepository).existsByNameContaining("Asus");
-//        verify(productRepository).findAllByNameContaining("Asus");
-//        assertTrue(result.size() >= 1);
-//    }
-//
-//    @Test
-//    public void getAllProductByNameNotExistsTest() {
-//        when(productRepository.existsByNameContaining("Asus"))
-//                .thenReturn(false);
-//
-//        try {
-//            productServiceImpl.getAllProductByName("Asus");
-//        } catch (CustomException ex) {
-//            verify(productRepository).existsByNameContaining("Asus");
-//            assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
-//        }
-//    }
+    @Test
+    public void getAllProductByNameTest() {
+        when(productRepository.findAllByNameContaining("Asus", pageable))
+            .thenReturn(new PageImpl<>(productsByName));
+
+        PageableProductDto result = productServiceImpl.getAllProductByName("Asus", page, size);
+
+        verify(productRepository).findAllByNameContaining("Asus", pageable);
+        assertTrue(result.getProducts().size() >= 1);
+    }
+
+    @Test
+    public void getAllProductByNameEmptyTest() {
+        when(productRepository.findAllByNameContaining("Asus", pageable))
+                .thenReturn(new PageImpl<>(emptyProducts));
+
+        try {
+            productServiceImpl.getAllProductByName("Asus", page, size);
+        } catch (CustomException ex) {
+            verify(productRepository).findAllByNameContaining("Asus", pageable);
+            assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
+        }
+    }
 
     @Test
     public void addProductExistsTest() {

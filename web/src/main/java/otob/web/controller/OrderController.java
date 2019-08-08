@@ -1,19 +1,16 @@
 package otob.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import otob.model.constant.path.OrderApiPath;
-import otob.web.model.OrderDto;
-import otob.util.mapper.BeanMapper;
 import otob.model.response.Response;
 import otob.service.OrderService;
+import otob.util.mapper.BeanMapper;
+import otob.web.model.OrderDto;
+import otob.web.model.PageableOrderDto;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
 
 @RestController
 @RequestMapping(OrderApiPath.BASE_PATH)
@@ -28,16 +25,28 @@ public class OrderController extends GlobalController {
     private HttpSession session;
 
     @GetMapping
-    public Response<List<OrderDto>> getAllOrder() {
+    public Response<PageableOrderDto> getAllOrder(
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size
+    ) {
+        page = (page == null) ? 0 : page-1;
+        if(size == null) size = 5;
 
-        return toResponse(mapper.mapAsList(orderService.getAllOrder(), OrderDto.class));
+        return toResponse(orderService.getAllOrder(page, size));
     }
 
     @GetMapping(OrderApiPath.GET_USER_ALL_ORDER)
-    public Response<List<OrderDto>> getUserAllOrder(HttpServletRequest request) {
+    public Response<PageableOrderDto> getUserAllOrder(
+        HttpServletRequest request,
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size
+    ) {
         session = request.getSession(true);
+        String email = session.getAttribute("userId").toString();
+        page = (page == null) ? 0 : page-1;
+        if(size == null) size = 5;
 
-        return toResponse(mapper.mapAsList(orderService.getAllOrderByUserEmail(session.getAttribute("userId").toString()), OrderDto.class));
+        return toResponse(orderService.getAllOrderByUserEmail(email, page, size));
     }
 
     @GetMapping(OrderApiPath.FIND_ORDER)
