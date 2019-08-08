@@ -1,8 +1,10 @@
 package otob.web.config;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import otob.model.constant.Status;
 import otob.model.entity.User;
+import otob.model.response.Response;
 import otob.service.CustomUserDetailsService;
 import otob.service.UserService;
 
@@ -36,6 +39,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private CustomUserDetailsService userDetailsService;
 
     private static Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+    private static Gson gson = new Gson();
+    private Response jsonResponse = Response.builder()
+            .code("200")
+            .message("Success")
+            .errors(null)
+            .build();
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
@@ -94,6 +103,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                     session.setAttribute("userId", email);
                     setCookie(session, response, email, true);
+
+                    jsonResponse.setData("Accepted");
+                    response.setStatus(200);
+                    response.getWriter().append(gson.toJson(jsonResponse));
                 })
                 .failureHandler((request, response, exception) -> {
                     logger.info("Login Fail");
@@ -102,6 +115,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     HttpSession session = request.getSession(true);
 
                     setCookie(session, response, email, false);
+
+                    jsonResponse.setData("Bad Request");
+                    response.setStatus(400);
+                    response.getWriter().append(gson.toJson(jsonResponse));
                 })
             .and()
             .logout()
