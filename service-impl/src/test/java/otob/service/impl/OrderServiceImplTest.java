@@ -5,15 +5,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import otob.model.constant.Status;
 import otob.model.entity.CartItem;
 import otob.model.entity.Order;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
+import otob.repository.OrderRepository;
 import otob.service.ProductService;
 import otob.service.UserService;
-import otob.repository.OrderRepository;
+import otob.web.model.PageableOrderDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +40,9 @@ public class OrderServiceImplTest {
     @InjectMocks
     private OrderServiceImpl orderServiceImpl;
 
+    int page;
+    int size;
+    private PageRequest pageable;
     private CartItem item1;
     private List<CartItem> items;
     private String orderId;
@@ -51,6 +57,11 @@ public class OrderServiceImplTest {
     @Before
     public void setUp() {
         initMocks(this);
+
+        page = 0;
+        size = 5;
+
+        pageable = PageRequest.of(page, size);
 
         item1 = CartItem.builder()
                 .productId(1L)
@@ -143,41 +154,73 @@ public class OrderServiceImplTest {
         }
     }
 
-//    @Test
-//    public void getAllOrderByUserEmailTest() {
-//        when(userService.checkUser(userEmail)).thenReturn(true);
-//        when(orderRepository.findAllByUserEmail(userEmail))
-//                .thenReturn(orders);
-//
-//        List<Order> userOrders = orderServiceImpl.getAllOrderByUserEmail(userEmail);
-//
-//        verify(userService).checkUser(userEmail);
-//        verify(orderRepository).findAllByUserEmail(userEmail);
-//        assertTrue(userOrders.size() >= 1);
-//    }
-//
-//    @Test
-//    public void getAllOrderByUserEmailNotExistsTest() {
-//        when(userService.checkUser(userEmail)).thenReturn(false);
-//
-//        try {
-//            orderServiceImpl.getAllOrderByUserEmail(userEmail);
-//        } catch (CustomException ex) {
-//            verify(userService).checkUser(userEmail);
-//            assertTrue(ex.getMessage().equals(ErrorCode.USER_NOT_FOUND.getMessage()));
-//        }
-//    }
-//
-//    @Test
-//    public void getAllOrderTest() {
-//        when(orderRepository.findAll())
-//                .thenReturn(orders);
-//
-//        List<Order> orders = orderServiceImpl.getAllOrder();
-//
-//        verify(orderRepository).findAll();
-//        assertTrue(orders.size() >= 1);
-//    }
+    @Test
+    public void getAllOrderTest() {
+        when(orderRepository.findAll(pageable))
+            .thenReturn(new PageImpl<>(orders));
+
+        PageableOrderDto result = orderServiceImpl.getAllOrder(page, size);
+
+        verify(orderRepository).findAll(pageable);
+        assertTrue(result.getOrders().size() >= 1);
+    }
+
+    @Test
+    public void getAllOrderEmptyTest() {
+        orders.clear();
+
+        when(orderRepository.findAll(pageable))
+            .thenReturn(new PageImpl<>(orders));
+
+        try {
+            orderServiceImpl.getAllOrder(page, size);
+        } catch (CustomException ex) {
+            verify(orderRepository).findAll(pageable);
+            assertEquals(ErrorCode.ORDER_NOT_FOUND.getMessage(), ex.getMessage());
+        }
+    }
+
+    @Test
+    public void getAllOrderByUserEmailTest() {
+        when(userService.checkUser(userEmail)).thenReturn(true);
+        when(orderRepository.findAllByUserEmail(userEmail, pageable))
+                .thenReturn(new PageImpl<>(orders));
+
+        PageableOrderDto result = orderServiceImpl.getAllOrderByUserEmail(userEmail, page, size);
+
+        verify(userService).checkUser(userEmail);
+        verify(orderRepository).findAllByUserEmail(userEmail, pageable);
+        assertTrue(result.getOrders().size() >= 1);
+    }
+
+    @Test
+    public void getAllOrderByUserEmailEmptyTest() {
+        orders.clear();
+
+        when(userService.checkUser(userEmail)).thenReturn(true);
+        when(orderRepository.findAllByUserEmail(userEmail, pageable))
+                .thenReturn(new PageImpl<>(orders));
+
+        try {
+            orderServiceImpl.getAllOrderByUserEmail(userEmail, page, size);
+        } catch (CustomException ex) {
+            verify(userService).checkUser(userEmail);
+            verify(orderRepository).findAllByUserEmail(userEmail, pageable);
+            assertEquals(ErrorCode.ORDER_NOT_FOUND.getMessage(), ex.getMessage());
+        }
+    }
+
+    @Test
+    public void getAllOrderByUserEmailNotExistsTest() {
+        when(userService.checkUser(userEmail)).thenReturn(false);
+
+        try {
+            orderServiceImpl.getAllOrderByUserEmail(userEmail, page, size);
+        } catch (CustomException ex) {
+            verify(userService).checkUser(userEmail);
+            assertTrue(ex.getMessage().equals(ErrorCode.USER_NOT_FOUND.getMessage()));
+        }
+    }
 
     @Test
     public void createOrderTest() {

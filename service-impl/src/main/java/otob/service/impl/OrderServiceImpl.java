@@ -127,8 +127,8 @@ public class OrderServiceImpl implements OrderService {
     private void checkEmptiness(List<Order> orders) throws CustomException {
         if(orders.isEmpty()) {
             throw new CustomException(
-                    ErrorCode.ORDER_NOT_FOUND.getCode(),
-                    ErrorCode.ORDER_NOT_FOUND.getMessage()
+                ErrorCode.ORDER_NOT_FOUND.getCode(),
+                ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
     }

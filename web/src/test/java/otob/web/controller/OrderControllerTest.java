@@ -17,6 +17,9 @@ import otob.model.entity.Order;
 import otob.model.entity.Product;
 import otob.model.exception.GlobalExceptionHandler;
 import otob.service.OrderService;
+import otob.util.mapper.BeanMapper;
+import otob.web.model.OrderDto;
+import otob.web.model.PageableOrderDto;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -45,6 +48,8 @@ public class OrderControllerTest {
     private MockHttpSession session;
     private ObjectMapper objectMapper;
 
+    private Integer page;
+    private Integer size;
     private CartItem item1;
     private List<CartItem> items;
     private String orderId;
@@ -53,6 +58,7 @@ public class OrderControllerTest {
     private Order orderAccepted;
     private Order orderRejected;
     private List<Order> orders;
+    private PageableOrderDto pageableOrderDto;
 
     @Before
     public void setUp() {
@@ -65,6 +71,9 @@ public class OrderControllerTest {
         session = new MockHttpSession();
         request.setSession(session);
         objectMapper = new ObjectMapper();
+
+        page = 0;
+        size = 5;
 
         item1 = CartItem.builder()
                 .productId(1L)
@@ -105,36 +114,45 @@ public class OrderControllerTest {
                 .build();
         orders = new ArrayList<>();
         orders.add(order);
+
+        pageableOrderDto = PageableOrderDto.builder()
+            .totalPage(1)
+            .orders(BeanMapper.mapAsList(orders, OrderDto.class))
+            .build();
     }
 
-//    @Test
-//    public void getAllOrder() throws Exception {
-//        when(orderService.getAllOrder())
-//                .thenReturn(orders);
-//
-//        mvc.perform(
-//                get(OrderApiPath.BASE_PATH)
-//        )
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.data", hasSize(1)));
-//
-//        verify(orderService).getAllOrder();
-//    }
-//
-//    @Test
-//    public void getUserAllOrderTest() throws Exception {
-//        when(orderService.getAllOrderByUserEmail(userEmail))
-//                .thenReturn(orders);
-//
-//        mvc.perform(
-//            get(OrderApiPath.BASE_PATH + OrderApiPath.GET_USER_ALL_ORDER)
-//                .sessionAttr("userId", userEmail)
-//        )
-//        .andExpect(status().isOk())
-//        .andExpect(jsonPath("$.data", hasSize(1)));
-//
-//        verify(orderService).getAllOrderByUserEmail(userEmail);
-//    }
+    @Test
+    public void getAllOrder() throws Exception {
+        when(orderService.getAllOrder(page, size))
+            .thenReturn(pageableOrderDto);
+
+        mvc.perform(
+            get(OrderApiPath.BASE_PATH)
+                .param("page", "1")
+                .param("size", "5")
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.orders", hasSize(1)));
+
+        verify(orderService).getAllOrder(page, size);
+    }
+
+    @Test
+    public void getUserAllOrderTest() throws Exception {
+        when(orderService.getAllOrderByUserEmail(userEmail, page, size))
+                .thenReturn(pageableOrderDto);
+
+        mvc.perform(
+            get(OrderApiPath.BASE_PATH + OrderApiPath.GET_USER_ALL_ORDER)
+                .sessionAttr("userId", userEmail)
+                .param("page", "1")
+                .param("size", "5")
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.orders", hasSize(1)));
+
+        verify(orderService).getAllOrderByUserEmail(userEmail, page, size);
+    }
 
     @Test
     public void findOrderTest() throws Exception {

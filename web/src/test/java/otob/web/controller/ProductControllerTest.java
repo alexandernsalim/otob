@@ -59,7 +59,7 @@ public class ProductControllerTest {
 
         objectMapper = new ObjectMapper();
 
-        page = 1;
+        page = 0;
         size = 5;
 
         product1 = Product.builder()
@@ -94,7 +94,7 @@ public class ProductControllerTest {
         products.add(product2);
 
         pageableProductDto = PageableProductDto.builder()
-            .totalPage(page)
+            .totalPage(1)
             .products(BeanMapper.mapAsList(products, ProductDto.class))
             .build();
 
@@ -107,6 +107,8 @@ public class ProductControllerTest {
 
         mvc.perform(
             get(ProductApiPath.BASE_PATH)
+                .param("page", "1")
+                .param("size", "5")
         )
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
@@ -116,38 +118,38 @@ public class ProductControllerTest {
         verify(productService).getAllProduct(page, size);
     }
 
-//    @Test
-//    public void getAllProductByNameTest() throws Exception {
-//        products.remove(1);
-//
-//        when(productService.getAllProductByName("Redmi"))
-//            .thenReturn(products);
-//
-//        mvc.perform(
-//            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_NAME, "Redmi")
-//        )
-//        .andExpect(status().isOk())
-//        .andExpect(jsonPath("$.data", hasSize(1)));
-//
-//        verify(productService).getAllProductByName("Redmi");
-//    }
-//
-//    @Test
-//    public void getProductByIdTest() throws Exception {
-//        when(productService.getProductById(1L))
-//            .thenReturn(product1);
-//
-//        when(productService.getAllProductByName("Redmi"))
-//            .thenReturn(products);
-//
-//        mvc.perform(
-//            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_ID, 1L)
-//        )
-//        .andExpect(status().isOk())
-//        .andExpect(jsonPath("$.data").value(product1));
-//
-//        verify(productService).getProductById(1L);
-//    }
+    @Test
+    public void getAllProductByNameTest() throws Exception {
+        products.remove(1);
+        pageableProductDto.setProducts(BeanMapper.mapAsList(products, ProductDto.class));
+
+        when(productService.getAllProductByName("Redmi", page, size))
+            .thenReturn(pageableProductDto);
+
+        mvc.perform(
+            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_NAME, "Redmi")
+                .param("page", "1")
+                .param("size", "5")
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.products", hasSize(1)));
+
+        verify(productService).getAllProductByName("Redmi", page, size);
+    }
+
+    @Test
+    public void getProductByIdTest() throws Exception {
+        when(productService.getProductById(1L))
+            .thenReturn(product1);
+
+        mvc.perform(
+            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_ID, 1L)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data").value(product1));
+
+        verify(productService).getProductById(1L);
+    }
 
     @Test
     public void addProductTest() throws Exception {
