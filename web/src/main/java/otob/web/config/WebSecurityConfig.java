@@ -123,6 +123,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .logout()
                 .logoutUrl("/api/auth/logout")
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    jsonResponse.setData("OK");
+                    response.setStatus(200);
+                    response.getWriter().append(gson.toJson(jsonResponse));
+                })
                 .deleteCookies("user-id")
                 .deleteCookies("user-role")
                 .deleteCookies("is-login")
