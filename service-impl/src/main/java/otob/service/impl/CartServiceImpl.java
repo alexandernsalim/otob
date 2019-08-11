@@ -5,19 +5,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import otob.model.constant.Status;
-import otob.web.model.CheckoutDto;
 import otob.model.entity.Cart;
 import otob.model.entity.CartItem;
 import otob.model.entity.Order;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
-import otob.util.generator.IdGenerator;
+import otob.model.exception.OutOfStockException;
+import otob.repository.CartRepository;
 import otob.service.CartService;
 import otob.service.OrderService;
 import otob.service.ProductService;
 import otob.service.UserService;
-import otob.repository.CartRepository;
+import otob.util.generator.IdGenerator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -110,7 +110,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CheckoutDto checkout(String userEmail) {
+    public Order checkout(String userEmail) {
         Cart cart = getUserCart(userEmail);
         List<CartItem> cartItems = cart.getCartItems();
         String orderId = "";
@@ -120,49 +120,49 @@ public class CartServiceImpl implements CartService {
         String ordDate = dateFormat.format(new Date());
         List<String> outOfStockProducts = new ArrayList<>();
 
-        int cartItemsSize = cartItems.size();
-        if (cartItemsSize == 0) {
+        if (cartItems.isEmpty()) {
             throw new CustomException(
-                    ErrorCode.BAD_REQUEST.getCode(),
-                    ErrorCode.BAD_REQUEST.getMessage()
+                ErrorCode.BAD_REQUEST.getCode(),
+                ErrorCode.BAD_REQUEST.getMessage()
             );
         }
 
-        int itemIdx = 0;
-        for (int i = 0; i < cartItemsSize; i++) {
-            CartItem item = cartItems.get(itemIdx);
+        for (CartItem item : cartItems) {
             Product product = productService.getProductById(item.getProductId());
             int itemQty = item.getQty();
             int productStock = product.getStock();
 
             if (itemQty > productStock) {
                 outOfStockProducts.add(product.getName());
-                cartItems.remove(item);
-                itemIdx--;
-            } else {
-                totPrice += item.getProductPrice() * itemQty;
-                totItem++;
-                product.setStock(productStock - itemQty);
-                productService.updateProductById(product.getProductId(), product);
             }
-
-            removeItemFromCart(userEmail, product.getProductId());
-            itemIdx++;
         }
 
-        if (cartItems.size() == 0) {
-            throw new CustomException(
-                ErrorCode.STOCK_INSUFFICIENT.getCode(),
-                ErrorCode.STOCK_INSUFFICIENT.getMessage()
+        if(!outOfStockProducts.isEmpty()) {
+            throw new OutOfStockException(
+                ErrorCode.SOME_PRODUCTS_INVALID.getCode(),
+                ErrorCode.SOME_PRODUCTS_INVALID.getMessage(),
+                outOfStockProducts
             );
+        }
+
+        for (CartItem item : cartItems) {
+            Product product = productService.getProductById(item.getProductId());
+            double itemPrice = item.getProductPrice();
+            int itemQty = item.getQty();
+            int productStock = product.getStock();
+
+            totPrice += itemPrice * itemQty;
+            totItem++;
+            product.setStock(productStock - itemQty);
+            productService.updateProductById(product.getProductId(), product);
         }
 
         try {
             orderId = idGenerator.generateOrderId(ordDate);
         } catch (Exception e) {
             throw new CustomException(
-                    ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-                    ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
             );
         }
 
@@ -176,14 +176,7 @@ public class CartServiceImpl implements CartService {
                 .ordStatus(Status.ORD_WAIT)
                 .build();
 
-        orderService.createOrder(order);
-
-        CheckoutDto checkoutDet = CheckoutDto.builder()
-                .order(order)
-                .outOfStockProducts(outOfStockProducts)
-                .build();
-
-        return checkoutDet;
+        return orderService.createOrder(order);
     }
 
     @Override

@@ -9,7 +9,7 @@ import otob.model.response.Response;
 import otob.service.CartService;
 import otob.util.mapper.BeanMapper;
 import otob.web.model.CartDto;
-import otob.web.model.CheckoutDto;
+import otob.web.model.OrderDto;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -73,10 +73,11 @@ public class CartController extends GlobalController {
     }
 
     @GetMapping(CartApiPath.CHECKOUT)
-    public Response<CheckoutDto> checkout(HttpServletRequest request) {
+    public Response<OrderDto> checkout(HttpServletRequest request) {
         session = request.getSession(true);
+        String email = session.getAttribute("userId").toString();
 
-        return toResponse(cartService.checkout(session.getAttribute("userId").toString()));
+        return toResponse(mapper.map(cartService.checkout(email), OrderDto.class));
     }
 
 }

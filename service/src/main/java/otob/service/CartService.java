@@ -1,7 +1,7 @@
 package otob.service;
 
-import otob.web.model.CheckoutDto;
 import otob.model.entity.Cart;
+import otob.model.entity.Order;
 
 public interface CartService {
 
@@ -11,6 +11,6 @@ public interface CartService {
     Cart updateItemQty(String userEmail, Long productId, int qty);
     Cart removeItemFromCart(String userEmail, Long productId);
     Boolean removeUserCart(String userEmail);
-    CheckoutDto checkout(String userEmail);
+    Order checkout(String userEmail);
 
 }

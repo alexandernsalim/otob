@@ -1,7 +1,6 @@
 package otob.model.enumerator;
 
 public enum ErrorCode {
-    UNAUTHORIZED("403", "Forbidden"),
     NOT_FOUND("404", "Not Found"),
     BAD_REQUEST("400", "Bad Request"),
     INTERNAL_SERVER_ERROR("500", "Internal Server Error"),
@@ -13,6 +12,7 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND("404", "Product not found"),
     STOCK_INSUFFICIENT("400", "Insufficient stock"),
 
+    SOME_PRODUCTS_INVALID("400", "Insufficient stock of one or more product"),
     ORDER_NOT_FOUND("404", "Order not found"),
     ORDER_PROCESSED("400", "Order already processed"),
 
