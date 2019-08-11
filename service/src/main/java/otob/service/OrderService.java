@@ -9,6 +9,7 @@ public interface OrderService {
 
     PageableOrderDto getAllOrder(Integer page, Integer size);
     PageableOrderDto getAllOrderByUserEmail(String userEmail, Integer page, Integer size);
+    PageableOrderDto getAllOrderByOrderStatus(String status, Integer page, Integer size);
     Order getOrderByOrderId(String ordId);
     Order createOrder(Order order);
     Order acceptOrder(String ordId);

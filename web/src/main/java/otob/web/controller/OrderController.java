@@ -49,6 +49,18 @@ public class OrderController extends GlobalController {
         return toResponse(orderService.getAllOrderByUserEmail(email, page, size));
     }
 
+    @GetMapping(OrderApiPath.GET_ORDER_BY_STATUS)
+    public Response<PageableOrderDto> getAllOrderByOrderStatus(
+        @PathVariable String orderStatus,
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size
+    ) {
+        page = (page == null) ? 0 : page-1;
+        if(size == null) size = 5;
+
+        return toResponse(orderService.getAllOrderByOrderStatus(orderStatus, page, size));
+    }
+
     @GetMapping(OrderApiPath.FIND_ORDER)
     public Response<OrderDto> findOrder(@PathVariable String orderId) {
 

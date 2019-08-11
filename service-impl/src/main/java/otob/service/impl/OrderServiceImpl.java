@@ -76,6 +76,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public PageableOrderDto getAllOrderByOrderStatus(String status, Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Order> pages = orderRepository.findAllByOrdStatus(status, pageable);
+        List<Order> orders = pages.getContent();
+
+        return generateResult(pages, orders);
+    }
+
+    @Override
     public Order acceptOrder(String ordId) {
         if (!orderRepository.existsByOrderId(ordId)) {
             throw new CustomException(

@@ -16,6 +16,7 @@ import otob.model.exception.CustomException;
 import otob.repository.OrderRepository;
 import otob.service.ProductService;
 import otob.service.UserService;
+import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class OrderServiceImplTest {
     private List<CartItem> items;
     private String orderId;
     private String userEmail;
+    private String orderStatus;
     private Order order;
     private Order orderAccepted;
     private Order orderRejected;
@@ -75,6 +77,7 @@ public class OrderServiceImplTest {
 
         orderId = "ORD1561436040000";
         userEmail = "alexandernsalim@gmail.com";
+
         order = Order.builder()
                 .orderId(orderId)
                 .userEmail(userEmail)
@@ -220,6 +223,33 @@ public class OrderServiceImplTest {
             verify(userService).checkUser(userEmail);
             assertTrue(ex.getMessage().equals(ErrorCode.USER_NOT_FOUND.getMessage()));
         }
+    }
+
+    @Test
+    public void getAllOrderByOrderStatusTest() {
+        when(orderRepository.findAllByOrdStatus(Status.ORD_WAIT, pageable))
+            .thenReturn(new PageImpl<>(orders));
+
+        PageableOrderDto result = orderServiceImpl.getAllOrderByOrderStatus(Status.ORD_WAIT, page, size);
+
+        verify(orderRepository).findAllByOrdStatus(Status.ORD_WAIT, pageable);
+        assertTrue(result.getOrders().size() >= 1);
+    }
+
+    @Test
+    public void getAllOrderByOrderStatusEmptyTest() {
+        orders.clear();
+
+        when(orderRepository.findAllByOrdStatus(Status.ORD_WAIT, pageable))
+            .thenReturn(new PageImpl<>(orders));
+
+        try {
+            orderServiceImpl.getAllOrderByOrderStatus(Status.ORD_WAIT, page, size);
+        } catch (CustomException ex) {
+            verify(orderRepository).findAllByOrdStatus(Status.ORD_WAIT, pageable);
+            assertEquals(ErrorCode.ORDER_NOT_FOUND.getMessage(), ex.getMessage());
+        }
+
     }
 
     @Test
