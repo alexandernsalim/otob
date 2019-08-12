@@ -13,11 +13,12 @@ import otob.model.entity.Order;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
-import otob.util.generator.IdGenerator;
+import otob.model.exception.OutOfStockException;
+import otob.repository.CartRepository;
 import otob.service.OrderService;
 import otob.service.ProductService;
 import otob.service.UserService;
-import otob.repository.CartRepository;
+import otob.util.generator.IdGenerator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -114,11 +115,6 @@ public class CartServiceImplTest {
                 .build();
 
         outOfStockProducts = new ArrayList<>();
-
-//        checkoutResult = CheckoutDto.builder()
-//                .order(order)
-//                .outOfStockProducts(outOfStockProducts)
-//                .build();
     }
 
     @Test
@@ -301,33 +297,34 @@ public class CartServiceImplTest {
         assertTrue(!bool);
     }
 
-//    @Test
-//    public void checkoutTest() throws Exception {
-//        when(userService.checkUser(userEmail))
-//                .thenReturn(true);
-//        when(cartRepository.findByUserEmail(userEmail))
-//                .thenReturn(updatedCart);
-//        when(productService.getProductById(product.getProductId()))
-//                .thenReturn(product);
-//
-//        when(idGenerator.generateOrderId(orderDate))
-//                .thenReturn(orderId);
-//
-//        CheckoutDto result = cartServiceImpl.checkout(userEmail);
-//
-//        verify(userService, times(2)).checkUser(userEmail);
-//        verify(cartRepository).findByUserEmail(userEmail);
-//        verify(productService).getProductById(product.getProductId());
-//        verify(productService).updateProductById(1L, product);
-//        verify(cartRepository).removeFromCart(userEmail, 1L);
-//        verify(idGenerator).generateOrderId(orderDate);
-//        verify(orderService).createOrder(order);
-//        Assert.assertEquals(checkoutResult.getOrder(), result.getOrder());
-//    }
+    @Test
+    public void checkoutTest() throws Exception {
+        when(userService.checkUser(userEmail))
+                .thenReturn(true);
+        when(cartRepository.findByUserEmail(userEmail))
+                .thenReturn(updatedCart);
+        when(productService.getProductById(product.getProductId()))
+                .thenReturn(product);
+        when(idGenerator.generateOrderId(orderDate))
+                .thenReturn(orderId);
+        when(orderService.createOrder(order))
+                .thenReturn(order);
+
+        Order result = cartServiceImpl.checkout(userEmail);
+
+        verify(userService, times(2)).checkUser(userEmail);
+        verify(cartRepository).findByUserEmail(userEmail);
+        verify(productService, times(2)).getProductById(product.getProductId());
+        verify(productService).updateProductById(1L, product);
+        verify(cartRepository).removeFromCart(userEmail, 1L);
+        verify(idGenerator).generateOrderId(orderDate);
+        verify(orderService).createOrder(order);
+        Assert.assertEquals(order, result);
+    }
 
     @Test
     public void checkoutCartItemsEmptyTest() {
-        updatedCart.getCartItems().remove(0);
+        updatedCart.getCartItems().clear();
 
         when(userService.checkUser(userEmail))
                 .thenReturn(true);
@@ -344,24 +341,23 @@ public class CartServiceImplTest {
     }
 
     @Test
-    public void checkoutStockInsufficientTest() {
+    public void checkoutCartOutOfStockTest() {
         product.setStock(0);
 
         when(userService.checkUser(userEmail))
-                .thenReturn(true);
+            .thenReturn(true);
         when(cartRepository.findByUserEmail(userEmail))
-                .thenReturn(updatedCart);
-        when(productService.getProductById(1L))
-                .thenReturn(product);
+            .thenReturn(updatedCart);
+        when(productService.getProductById(product.getProductId()))
+            .thenReturn(product);
 
         try {
             cartServiceImpl.checkout(userEmail);
-        } catch (CustomException ex) {
-            verify(userService, times(2)).checkUser(userEmail);
+        } catch (OutOfStockException ex) {
+            verify(userService).checkUser(userEmail);
             verify(cartRepository).findByUserEmail(userEmail);
-            verify(productService).getProductById(1L);
-            verify(cartRepository).removeFromCart(userEmail, 1L);
-            assertEquals(ErrorCode.STOCK_INSUFFICIENT.getMessage(), ex.getMessage());
+            verify(productService).getProductById(product.getProductId());
+            assertEquals(ErrorCode.SOME_PRODUCTS_INVALID.getMessage(), ex.getMessage());
         }
     }
 
@@ -381,7 +377,7 @@ public class CartServiceImplTest {
         } catch (CustomException ex) {
             verify(userService, times(2)).checkUser(userEmail);
             verify(cartRepository).findByUserEmail(userEmail);
-            verify(productService).getProductById(product.getProductId());
+            verify(productService, times(2)).getProductById(product.getProductId());
             verify(productService).updateProductById(1L, product);
             verify(cartRepository).removeFromCart(userEmail, 1L);
             verify(idGenerator).generateOrderId(orderDate);
