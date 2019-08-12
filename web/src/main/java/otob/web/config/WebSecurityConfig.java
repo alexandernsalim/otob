@@ -43,7 +43,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private Response jsonResponse = Response.builder()
             .code("200")
             .message("Success")
-            .errors(null)
             .build();
 
     @Override

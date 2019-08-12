@@ -70,8 +70,8 @@ public class CartServiceImpl implements CartService {
     public Cart addItemToCart(String userEmail, Long productId, int qty) {
         if (!userService.checkUser(userEmail)) {
             throw new CustomException(
-                    ErrorCode.USER_NOT_FOUND.getCode(),
-                    ErrorCode.USER_NOT_FOUND.getMessage()
+                ErrorCode.USER_NOT_FOUND.getCode(),
+                ErrorCode.USER_NOT_FOUND.getMessage()
             );
         } else if (!checkUserCartExistence(userEmail)) {
             logger.info("User cart not found, create new cart");
@@ -155,6 +155,7 @@ public class CartServiceImpl implements CartService {
             totItem++;
             product.setStock(productStock - itemQty);
             productService.updateProductById(product.getProductId(), product);
+            removeItemFromCart(userEmail, product.getProductId());
         }
 
         try {
