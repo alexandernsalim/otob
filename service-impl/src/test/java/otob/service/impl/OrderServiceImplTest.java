@@ -16,7 +16,6 @@ import otob.model.exception.CustomException;
 import otob.repository.OrderRepository;
 import otob.service.ProductService;
 import otob.service.UserService;
-import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
 import java.util.ArrayList;
@@ -67,8 +66,8 @@ public class OrderServiceImplTest {
 
         item1 = CartItem.builder()
                 .productId(1L)
-                .productName("Asus")
-                .productPrice(5000000)
+                .name("Asus")
+                .offerPrice(5000000)
                 .qty(1)
                 .build();
 

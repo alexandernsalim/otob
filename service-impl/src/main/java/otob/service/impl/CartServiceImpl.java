@@ -147,7 +147,7 @@ public class CartServiceImpl implements CartService {
 
         for (CartItem item : cartItems) {
             Product product = productService.getProductById(item.getProductId());
-            double itemPrice = item.getProductPrice();
+            double itemPrice = item.getOfferPrice();
             int itemQty = item.getQty();
             int productStock = product.getStock();
 

@@ -73,8 +73,8 @@ public class CartServiceImplTest {
 
         item = CartItem.builder()
                 .productId(1L)
-                .productName("Redmi 7")
-                .productPrice(1000000)
+                .name("Redmi 7")
+                .offerPrice(1000000)
                 .qty(1)
                 .build();
 
@@ -172,7 +172,7 @@ public class CartServiceImplTest {
         verify(productService).getProductById(1L);
         verify(cartRepository).addToCart(userEmail, qty, product);
         assertTrue(result.getCartItems().size() >= 1);
-        assertEquals(product.getName(), result.getCartItems().get(0).getProductName());
+        assertEquals(product.getName(), result.getCartItems().get(0).getName());
     }
 
     @Test
@@ -209,7 +209,7 @@ public class CartServiceImplTest {
         verify(productService).getProductById(1L);
         verify(cartRepository).addToCart(userEmail, qty, product);
         assertTrue(result.getCartItems().size() >= 1);
-        assertEquals(product.getName(), result.getCartItems().get(0).getProductName());
+        assertEquals(product.getName(), result.getCartItems().get(0).getName());
 
     }
 

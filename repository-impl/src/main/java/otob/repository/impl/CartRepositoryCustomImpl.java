@@ -36,8 +36,8 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
             query.addCriteria(Criteria.where("userEmail").is(email));
             update.push("cartItems", new BasicDBObject()
                     .append("productId", product.getProductId())
-                    .append("productName", product.getName())
-                    .append("productPrice", product.getOfferPrice())
+                    .append("name", product.getName())
+                    .append("offerPrice", product.getOfferPrice())
                     .append("qty", qty)
             );
         } else {

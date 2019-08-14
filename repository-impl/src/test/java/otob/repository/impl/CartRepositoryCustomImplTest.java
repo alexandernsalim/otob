@@ -37,8 +37,8 @@ public class CartRepositoryCustomImplTest {
 
         CartItem item = CartItem.builder()
                 .productId(1L)
-                .productName("Asus")
-                .productPrice(4500000)
+                .name("Asus")
+                .offerPrice(4500000)
                 .qty(1)
                 .build();
 

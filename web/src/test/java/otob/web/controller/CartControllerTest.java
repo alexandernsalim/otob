@@ -69,8 +69,8 @@ public class CartControllerTest {
         orderId = "ORD1561436040000";
         CartItem item = CartItem.builder()
                 .productId(1L)
-                .productName("Redmi 7")
-                .productPrice(1000000)
+                .name("Redmi 7")
+                .offerPrice(1000000)
                 .qty(1)
                 .build();
         cartItems = new ArrayList<>();

@@ -14,15 +14,12 @@ import otob.model.constant.Status;
 import otob.model.constant.path.OrderApiPath;
 import otob.model.entity.CartItem;
 import otob.model.entity.Order;
-import otob.model.entity.Product;
 import otob.model.exception.GlobalExceptionHandler;
 import otob.service.OrderService;
 import otob.util.mapper.BeanMapper;
 import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,8 +74,8 @@ public class OrderControllerTest {
 
         item1 = CartItem.builder()
                 .productId(1L)
-                .productName("Asus")
-                .productPrice(5000000)
+                .name("Asus")
+                .offerPrice(5000000)
                 .qty(1)
                 .build();
         items = new ArrayList<>();
