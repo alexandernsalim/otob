@@ -113,7 +113,7 @@ public class CartServiceImpl implements CartService {
     public Order checkout(String userEmail) {
         Cart cart = getUserCart(userEmail);
         List<CartItem> cartItems = cart.getCartItems();
-        String orderId = "";
+        String orderId;
         int totItem = 0;
         long totPrice = 0;
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");

@@ -63,7 +63,6 @@ public class CartServiceImplTest {
     private String orderDate;
     private Order order;
     private List<String> outOfStockProducts;
-//    private CheckoutDto checkoutResult;
 
     @Before
     public void setUp() {

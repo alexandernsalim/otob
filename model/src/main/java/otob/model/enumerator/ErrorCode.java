@@ -1,6 +1,7 @@
 package otob.model.enumerator;
 
 public enum ErrorCode {
+    INVALID_CLIENT("400", "Invalid client"),
     NOT_FOUND("404", "Not Found"),
     BAD_REQUEST("400", "Bad Request"),
     INTERNAL_SERVER_ERROR("500", "Internal Server Error"),

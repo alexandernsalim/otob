@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,9 +23,6 @@ import otob.service.UserService;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -99,8 +95,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                     String email = request.getParameter("username");
                     HttpSession session = request.getSession(true);
+                    User user = userService.getUserByEmail(email);
 
                     session.setAttribute("userId", email);
+                    session.setAttribute("userRole", user.getRoles().get(0).getRoleId());
+                    session.setAttribute("isLogin", true);
+
                     setCookie(session, response, email, true);
 
                     jsonResponse.setData("Accepted");
@@ -108,7 +108,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     response.getWriter().append(gson.toJson(jsonResponse));
                 })
                 .failureHandler((request, response, exception) -> {
-                    logger.info("Login Fail");
+                    logger.warn("Login Fail");
 
                     String email = request.getParameter("username");
                     HttpSession session = request.getSession(true);
@@ -123,6 +123,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .logout()
                 .logoutUrl("/api/auth/logout")
                 .logoutSuccessHandler((request, response, authentication) -> {
+                    logger.info("Logout Success");
+
                     jsonResponse.setData("OK");
                     response.setStatus(200);
                     response.getWriter().append(gson.toJson(jsonResponse));
@@ -157,7 +159,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private void setCookie(HttpSession session, HttpServletResponse response, String email, boolean authenticated) {
         User user = userService.getUserByEmail(email);
-        List<String> roleList = new ArrayList<>(Arrays.asList("ROLE_ADMIN", "ROLE_CASHIER", "ROLE_CUSTOMER"));
 
         Cookie userId = new Cookie("user-id", authenticated ? email : session.getAttribute("userId").toString());
         userId.setHttpOnly(false);
@@ -166,7 +167,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         userId.setMaxAge(3600);
 
         Cookie userRole = new Cookie("user-role", authenticated ?
-                String.valueOf(roleList.indexOf(user.getRoles().get(0).getName())+1) : "4");
+                String.valueOf(user.getRoles().get(0).getRoleId()) : "4");
         userRole.setHttpOnly(false);
         userRole.setSecure(false);
         userRole.setPath("/");
