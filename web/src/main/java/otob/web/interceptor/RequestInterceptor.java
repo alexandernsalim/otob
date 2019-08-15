@@ -60,10 +60,12 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
             if(cookie.getName().equals("user-id")) {
                 cond = session.getAttribute("userId").equals(cookie.getValue());
             } else if(cookie.getName().equals("user-role")) {
-                cond = session.getAttribute("userRole").equals(cookie.getValue());
+                cond = session.getAttribute("userRole").toString().equals(cookie.getValue());
             } else if (cookie.getName().equals("is-login")) {
-                cond = session.getAttribute("isLogin").equals(cookie.getValue());
+                cond = session.getAttribute("isLogin").toString().equals(cookie.getValue());
             }
+
+            if(!cond) break;
         }
 
         return cond;
