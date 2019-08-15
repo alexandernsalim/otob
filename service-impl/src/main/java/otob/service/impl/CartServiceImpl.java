@@ -116,7 +116,7 @@ public class CartServiceImpl implements CartService {
         String orderId;
         int totItem = 0;
         long totPrice = 0;
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         String ordDate = dateFormat.format(new Date());
         List<String> outOfStockProducts = new ArrayList<>();
 

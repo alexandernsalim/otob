@@ -34,7 +34,7 @@ public class IdGenerator {
     }
 
     public String generateOrderId(String checkoutDate) throws Exception {
-        Date date = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(checkoutDate);
+        Date date = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(checkoutDate);
         Timestamp timestamp = new Timestamp(date.getTime());
         String ordId = ORD_PRE + timestamp.getTime();
 
