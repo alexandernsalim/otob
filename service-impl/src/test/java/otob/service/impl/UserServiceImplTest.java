@@ -6,15 +6,15 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import otob.entity.Role;
-import otob.entity.User;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
-import otob.generator.RandomTextGenerator;
+import otob.model.entity.Role;
+import otob.model.entity.User;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
 import otob.repository.UserRepository;
-import otob.service.api.CartService;
-import otob.service.api.EmailService;
-import otob.service.api.RoleService;
+import otob.service.CartService;
+import otob.service.EmailService;
+import otob.service.RoleService;
+import otob.util.generator.RandomTextGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,15 +150,15 @@ public class UserServiceImplTest {
                 .thenReturn(password);
         when(encoder.encode(password))
                 .thenReturn(encodedPassword);
-        when(roleService.getRoleByName(otob.constant.Role.CUSTOMER))
+        when(roleService.getRoleByName(otob.model.constant.Role.CUSTOMER))
                 .thenReturn(roleCustomer);
 
-        User result = userServiceImpl.registerNewUser(user1, otob.constant.Role.CUSTOMER);
+        User result = userServiceImpl.registerNewUser(user1, otob.model.constant.Role.CUSTOMER);
 
         verify(userRepository).existsByEmail(user1.getEmail());
         verify(textGenerator).generateRandomPassword();
         verify(encoder).encode(user1.getPassword());
-        verify(roleService).getRoleByName(otob.constant.Role.CUSTOMER);
+        verify(roleService).getRoleByName(otob.model.constant.Role.CUSTOMER);
         verify(userRepository).save(userRequest);
         verify(emailService).sendSimpleMessage(user1.getEmail(), subject, text);
         assertEquals(user1.getEmail(), result.getEmail());
@@ -170,7 +170,7 @@ public class UserServiceImplTest {
                 .thenReturn(true);
 
         try {
-            userServiceImpl.registerNewUser(user1, otob.constant.Role.CUSTOMER);
+            userServiceImpl.registerNewUser(user1, otob.model.constant.Role.CUSTOMER);
         } catch (CustomException ex) {
             verify(userRepository).existsByEmail(user1.getEmail());
             assertEquals(ErrorCode.EMAIL_EXISTS.getMessage(), ex.getMessage());

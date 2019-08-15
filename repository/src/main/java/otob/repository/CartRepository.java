@@ -1,7 +1,7 @@
 package otob.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import otob.entity.Cart;
+import otob.model.entity.Cart;
 
 public interface CartRepository extends MongoRepository<Cart, String>, CartRepositoryCustom {
 

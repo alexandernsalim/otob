@@ -5,11 +5,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import otob.dto.RoleDto;
-import otob.entity.Role;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
-import otob.generator.IdGenerator;
+import otob.web.model.RoleDto;
+import otob.model.entity.Role;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.util.generator.IdGenerator;
 import otob.repository.RoleRepository;
 
 import static org.junit.Assert.assertEquals;

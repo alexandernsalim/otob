@@ -7,15 +7,17 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import otob.entity.Cart;
-import otob.entity.CartItem;
-import otob.entity.Product;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
+import org.springframework.stereotype.Repository;
+import otob.model.entity.Cart;
+import otob.model.entity.CartItem;
+import otob.model.entity.Product;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
 import otob.repository.CartRepositoryCustom;
 
 import java.util.List;
 
+@Repository
 public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
     @Autowired
@@ -34,8 +36,8 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
             query.addCriteria(Criteria.where("userEmail").is(email));
             update.push("cartItems", new BasicDBObject()
                     .append("productId", product.getProductId())
-                    .append("productName", product.getName())
-                    .append("productPrice", product.getOfferPrice())
+                    .append("name", product.getName())
+                    .append("offerPrice", product.getOfferPrice())
                     .append("qty", qty)
             );
         } else {
@@ -117,8 +119,8 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
     private void checkStock(int qty, int stock) {
         if (qty > stock) {
             throw new CustomException(
-                    ErrorCode.STOCK_INSUFFICIENT.getCode(),
-                    ErrorCode.STOCK_INSUFFICIENT.getMessage()
+                ErrorCode.STOCK_INSUFFICIENT.getCode(),
+                ErrorCode.STOCK_INSUFFICIENT.getMessage()
             );
         }
     }

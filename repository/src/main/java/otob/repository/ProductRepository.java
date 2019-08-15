@@ -1,20 +1,21 @@
 package otob.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import otob.entity.Product;
-
-import java.util.List;
+import org.springframework.data.mongodb.repository.Query;
+import otob.model.entity.Product;
 
 public interface ProductRepository extends MongoRepository<Product, String> {
+
     Product findByProductId(Long productId);
 
-    List<Product> findAllByNameContaining(String name);
+    @Query("{'name': {$regex: ?0, $options: 'i'}}")
+    Page<Product> findAllByNameContaining(String name, Pageable pageable);
 
+    @Query("{'name': {$regex: ?0, $options: 'i'}}")
     Product findByName(String name);
-
-    boolean existsByNameContaining(String name);
 
     boolean existsByName(String name);
 
-    boolean deleteByProductId(Long productId);
 }

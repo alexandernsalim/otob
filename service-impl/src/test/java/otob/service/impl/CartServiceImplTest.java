@@ -1,23 +1,24 @@
 package otob.service.impl;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import otob.constant.Status;
-import otob.dto.CheckoutDto;
-import otob.entity.Cart;
-import otob.entity.CartItem;
-import otob.entity.Order;
-import otob.entity.Product;
-import otob.enumerator.ErrorCode;
-import otob.exception.CustomException;
-import otob.generator.IdGenerator;
+import otob.model.constant.Status;
+import otob.model.entity.Cart;
+import otob.model.entity.CartItem;
+import otob.model.entity.Order;
+import otob.model.entity.Product;
+import otob.model.enumerator.ErrorCode;
+import otob.model.exception.CustomException;
+import otob.model.exception.OutOfStockException;
 import otob.repository.CartRepository;
-import otob.service.api.OrderService;
-import otob.service.api.ProductService;
-import otob.service.api.UserService;
+import otob.service.OrderService;
+import otob.service.ProductService;
+import otob.service.UserService;
+import otob.util.generator.IdGenerator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -62,7 +63,6 @@ public class CartServiceImplTest {
     private String orderDate;
     private Order order;
     private List<String> outOfStockProducts;
-    private CheckoutDto checkoutResult;
 
     @Before
     public void setUp() {
@@ -73,8 +73,8 @@ public class CartServiceImplTest {
 
         item = CartItem.builder()
                 .productId(1L)
-                .productName("Redmi 7")
-                .productPrice(1000000)
+                .name("Redmi 7")
+                .offerPrice(1000000)
                 .qty(1)
                 .build();
 
@@ -114,11 +114,6 @@ public class CartServiceImplTest {
                 .build();
 
         outOfStockProducts = new ArrayList<>();
-
-        checkoutResult = CheckoutDto.builder()
-                .order(order)
-                .outOfStockProducts(outOfStockProducts)
-                .build();
     }
 
     @Test
@@ -155,7 +150,7 @@ public class CartServiceImplTest {
             cartServiceImpl.getUserCart(userEmail);
         } catch (CustomException ex) {
             verify(userService).checkUser(userEmail);
-            assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
+            Assert.assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
         }
     }
 
@@ -177,7 +172,7 @@ public class CartServiceImplTest {
         verify(productService).getProductById(1L);
         verify(cartRepository).addToCart(userEmail, qty, product);
         assertTrue(result.getCartItems().size() >= 1);
-        assertEquals(product.getName(), result.getCartItems().get(0).getProductName());
+        assertEquals(product.getName(), result.getCartItems().get(0).getName());
     }
 
     @Test
@@ -214,7 +209,7 @@ public class CartServiceImplTest {
         verify(productService).getProductById(1L);
         verify(cartRepository).addToCart(userEmail, qty, product);
         assertTrue(result.getCartItems().size() >= 1);
-        assertEquals(product.getName(), result.getCartItems().get(0).getProductName());
+        assertEquals(product.getName(), result.getCartItems().get(0).getName());
 
     }
 
@@ -309,25 +304,26 @@ public class CartServiceImplTest {
                 .thenReturn(updatedCart);
         when(productService.getProductById(product.getProductId()))
                 .thenReturn(product);
-
         when(idGenerator.generateOrderId(orderDate))
                 .thenReturn(orderId);
+        when(orderService.createOrder(order))
+                .thenReturn(order);
 
-        CheckoutDto result = cartServiceImpl.checkout(userEmail);
+        Order result = cartServiceImpl.checkout(userEmail);
 
         verify(userService, times(2)).checkUser(userEmail);
         verify(cartRepository).findByUserEmail(userEmail);
-        verify(productService).getProductById(product.getProductId());
+        verify(productService, times(2)).getProductById(product.getProductId());
         verify(productService).updateProductById(1L, product);
         verify(cartRepository).removeFromCart(userEmail, 1L);
         verify(idGenerator).generateOrderId(orderDate);
         verify(orderService).createOrder(order);
-        assertEquals(checkoutResult.getOrder(), result.getOrder());
+        Assert.assertEquals(order, result);
     }
 
     @Test
     public void checkoutCartItemsEmptyTest() {
-        updatedCart.getCartItems().remove(0);
+        updatedCart.getCartItems().clear();
 
         when(userService.checkUser(userEmail))
                 .thenReturn(true);
@@ -344,24 +340,23 @@ public class CartServiceImplTest {
     }
 
     @Test
-    public void checkoutStockInsufficientTest() {
+    public void checkoutCartOutOfStockTest() {
         product.setStock(0);
 
         when(userService.checkUser(userEmail))
-                .thenReturn(true);
+            .thenReturn(true);
         when(cartRepository.findByUserEmail(userEmail))
-                .thenReturn(updatedCart);
-        when(productService.getProductById(1L))
-                .thenReturn(product);
+            .thenReturn(updatedCart);
+        when(productService.getProductById(product.getProductId()))
+            .thenReturn(product);
 
         try {
             cartServiceImpl.checkout(userEmail);
-        } catch (CustomException ex) {
-            verify(userService, times(2)).checkUser(userEmail);
+        } catch (OutOfStockException ex) {
+            verify(userService).checkUser(userEmail);
             verify(cartRepository).findByUserEmail(userEmail);
-            verify(productService).getProductById(1L);
-            verify(cartRepository).removeFromCart(userEmail, 1L);
-            assertEquals(ErrorCode.STOCK_INSUFFICIENT.getMessage(), ex.getMessage());
+            verify(productService).getProductById(product.getProductId());
+            assertEquals(ErrorCode.SOME_PRODUCTS_INVALID.getMessage(), ex.getMessage());
         }
     }
 
@@ -381,7 +376,7 @@ public class CartServiceImplTest {
         } catch (CustomException ex) {
             verify(userService, times(2)).checkUser(userEmail);
             verify(cartRepository).findByUserEmail(userEmail);
-            verify(productService).getProductById(product.getProductId());
+            verify(productService, times(2)).getProductById(product.getProductId());
             verify(productService).updateProductById(1L, product);
             verify(cartRepository).removeFromCart(userEmail, 1L);
             verify(idGenerator).generateOrderId(orderDate);
