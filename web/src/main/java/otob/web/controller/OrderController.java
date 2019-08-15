@@ -1,16 +1,23 @@
 package otob.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import otob.model.constant.path.OrderApiPath;
 import otob.model.response.Response;
 import otob.service.OrderService;
 import otob.util.mapper.BeanMapper;
+import otob.web.model.ExportFilterDto;
 import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
 
 @RestController
 @RequestMapping(OrderApiPath.BASE_PATH)
@@ -77,6 +84,19 @@ public class OrderController extends GlobalController {
     public Response<OrderDto> rejectOrder(@PathVariable String orderId) {
 
         return toResponse(mapper.map(orderService.rejectOrder(orderId), OrderDto.class));
+    }
+
+    @PostMapping(OrderApiPath.EXPORT_ORDER_HISTORY)
+    public ResponseEntity<InputStreamResource> exportOrder(HttpServletResponse response,
+                                                           @RequestBody ExportFilterDto filter) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=orders.xlsx");
+
+        ByteArrayInputStream in = orderService.exportOrder(response, filter);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new InputStreamResource(in));
     }
 
 }

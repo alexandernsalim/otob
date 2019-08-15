@@ -171,7 +171,6 @@ public class ProductControllerTest {
     public void addProductsTest() throws Exception {
         String content = "";
         MockMultipartFile file = new MockMultipartFile("file", "products.xlsx", null, content.getBytes());
-        List<ProductDto> productResponse = BeanMapper.mapAsList(products, ProductDto.class);
 
         when(productService.addProducts(file))
             .thenReturn(products);

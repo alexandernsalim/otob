@@ -8,5 +8,6 @@ public interface OrderApiPath {
   String FIND_ORDER = "/{orderId}/search";
   String ACCEPT_ORDER = "/{orderId}/accept";
   String REJECT_ORDER = "/{orderId}/reject";
+  String EXPORT_ORDER_HISTORY = "/export";
 
 }

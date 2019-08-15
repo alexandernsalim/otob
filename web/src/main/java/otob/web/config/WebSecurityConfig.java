@@ -58,6 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/api/orders",
                 "/api/orders/{\\w+}/accept",
                 "/api/orders/{\\w+}/reject",
+                "/api/orders/export",
                 "/api/products/{\\d+}",
                 "/api/products/batch"
             )

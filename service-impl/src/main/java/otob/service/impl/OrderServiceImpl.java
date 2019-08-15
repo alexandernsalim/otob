@@ -1,5 +1,9 @@
 package otob.service.impl;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +20,17 @@ import otob.service.ProductService;
 import otob.service.UserService;
 import otob.repository.OrderRepository;
 import otob.util.mapper.BeanMapper;
+import otob.web.model.ExportFilterDto;
 import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -32,6 +44,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserService userService;
+
+    private static Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Override
     public Order createOrder(Order order) {
@@ -131,6 +145,91 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return orderRepository.save(order);
+    }
+
+    @Override
+    public ByteArrayInputStream exportOrder(HttpServletResponse response, ExportFilterDto filter) {
+        String year = filter.getYear();
+        String month = filter.getMonth();
+        List<Order> orders;
+
+        if(!year.isEmpty()) {
+            if(!month.isEmpty()) {
+                orders = orderRepository.findOrderWithFilter(year, month);
+            } else {
+                orders = orderRepository.findOrderWithFilter(year);
+            }
+
+            try {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                List<String> headerName = new ArrayList<>(Arrays.asList(
+                    "Order ID", "Customer", "Order Date", "Items", "Total Item", "Total Price", "Status"
+                ));
+
+                Workbook workbook = new XSSFWorkbook();
+                Sheet sheet = workbook.createSheet("Order History");
+                Row header = sheet.createRow(0);
+
+                CellStyle headerStyle = workbook.createCellStyle();
+                headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+                headerStyle.setFillPattern((short) FillPatternType.SOLID_FOREGROUND.ordinal());
+
+                for(int i = 0; i < headerName.size(); i++) {
+                    Cell headerCell = header.createCell(i);
+                    headerCell.setCellValue(headerName.get(i));
+                    headerCell.setCellStyle(headerStyle);
+                }
+
+                CellStyle cellStyle = workbook.createCellStyle();
+                cellStyle.setWrapText(true);
+
+                for(int i = 1; i <= orders.size(); i++) {
+                    Row row = sheet.createRow(i);
+                    Order order = orders.get(i-1);
+                    StringBuilder items = new StringBuilder();
+                    for (int j = 0; j < order.getTotItem(); j++) {
+                        items.append(j+1)
+                            .append(". ")
+                            .append(order.getOrdItems().get(j).getName())
+                            .append(System.lineSeparator());
+                    }
+
+                    row.createCell(0).setCellValue(order.getOrderId());
+                    row.createCell(1).setCellValue(order.getUserEmail());
+                    row.createCell(2).setCellValue(order.getOrdDate());
+                    row.createCell(3).setCellValue(items.toString());
+                    row.createCell(4).setCellValue(order.getTotItem());
+                    row.createCell(5).setCellValue(order.getTotPrice());
+                    row.createCell(6).setCellValue(order.getOrdStatus());
+                }
+
+                sheet.autoSizeColumn(0);
+                sheet.autoSizeColumn(1);
+                sheet.autoSizeColumn(2);
+                sheet.autoSizeColumn(3);
+                sheet.autoSizeColumn(4);
+                sheet.autoSizeColumn(5);
+                sheet.autoSizeColumn(6);
+
+                workbook.write(out);
+
+                return new ByteArrayInputStream(out.toByteArray());
+            } catch (IOException e) {
+                logger.warn("Error creating excel file");
+
+                throw new CustomException(
+                    ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                    ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+                );
+            }
+        } else {
+            logger.warn("Filter parameter not found");
+
+            throw new CustomException(
+                ErrorCode.BAD_REQUEST.getCode(),
+                ErrorCode.BAD_REQUEST.getMessage()
+            );
+        }
     }
 
     private void checkEmptiness(List<Order> orders) throws CustomException {

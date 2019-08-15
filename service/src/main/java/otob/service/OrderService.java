@@ -1,8 +1,11 @@
 package otob.service;
 
 import otob.model.entity.Order;
+import otob.web.model.ExportFilterDto;
 import otob.web.model.PageableOrderDto;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public interface OrderService {
@@ -14,5 +17,6 @@ public interface OrderService {
     Order createOrder(Order order);
     Order acceptOrder(String ordId);
     Order rejectOrder(String ordId);
+    ByteArrayInputStream exportOrder(HttpServletResponse response, ExportFilterDto filter);
 
 }
