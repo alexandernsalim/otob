@@ -152,6 +152,23 @@ public class OrderControllerTest {
     }
 
     @Test
+    public void getAllOrderByFilter() throws Exception {
+        when(orderService.getAllOrderByFilter("2019/06/25", null, page, size))
+            .thenReturn(pageableOrderDto);
+
+        mvc.perform(
+            get(OrderApiPath.BASE_PATH + OrderApiPath.GET_ORDER_BY_FILTER)
+                .param("date", "2019/06/25")
+                .param("page", "1")
+                .param("size", "5")
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.orders", hasSize(1)));
+
+        verify(orderService).getAllOrderByFilter("2019/06/25", null, page, size);
+    }
+
+    @Test
     public void findOrderTest() throws Exception {
         when(orderService.getOrderByOrderId(orderId))
                 .thenReturn(order);

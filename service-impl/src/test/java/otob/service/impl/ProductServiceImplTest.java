@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
@@ -16,6 +17,7 @@ import otob.repository.ProductRepository;
 import otob.util.generator.IdGenerator;
 import otob.web.model.PageableProductDto;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +38,7 @@ public class ProductServiceImplTest {
     @InjectMocks
     private ProductServiceImpl productServiceImpl;
 
+    private InputStream inputStream;
     private Pageable pageable;
     private Integer page;
     private Integer size;
@@ -45,6 +48,7 @@ public class ProductServiceImplTest {
     private List<Product> products;
     private List<Product> productsByName;
     private List<Product> emptyProducts;
+
     @Before
     public void setUp() {
         initMocks(this);
@@ -210,26 +214,8 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void addProductFromExcelTest() throws Exception {
-//        when(productRepository.existsByName(product1.getName()))
-//                .thenReturn(false);
-//        when(productRepository.existsByName(product2.getName()))
-//                .thenReturn(false);
-//        when(idGenerator.getNextId("productid"))
-//                .thenReturn(1L, 2L);
-//        when(productRepository.save(product1))
-//                .thenReturn(product1);
-//        when(productRepository.save(product2))
-//                .thenReturn(product2);
-//
-//        List<Product> result = productServiceImpl.addProducts(products);
-//
-//        verify(productRepository).existsByName(product1.getName());
-//        verify(productRepository).existsByName(product2.getName());
-//        verify(idGenerator, times(2)).getNextId("productid");
-//        verify(productRepository).save(product1);
-//        verify(productRepository).save(product2);
-//        assertEquals(2, result.size());
+    public void addProductsTest() throws Exception {
+
     }
 
 //    @Test

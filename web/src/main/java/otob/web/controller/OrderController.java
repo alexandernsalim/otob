@@ -54,7 +54,7 @@ public class OrderController extends GlobalController {
         return toResponse(orderService.getAllOrderByUserEmail(email, page, size));
     }
 
-    @GetMapping("/filter")
+    @GetMapping(OrderApiPath.GET_ORDER_BY_FILTER)
     public Response<PageableOrderDto> getAllOrderByFilter(
         @RequestParam(required = false) String date,
         @RequestParam(required = false) String status,

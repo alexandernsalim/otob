@@ -13,6 +13,8 @@ import otob.model.entity.Order;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
+import otob.model.filter.ExportFilter;
+import otob.model.filter.OrderFilter;
 import otob.repository.OrderRepository;
 import otob.service.ProductService;
 import otob.service.UserService;
@@ -54,6 +56,7 @@ public class OrderServiceImplTest {
     private List<Order> orders;
     private Product product;
     private Product productUpdated;
+    private OrderFilter orderFilter;
 
     @Before
     public void setUp() {
@@ -126,6 +129,11 @@ public class OrderServiceImplTest {
                 .listPrice(7500000)
                 .offerPrice(5000000)
                 .stock(1)
+                .build();
+
+        orderFilter = OrderFilter.builder()
+                .orderDate("2019/06/25")
+                .orderStatus(Status.ORD_WAIT)
                 .build();
 
     }
@@ -221,6 +229,32 @@ public class OrderServiceImplTest {
         } catch (CustomException ex) {
             verify(userService).checkUser(userEmail);
             assertTrue(ex.getMessage().equals(ErrorCode.USER_NOT_FOUND.getMessage()));
+        }
+    }
+
+    @Test
+    public void getAllOrderByFilterTest() {
+        when(orderRepository.findOrderWithFilter(orderFilter, pageable))
+                .thenReturn(new PageImpl<>(orders));
+
+        PageableOrderDto result = orderServiceImpl.getAllOrderByFilter("2019/06/25", Status.ORD_WAIT, page, size);
+
+        verify(orderRepository).findOrderWithFilter(orderFilter, pageable);
+        assertTrue(result.getOrders().size() >= 1);
+    }
+
+    @Test
+    public void getAllOrderByFilterEmptyTest() {
+        orders.clear();
+
+        when(orderRepository.findOrderWithFilter(orderFilter, pageable))
+                .thenReturn(new PageImpl<>(orders));
+
+        try {
+            orderServiceImpl.getAllOrderByFilter("2019/06/25", Status.ORD_WAIT, page, size);
+        } catch (CustomException ex) {
+            verify(orderRepository).findOrderWithFilter(orderFilter, pageable);
+            assertEquals(ErrorCode.ORDER_NOT_FOUND.getMessage(), ex.getMessage());
         }
     }
 
