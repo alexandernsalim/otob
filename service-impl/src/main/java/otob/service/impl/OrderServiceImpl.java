@@ -15,22 +15,24 @@ import otob.model.entity.Order;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
+import otob.model.filter.ExportFilter;
+import otob.model.filter.OrderFilter;
+import otob.repository.OrderRepository;
 import otob.service.OrderService;
 import otob.service.ProductService;
 import otob.service.UserService;
-import otob.repository.OrderRepository;
 import otob.util.mapper.BeanMapper;
-import otob.web.model.ExportFilterDto;
 import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -63,14 +65,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrderByOrderId(String orderId) {
-        if(!orderRepository.existsByOrderId(orderId)){
+        if(!orderRepository.existsByOrdId(orderId)){
             throw new CustomException(
                 ErrorCode.ORDER_NOT_FOUND.getCode(),
                 ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
-        return orderRepository.findByOrderId(orderId);
+        return orderRepository.findByOrdId(orderId);
     }
 
     @Override
@@ -90,9 +92,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageableOrderDto getAllOrderByOrderStatus(String status, Integer page, Integer size) {
+    public PageableOrderDto getAllOrderByFilter(String date, String status, Integer page, Integer size) {
+        OrderFilter filter = OrderFilter.builder()
+                .orderDate((date == null) ? "" : date)
+                .orderStatus((status == null) ? "" : status)
+                .build();
+
         Pageable pageable = PageRequest.of(page, size);
-        Page<Order> pages = orderRepository.findAllByOrdStatus(status, pageable);
+        Page<Order> pages = orderRepository.findOrderWithFilter(filter, pageable);
         List<Order> orders = pages.getContent();
 
         return generateResult(pages, orders);
@@ -100,14 +107,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order acceptOrder(String ordId) {
-        if (!orderRepository.existsByOrderId(ordId)) {
+        if (!orderRepository.existsByOrdId(ordId)) {
             throw new CustomException(
                     ErrorCode.ORDER_NOT_FOUND.getCode(),
                     ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
-        Order order = orderRepository.findByOrderId(ordId);
+        Order order = orderRepository.findByOrdId(ordId);
         order.setOrdStatus(Status.ORD_ACCEPT);
 
         return orderRepository.save(order);
@@ -115,16 +122,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order rejectOrder(String ordId) {
-        if (!orderRepository.existsByOrderId(ordId)) {
+        if (!orderRepository.existsByOrdId(ordId)) {
             throw new CustomException(
                     ErrorCode.ORDER_NOT_FOUND.getCode(),
-                    ErrorCode   .ORDER_NOT_FOUND.getMessage()
+                    ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
-        Order order = orderRepository.findByOrderId(ordId);
+        Order order = orderRepository.findByOrdId(ordId);
 
-        if (!order.getOrdStatus().equals("Waiting")) {
+        if (!order.getOrdStatus().equals(Status.ORD_WAIT)) {
             throw new CustomException(
                     ErrorCode.ORDER_PROCESSED.getCode(),
                     ErrorCode.ORDER_PROCESSED.getMessage()
@@ -148,86 +155,77 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ByteArrayInputStream exportOrder(HttpServletResponse response, ExportFilterDto filter) {
-        String year = filter.getYear();
-        String month = filter.getMonth();
-        List<Order> orders;
+    public ByteArrayInputStream exportOrder(HttpServletResponse response, String year, String month) {
+        Date date = new Date();
+        String defaultYear = new SimpleDateFormat("yyyy").format(date);
 
-        if(!year.isEmpty()) {
-            if(!month.isEmpty()) {
-                orders = orderRepository.findOrderWithFilter(year, month);
-            } else {
-                orders = orderRepository.findOrderWithFilter(year);
+        ExportFilter filter = ExportFilter.builder()
+                .month((month == null) ? "" : month)
+                .year((year == null) ? defaultYear : year)
+                .build();
+
+        List<Order> orders = orderRepository.findOrderWithFilter(filter);
+
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            List<String> headerName = new ArrayList<>(Arrays.asList(
+                "Order ID", "Customer", "Order Date", "Items", "Total Item", "Total Price", "Status"
+            ));
+
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Order History");
+            Row header = sheet.createRow(0);
+
+            CellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+            headerStyle.setFillPattern((short) FillPatternType.SOLID_FOREGROUND.ordinal());
+
+            for(int i = 0; i < headerName.size(); i++) {
+                Cell headerCell = header.createCell(i);
+                headerCell.setCellValue(headerName.get(i));
+                headerCell.setCellStyle(headerStyle);
             }
 
-            try {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                List<String> headerName = new ArrayList<>(Arrays.asList(
-                    "Order ID", "Customer", "Order Date", "Items", "Total Item", "Total Price", "Status"
-                ));
+            CellStyle cellStyle = workbook.createCellStyle();
+            cellStyle.setWrapText(true);
 
-                Workbook workbook = new XSSFWorkbook();
-                Sheet sheet = workbook.createSheet("Order History");
-                Row header = sheet.createRow(0);
-
-                CellStyle headerStyle = workbook.createCellStyle();
-                headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
-                headerStyle.setFillPattern((short) FillPatternType.SOLID_FOREGROUND.ordinal());
-
-                for(int i = 0; i < headerName.size(); i++) {
-                    Cell headerCell = header.createCell(i);
-                    headerCell.setCellValue(headerName.get(i));
-                    headerCell.setCellStyle(headerStyle);
+            for(int i = 1; i <= orders.size(); i++) {
+                Row row = sheet.createRow(i);
+                Order order = orders.get(i-1);
+                StringBuilder items = new StringBuilder();
+                for (int j = 0; j < order.getTotItem(); j++) {
+                    items.append(j+1)
+                        .append(". ")
+                        .append(order.getOrdItems().get(j).getName())
+                        .append(System.lineSeparator());
                 }
 
-                CellStyle cellStyle = workbook.createCellStyle();
-                cellStyle.setWrapText(true);
-
-                for(int i = 1; i <= orders.size(); i++) {
-                    Row row = sheet.createRow(i);
-                    Order order = orders.get(i-1);
-                    StringBuilder items = new StringBuilder();
-                    for (int j = 0; j < order.getTotItem(); j++) {
-                        items.append(j+1)
-                            .append(". ")
-                            .append(order.getOrdItems().get(j).getName())
-                            .append(System.lineSeparator());
-                    }
-
-                    row.createCell(0).setCellValue(order.getOrderId());
-                    row.createCell(1).setCellValue(order.getUserEmail());
-                    row.createCell(2).setCellValue(order.getOrdDate());
-                    row.createCell(3).setCellValue(items.toString());
-                    row.createCell(4).setCellValue(order.getTotItem());
-                    row.createCell(5).setCellValue(order.getTotPrice());
-                    row.createCell(6).setCellValue(order.getOrdStatus());
-                }
-
-                sheet.autoSizeColumn(0);
-                sheet.autoSizeColumn(1);
-                sheet.autoSizeColumn(2);
-                sheet.autoSizeColumn(3);
-                sheet.autoSizeColumn(4);
-                sheet.autoSizeColumn(5);
-                sheet.autoSizeColumn(6);
-
-                workbook.write(out);
-
-                return new ByteArrayInputStream(out.toByteArray());
-            } catch (IOException e) {
-                logger.warn("Error creating excel file");
-
-                throw new CustomException(
-                    ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-                    ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
-                );
+                row.createCell(0).setCellValue(order.getOrdId());
+                row.createCell(1).setCellValue(order.getUserEmail());
+                row.createCell(2).setCellValue(order.getOrdDate());
+                row.createCell(3).setCellValue(items.toString());
+                row.createCell(4).setCellValue(order.getTotItem());
+                row.createCell(5).setCellValue(order.getTotPrice());
+                row.createCell(6).setCellValue(order.getOrdStatus());
             }
-        } else {
-            logger.warn("Filter parameter not found");
+
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+            sheet.autoSizeColumn(2);
+            sheet.autoSizeColumn(3);
+            sheet.autoSizeColumn(4);
+            sheet.autoSizeColumn(5);
+            sheet.autoSizeColumn(6);
+
+            workbook.write(out);
+
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (IOException e) {
+            logger.warn("Error creating excel file");
 
             throw new CustomException(
-                ErrorCode.BAD_REQUEST.getCode(),
-                ErrorCode.BAD_REQUEST.getMessage()
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
             );
         }
     }

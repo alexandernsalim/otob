@@ -10,10 +10,9 @@ import java.util.List;
 
 public interface OrderRepository extends MongoRepository<Order, String>, OrderRepositoryCustom {
 
-    Boolean existsByOrderId(String ordId);
-    Order findByOrderId(String ordId);
+    Boolean existsByOrdId(String ordId);
+    Order findByOrdId(String ordId);
     Page<Order> findAllByUserEmail(String userEmail, Pageable pageable);
     Page<Order> findAllByOrdStatus(String status, Pageable pageable);
-
 
 }

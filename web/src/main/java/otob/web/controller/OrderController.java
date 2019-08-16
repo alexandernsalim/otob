@@ -9,14 +9,12 @@ import otob.model.constant.path.OrderApiPath;
 import otob.model.response.Response;
 import otob.service.OrderService;
 import otob.util.mapper.BeanMapper;
-import otob.web.model.ExportFilterDto;
 import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 
 @RestController
@@ -56,16 +54,17 @@ public class OrderController extends GlobalController {
         return toResponse(orderService.getAllOrderByUserEmail(email, page, size));
     }
 
-    @GetMapping(OrderApiPath.GET_ORDER_BY_STATUS)
-    public Response<PageableOrderDto> getAllOrderByOrderStatus(
-        @PathVariable String orderStatus,
+    @GetMapping("/filter")
+    public Response<PageableOrderDto> getAllOrderByFilter(
+        @RequestParam(required = false) String date,
+        @RequestParam(required = false) String status,
         @RequestParam(required = false) Integer page,
         @RequestParam(required = false) Integer size
     ) {
         page = (page == null) ? 0 : page-1;
         if(size == null) size = 5;
 
-        return toResponse(orderService.getAllOrderByOrderStatus(orderStatus, page, size));
+        return toResponse(orderService.getAllOrderByFilter(date, status, page, size));
     }
 
     @GetMapping(OrderApiPath.FIND_ORDER)
@@ -86,13 +85,16 @@ public class OrderController extends GlobalController {
         return toResponse(mapper.map(orderService.rejectOrder(orderId), OrderDto.class));
     }
 
-    @PostMapping(OrderApiPath.EXPORT_ORDER_HISTORY)
-    public ResponseEntity<InputStreamResource> exportOrder(HttpServletResponse response,
-                                                           @RequestBody ExportFilterDto filter) {
+    @GetMapping(OrderApiPath.EXPORT_ORDER_HISTORY)
+    public ResponseEntity<InputStreamResource> exportOrder(
+        HttpServletResponse response,
+        @RequestParam(required = false) String year,
+        @RequestParam(required = false) String month
+    ) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=orders.xlsx");
 
-        ByteArrayInputStream in = orderService.exportOrder(response, filter);
+        ByteArrayInputStream in = orderService.exportOrder(response, year, month);
 
         return ResponseEntity.ok()
                 .headers(headers)

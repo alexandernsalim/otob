@@ -1,4 +1,4 @@
-package otob.web.model;
+package otob.model.filter;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExportFilterDto implements Serializable {
+public class ExportFilter implements Serializable {
 
     private String year;
     private String month;

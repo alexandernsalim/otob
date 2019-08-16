@@ -104,7 +104,7 @@ public class CartServiceImplTest {
         orderId = "ORD1235648790";
 
         order = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate(orderDate)
                 .ordItems(cartItems)

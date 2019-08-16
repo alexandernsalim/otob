@@ -83,7 +83,7 @@ public class OrderControllerTest {
         orderId = "ORD1561436040000";
         userEmail = "alexandernsalim@gmail.com";
         order = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate("2019/06/25 11:14")
                 .ordItems(items)
@@ -92,7 +92,7 @@ public class OrderControllerTest {
                 .ordStatus(Status.ORD_WAIT)
                 .build();
         orderAccepted = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate("2019/06/25 11:14")
                 .ordItems(items)
@@ -101,7 +101,7 @@ public class OrderControllerTest {
                 .ordStatus(Status.ORD_ACCEPT)
                 .build();
         orderRejected = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate("2019/06/25 11:14")
                 .ordItems(items)

@@ -85,7 +85,7 @@ public class CartControllerTest {
                 .cartItems(cartItems)
                 .build();
         order = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate("2019/06/25 11:14")
                 .ordItems(cartItems)

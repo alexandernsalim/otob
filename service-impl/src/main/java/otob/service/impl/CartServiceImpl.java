@@ -168,7 +168,7 @@ public class CartServiceImpl implements CartService {
         }
 
         Order order = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate(ordDate)
                 .ordItems(cartItems)
