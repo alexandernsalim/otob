@@ -40,7 +40,7 @@ public class ProductController extends GlobalController {
         @RequestParam(required = false) Integer size
     ) {
         page = (page == null) ? 0 : page-1;
-        if(size == null) size = 5;
+        size = (size == null) ? 5 : size;
 
         return toResponse(productService.getAllProduct(page, size));
     }
@@ -52,7 +52,7 @@ public class ProductController extends GlobalController {
         @RequestParam(required = false) Integer size
     ) {
         page = (page == null) ? 0 : page-1;
-        if(size == null) size = 5;
+        size = (size == null) ? 5 : size;
 
         return toResponse(productService.getAllProductByName(productName, page, size));
     }

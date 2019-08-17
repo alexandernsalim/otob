@@ -10,6 +10,7 @@ import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
 import otob.util.generator.RandomTextGenerator;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,10 +26,11 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
     private static Logger logger = LoggerFactory.getLogger(RequestInterceptor.class);
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ServletException {
         checkSession(request);
 
         if(!validClient(request)) {
+            request.logout();
             throw new CustomException(
                 ErrorCode.INVALID_CLIENT.getCode(),
                 ErrorCode.INVALID_CLIENT.getMessage()

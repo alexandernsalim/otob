@@ -46,51 +46,49 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors();
         http.csrf().disable()
             .authorizeRequests()
-                .anyRequest()
+            .antMatchers(
+                "/api/users",
+                "/api/admin/register"
+            )
+                .hasRole("ADMIN")
+            .antMatchers(HttpMethod.POST, "/api/products")
+                .hasAnyRole("ADMIN", "CASHIER")
+            .antMatchers(
+                "/api/cashier/register",
+                "/api/orders",
+                "/api/orders/{\\w+}/accept",
+                "/api/orders/{\\w+}/reject",
+                "/api/orders/export",
+                "/api/products/{\\d+}",
+                "/api/products/batch"
+            )
+                .hasAnyRole("ADMIN", "CASHIER")
+            .antMatchers(
+                "/api/"
+            )
+                .hasAnyRole("")
+            .antMatchers(
+                "/api/carts",
+                "/api/carts/{\\d+}",
+                "/api/carts/{\\d+}/{\\d+}",
+                "/api/carts/checkout",
+                "/api/orders/user"
+            )
+                .hasRole("CUSTOMER")
+            .antMatchers(
+                "/api/users/change-password",
+                "/api/orders/{\\w+}/search"
+            )
+                .authenticated()
+            .antMatchers(HttpMethod.GET, "/api/products")
                 .permitAll()
-//            .antMatchers(
-//                "/api/users",
-//                "/api/admin/register"
-//            )
-//                .hasRole("ADMIN")
-//            .antMatchers(HttpMethod.POST, "/api/products")
-//                .hasAnyRole("ADMIN", "CASHIER")
-//            .antMatchers(
-//                "/api/cashier/register",
-//                "/api/orders",
-//                "/api/orders/{\\w+}/accept",
-//                "/api/orders/{\\w+}/reject",
-//                "/api/orders/export",
-//                "/api/products/{\\d+}",
-//                "/api/products/batch"
-//            )
-//                .hasAnyRole("ADMIN", "CASHIER")
-//            .antMatchers(
-//                "/api/"
-//            )
-//                .hasAnyRole("")
-//            .antMatchers(
-//                "/api/carts",
-//                "/api/carts/{\\d+}",
-//                "/api/carts/{\\d+}/{\\d+}",
-//                "/api/carts/checkout",
-//                "/api/orders/user"
-//            )
-//                .hasRole("CUSTOMER")
-//            .antMatchers(
-//                "/api/users/change-password",
-//                "/api/orders/{\\w+}/search"
-//            )
-//                .authenticated()
-//            .antMatchers(HttpMethod.GET, "/api/products")
-//                .permitAll()
-//            .antMatchers(
-//                "/api/users/customer/register",
-//                "/api/products/id/{\\d+}",
-//                "/api/products/name/{\\w+}",
-//                "/api/orders/filter"
-//            )
-//                .permitAll()
+            .antMatchers(
+                "/api/users/customer/register",
+                "/api/products/id/{\\d+}",
+                "/api/products/name/{\\w+}",
+                "/api/orders/filter"
+            )
+                .permitAll()
             .and()
             .formLogin()
                 .loginProcessingUrl("/api/auth/login")

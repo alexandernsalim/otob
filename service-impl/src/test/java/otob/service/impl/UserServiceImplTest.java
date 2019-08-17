@@ -5,6 +5,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import otob.model.entity.Role;
 import otob.model.entity.User;
@@ -15,6 +18,7 @@ import otob.service.CartService;
 import otob.service.EmailService;
 import otob.service.RoleService;
 import otob.util.generator.RandomTextGenerator;
+import otob.web.model.PageableUserDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +51,9 @@ public class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userServiceImpl;
 
+    private Integer page;
+    private Integer size;
+    private Pageable pageable;
     private User user1;
     private User user1Updated;
     private User userRequest;
@@ -61,6 +68,10 @@ public class UserServiceImplTest {
     @Before
     public void setUp() {
         initMocks(this);
+
+        page = 0;
+        size = 5;
+        pageable = PageRequest.of(page, size);
 
         roleCustomer = Role.builder()
                 .roleId(1L)
@@ -102,13 +113,13 @@ public class UserServiceImplTest {
 
     @Test
     public void getAllUserTest() {
-        when(userRepository.findAll())
-                .thenReturn(users);
+        when(userRepository.findAll(pageable))
+                .thenReturn(new PageImpl<>(users));
 
-        List<User> result = userServiceImpl.getAllUser();
+        PageableUserDto result = userServiceImpl.getAllUser(page, size);
 
-        verify(userRepository).findAll();
-        assertEquals(users, result);
+        verify(userRepository).findAll(pageable);
+        assertTrue(result.getUsers().size() >= 1);
     }
 
     @Test

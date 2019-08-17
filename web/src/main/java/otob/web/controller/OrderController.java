@@ -35,7 +35,7 @@ public class OrderController extends GlobalController {
         @RequestParam(required = false) Integer size
     ) {
         page = (page == null) ? 0 : page-1;
-        if(size == null) size = 5;
+        size = (size == null) ? 5 : size;
 
         return toResponse(orderService.getAllOrder(page, size));
     }
@@ -49,7 +49,7 @@ public class OrderController extends GlobalController {
         session = request.getSession(true);
         String email = session.getAttribute("userId").toString();
         page = (page == null) ? 0 : page-1;
-        if(size == null) size = 5;
+        size = (size == null) ? 5 : size;
 
         return toResponse(orderService.getAllOrderByUserEmail(email, page, size));
     }
@@ -62,7 +62,7 @@ public class OrderController extends GlobalController {
         @RequestParam(required = false) Integer size
     ) {
         page = (page == null) ? 0 : page-1;
-        if(size == null) size = 5;
+        size = (size == null) ? 5 : size;
 
         return toResponse(orderService.getAllOrderByFilter(date, status, page, size));
     }
