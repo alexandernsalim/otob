@@ -15,14 +15,20 @@ public class IdGenerator {
     @Autowired
     private MongoProperties mongoProperties;
 
+    private MongoClient mongoClient;
+    private DB db;
+    private DBCollection collection;
+    private BasicDBObject find;
+    private BasicDBObject update;
+
     private final String ORD_PRE = "ORD";
 
     public Long getNextId(String name) throws Exception {
-        MongoClient mongoClient = new MongoClient(mongoProperties.getHost(), mongoProperties.getPort());
-        DB db = mongoClient.getDB(mongoProperties.getDatabase());
-        DBCollection collection = db.getCollection("counters");
-        BasicDBObject find = new BasicDBObject();
-        BasicDBObject update = new BasicDBObject();
+        mongoClient = new MongoClient(mongoProperties.getHost(), mongoProperties.getPort());
+        db = mongoClient.getDB(mongoProperties.getDatabase());
+        collection = db.getCollection("counters");
+        find = new BasicDBObject();
+        update = new BasicDBObject();
 
         find.put("_id", name);
         update.put("$inc", new BasicDBObject("seq", 1));

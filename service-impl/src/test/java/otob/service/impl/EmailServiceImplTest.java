@@ -8,12 +8,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -29,6 +31,7 @@ public class EmailServiceImplTest {
     private String to;
     private String subject;
     private String text;
+    private SimpleMailMessage message;
 
     @Before
     public void setUp(){
@@ -39,19 +42,18 @@ public class EmailServiceImplTest {
         to = "alexandernsalim@gmail.com";
         subject = "Test";
         text = "Test success";
+        message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
     }
 
+
     @Test
-    public void sendSimpleMessageTest() throws MessagingException {
-//        emailServiceImpl.sendSimpleMessage(to, subject, text);
-//
-//        Message[] messages = greenMail.getReceivedMessages();
-//        assertEquals(1, messages.length);
-//        assertEquals("Test", messages[0].getSubject());
-//
-//        String body = GreenMailUtil.getBody(messages[0]).replaceAll("=\r?\n", "");
-//
-//        assertEquals("Test success", body);
+    public void sendSimpleMessageTest() {
+        emailServiceImpl.sendSimpleMessage(to, subject, text);
+
+        verify(mailSender).send(message);
     }
 
     @After

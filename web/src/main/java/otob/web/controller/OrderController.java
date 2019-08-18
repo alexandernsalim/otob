@@ -87,14 +87,13 @@ public class OrderController extends GlobalController {
 
     @GetMapping(OrderApiPath.EXPORT_ORDER_HISTORY)
     public ResponseEntity<InputStreamResource> exportOrder(
-        HttpServletResponse response,
         @RequestParam(required = false) String year,
         @RequestParam(required = false) String month
     ) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=orders.xlsx");
 
-        ByteArrayInputStream in = orderService.exportOrder(response, year, month);
+        ByteArrayInputStream in = orderService.exportOrder(year, month);
 
         return ResponseEntity.ok()
                 .headers(headers)

@@ -58,8 +58,8 @@ public class CartServiceImpl implements CartService {
     public Cart getUserCart(String userEmail) {
         if (!userService.checkUser(userEmail)) {
             throw new CustomException(
-                    ErrorCode.USER_NOT_FOUND.getCode(),
-                    ErrorCode.USER_NOT_FOUND.getMessage()
+                ErrorCode.USER_NOT_FOUND.getCode(),
+                ErrorCode.USER_NOT_FOUND.getMessage()
             );
         }
 

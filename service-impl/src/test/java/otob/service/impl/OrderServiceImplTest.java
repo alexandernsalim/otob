@@ -20,6 +20,7 @@ import otob.service.ProductService;
 import otob.service.UserService;
 import otob.web.model.PageableOrderDto;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,14 +43,13 @@ public class OrderServiceImplTest {
     @InjectMocks
     private OrderServiceImpl orderServiceImpl;
 
-    int page;
-    int size;
+    private int page;
+    private int size;
     private PageRequest pageable;
     private CartItem item1;
     private List<CartItem> items;
     private String orderId;
     private String userEmail;
-    private String orderStatus;
     private Order order;
     private Order orderAccepted;
     private Order orderRejected;
@@ -351,6 +351,24 @@ public class OrderServiceImplTest {
             assertTrue(ex.getMessage().equals(ErrorCode.ORDER_PROCESSED.getMessage()));
         }
 
+    }
+
+    @Test
+    public void exportOrderTest() {
+        String month = "08";
+        String year = "2019";
+
+        ExportFilter filter = ExportFilter.builder()
+                .month(month)
+                .year(year)
+                .build();
+
+        when(orderRepository.findOrderWithFilter(filter))
+            .thenReturn(orders);
+
+        orderServiceImpl.exportOrder(year, month);
+
+        verify(orderRepository).findOrderWithFilter(filter);
     }
 
     @After

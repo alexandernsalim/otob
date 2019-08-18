@@ -155,7 +155,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ByteArrayInputStream exportOrder(HttpServletResponse response, String year, String month) {
+    public ByteArrayInputStream exportOrder(String year, String month) {
         Date date = new Date();
         String defaultYear = new SimpleDateFormat("yyyy").format(date);
 

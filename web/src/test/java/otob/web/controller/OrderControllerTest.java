@@ -210,6 +210,21 @@ public class OrderControllerTest {
         verify(orderService).rejectOrder(orderId);
     }
 
+    @Test
+    public void exportOrderTest() throws Exception {
+        String year = "2019";
+        String month = "08";
+
+        mvc.perform(
+            get(OrderApiPath.BASE_PATH + OrderApiPath.EXPORT_ORDER_HISTORY)
+                .param("year", year)
+                .param("month", month)
+        )
+        .andExpect(status().isOk());
+
+        verify(orderService).exportOrder(year, month);
+    }
+
     @After
     public void tearDown() {
         verifyNoMoreInteractions(orderService);

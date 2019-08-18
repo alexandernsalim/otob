@@ -16,6 +16,6 @@ public interface OrderService {
     Order createOrder(Order order);
     Order acceptOrder(String ordId);
     Order rejectOrder(String ordId);
-    ByteArrayInputStream exportOrder(HttpServletResponse response, String year, String month);
+    ByteArrayInputStream exportOrder(String year, String month);
 
 }
