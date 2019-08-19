@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderDto implements Serializable {
 
-    private String orderId;
+    private String ordId;
     private String userEmail;
     private String ordDate;
     private List<CartItem> ordItems;

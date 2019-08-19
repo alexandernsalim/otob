@@ -48,45 +48,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers(
                 "/api/users",
-                "/api/admin/register"
-            )
-                .hasRole("ADMIN")
-            .antMatchers(HttpMethod.POST, "/api/products")
-                .hasAnyRole("ADMIN", "CASHIER")
-            .antMatchers(
+                "/api/admin/register",
                 "/api/cashier/register",
-                "/api/orders",
-                "/api/orders/{\\w+}/accept",
-                "/api/orders/{\\w+}/reject",
                 "/api/products/{\\d+}",
                 "/api/products/batch"
-            )
-                .hasAnyRole("ADMIN", "CASHIER")
+            ).hasRole("ADMIN")
+            .antMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+            .antMatchers("/api/orders", "/api/orders/filter").hasAnyRole("ADMIN", "CASHIER")
             .antMatchers(
-                "/api/"
-            )
-                .hasAnyRole("")
+                "/api/orders/{\\w+}/accept",
+                "/api/orders/{\\w+}/reject",
+                "/api/orders/export"
+            ).hasAnyRole("CASHIER")
             .antMatchers(
                 "/api/carts",
                 "/api/carts/{\\d+}",
                 "/api/carts/{\\d+}/{\\d+}",
                 "/api/carts/checkout",
                 "/api/orders/user"
-            )
-                .hasRole("CUSTOMER")
+            ).hasRole("CUSTOMER")
             .antMatchers(
-                "/api/users/change-password",
-                "/api/orders/{\\w+}/search"
-            )
-                .authenticated()
-            .antMatchers(HttpMethod.GET, "/api/products")
-                .permitAll()
+                "/api/users/change-password"
+            ).authenticated()
+            .antMatchers(HttpMethod.GET, "/api/products").permitAll()
             .antMatchers(
                 "/api/users/customer/register",
-                "/api/products/id/{\\d+}",
-                "/api/products/name/{\\w+}"
-            )
-                .permitAll()
+                "/api/orders/{\\w+}/search"
+            ).permitAll()
             .and()
             .formLogin()
                 .loginProcessingUrl("/api/auth/login")

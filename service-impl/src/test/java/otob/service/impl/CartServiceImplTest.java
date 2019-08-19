@@ -62,7 +62,6 @@ public class CartServiceImplTest {
     private DateFormat dateFormat;
     private String orderDate;
     private Order order;
-    private List<String> outOfStockProducts;
 
     @Before
     public void setUp() {
@@ -99,12 +98,12 @@ public class CartServiceImplTest {
                 .stock(4)
                 .build();
 
-        dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         orderDate = dateFormat.format(new Date());
         orderId = "ORD1235648790";
 
         order = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate(orderDate)
                 .ordItems(cartItems)
@@ -113,7 +112,6 @@ public class CartServiceImplTest {
                 .ordStatus(Status.ORD_WAIT)
                 .build();
 
-        outOfStockProducts = new ArrayList<>();
     }
 
     @Test
@@ -363,13 +361,13 @@ public class CartServiceImplTest {
     @Test
     public void checkoutGenerateIdErrorTest() throws Exception {
         when(userService.checkUser(userEmail))
-                .thenReturn(true);
+            .thenReturn(true);
         when(cartRepository.findByUserEmail(userEmail))
-                .thenReturn(updatedCart);
+            .thenReturn(updatedCart);
         when(productService.getProductById(product.getProductId()))
-                .thenReturn(product);
+            .thenReturn(product);
         when(idGenerator.generateOrderId(orderDate))
-                .thenThrow(new Exception());
+            .thenThrow(new Exception());
 
         try {
             cartServiceImpl.checkout(userEmail);

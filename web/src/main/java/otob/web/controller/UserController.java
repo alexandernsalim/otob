@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import otob.model.constant.Role;
 import otob.model.constant.path.UserApiPath;
+import otob.web.model.PageableUserDto;
 import otob.web.model.UserDto;
 import otob.model.entity.User;
 import otob.util.mapper.BeanMapper;
@@ -26,9 +27,14 @@ public class UserController extends GlobalController {
     private BeanMapper mapper;
 
     @GetMapping
-    public Response<List<UserDto>> getAllUser() {
+    public Response<PageableUserDto> getAllUser(
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer size
+    ) {
+        page = (page == null) ? 0 : page-1;
+        size = (size == null) ? 5 : size;
 
-        return toResponse(mapper.mapAsList(userService.getAllUser(), UserDto.class));
+        return toResponse(userService.getAllUser(page, size));
     }
 
     @PostMapping(UserApiPath.REGISTER_ADMIN)

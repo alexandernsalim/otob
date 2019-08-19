@@ -1,6 +1,9 @@
 package otob.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import otob.model.entity.User;
@@ -12,6 +15,9 @@ import otob.service.EmailService;
 import otob.service.RoleService;
 import otob.service.UserService;
 import otob.repository.UserRepository;
+import otob.util.mapper.BeanMapper;
+import otob.web.model.PageableUserDto;
+import otob.web.model.UserDto;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,8 +44,12 @@ public class UserServiceImpl implements UserService {
     private RandomTextGenerator textGenerator;
 
     @Override
-    public List<User> getAllUser() {
-        return userRepository.findAll();
+    public PageableUserDto getAllUser(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> pages = userRepository.findAll(pageable);
+        List<User> users = pages.getContent();
+
+        return generateResult(pages, users);
     }
 
     @Override
@@ -120,6 +130,16 @@ public class UserServiceImpl implements UserService {
         }
 
         return (userRepository.deleteByEmail(email) == 1 && cartService.removeUserCart(email)) ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    private PageableUserDto generateResult(Page<User> pages, List<User> users) {
+        List<UserDto> userResult = BeanMapper.mapAsList(users, UserDto.class);
+        PageableUserDto result = PageableUserDto.builder()
+                .totalPage(pages.getTotalPages())
+                .users(userResult)
+                .build();
+
+        return result;
     }
 
 }

@@ -5,6 +5,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import otob.model.entity.Role;
 import otob.model.entity.User;
@@ -15,6 +18,7 @@ import otob.service.CartService;
 import otob.service.EmailService;
 import otob.service.RoleService;
 import otob.util.generator.RandomTextGenerator;
+import otob.web.model.PageableUserDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +51,11 @@ public class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userServiceImpl;
 
+    private Integer page;
+    private Integer size;
+    private Pageable pageable;
     private User user1;
+    private User user1Updated;
     private User userRequest;
     private String password;
     private String encodedPassword;
@@ -60,6 +68,10 @@ public class UserServiceImplTest {
     @Before
     public void setUp() {
         initMocks(this);
+
+        page = 0;
+        size = 5;
+        pageable = PageRequest.of(page, size);
 
         roleCustomer = Role.builder()
                 .roleId(1L)
@@ -75,6 +87,12 @@ public class UserServiceImplTest {
         user1 = User.builder()
                 .email("user1@mail.com")
                 .password(password)
+                .roles(roles)
+                .build();
+
+        user1Updated = User.builder()
+                .email("user1@mail.com")
+                .password("newPassword")
                 .roles(roles)
                 .build();
 
@@ -95,13 +113,13 @@ public class UserServiceImplTest {
 
     @Test
     public void getAllUserTest() {
-        when(userRepository.findAll())
-                .thenReturn(users);
+        when(userRepository.findAll(pageable))
+                .thenReturn(new PageImpl<>(users));
 
-        List<User> result = userServiceImpl.getAllUser();
+        PageableUserDto result = userServiceImpl.getAllUser(page, size);
 
-        verify(userRepository).findAll();
-        assertEquals(users, result);
+        verify(userRepository).findAll(pageable);
+        assertTrue(result.getUsers().size() >= 1);
     }
 
     @Test
@@ -204,6 +222,59 @@ public class UserServiceImplTest {
         } catch (CustomException ex) {
             verify(userRepository).existsByEmail(user1.getEmail());
             assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
+        }
+    }
+
+    @Test
+    public void changePasswordSuccessTest() {
+        when(userRepository.existsByEmail(user1.getEmail()))
+            .thenReturn(true);
+        when(userRepository.findByEmail(user1.getEmail()))
+            .thenReturn(user1);
+        when(encoder.matches(user1.getPassword(), user1.getPassword()))
+            .thenReturn(true);
+        when(encoder.encode(user1Updated.getPassword()))
+            .thenReturn(user1Updated.getPassword());
+
+        Boolean result = userServiceImpl.changePassword(user1.getEmail(), user1.getPassword(), user1Updated.getPassword());
+
+        verify(userRepository).existsByEmail(user1.getEmail());
+        verify(userRepository).findByEmail(user1.getEmail());
+        verify(encoder).matches(password, password);
+        verify(encoder).encode(user1Updated.getPassword());
+        verify(userRepository).save(user1Updated);
+        assertTrue(result);
+    }
+
+    @Test
+    public void changePasswordEmailNotFound() {
+        when(userRepository.existsByEmail(user1.getEmail()))
+            .thenReturn(false);
+
+        try {
+            userServiceImpl.changePassword(user1.getEmail(), user1.getPassword(), user1Updated.getPassword());
+        } catch (CustomException ex) {
+            verify(userRepository).existsByEmail(user1.getEmail());
+            assertEquals(ErrorCode.USER_NOT_FOUND.getMessage(), ex.getMessage());
+        }
+    }
+
+    @Test
+    public void changePasswordNotMatchTest() {
+        when(userRepository.existsByEmail(user1.getEmail()))
+            .thenReturn(true);
+        when(userRepository.findByEmail(user1.getEmail()))
+                .thenReturn(user1);
+        when(encoder.matches(user1.getPassword(), user1.getPassword()))
+                .thenReturn(false);
+
+        try {
+            userServiceImpl.changePassword(user1.getEmail(), user1.getPassword(), user1Updated.getPassword());
+        } catch (CustomException ex) {
+            verify(userRepository).existsByEmail(user1.getEmail());
+            verify(userRepository).findByEmail(user1.getEmail());
+            verify(encoder).matches(user1.getPassword(), user1.getPassword());
+            assertEquals(ErrorCode.PASSWORD_NOT_MATCH.getMessage(), ex.getMessage());
         }
     }
 

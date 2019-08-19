@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 import otob.model.entity.Product;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
@@ -16,6 +17,10 @@ import otob.repository.ProductRepository;
 import otob.util.generator.IdGenerator;
 import otob.web.model.PageableProductDto;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +47,11 @@ public class ProductServiceImplTest {
     private Product product1;
     private Product product2;
     private Product productUpdated2;
+    private Product excelProduct;
     private List<Product> products;
     private List<Product> productsByName;
     private List<Product> emptyProducts;
+
     @Before
     public void setUp() {
         initMocks(this);
@@ -78,6 +85,15 @@ public class ProductServiceImplTest {
                 .listPrice(3000000)
                 .offerPrice(1500000)
                 .stock(2)
+                .build();
+
+        excelProduct = Product.builder()
+                .productId(3L)
+                .name("Note FE")
+                .description("Mismatch Product")
+                .listPrice(8000000)
+                .offerPrice(4000000)
+                .stock(1)
                 .build();
 
         products = new ArrayList<>();
@@ -210,69 +226,69 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void addProductFromExcelTest() throws Exception {
-//        when(productRepository.existsByName(product1.getName()))
-//                .thenReturn(false);
-//        when(productRepository.existsByName(product2.getName()))
-//                .thenReturn(false);
-//        when(idGenerator.getNextId("productid"))
-//                .thenReturn(1L, 2L);
-//        when(productRepository.save(product1))
-//                .thenReturn(product1);
-//        when(productRepository.save(product2))
-//                .thenReturn(product2);
-//
-//        List<Product> result = productServiceImpl.addProducts(products);
-//
-//        verify(productRepository).existsByName(product1.getName());
-//        verify(productRepository).existsByName(product2.getName());
-//        verify(idGenerator, times(2)).getNextId("productid");
-//        verify(productRepository).save(product1);
-//        verify(productRepository).save(product2);
-//        assertEquals(2, result.size());
+    public void addProductsTest() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Simple Product List.xlsx")));
+
+        when(productRepository.existsByName(anyString()))
+            .thenReturn(false);
+        when(idGenerator.getNextId("productid"))
+            .thenReturn(any());
+
+        List<Product> result = productServiceImpl.addProducts(file);
+
+        verify(productRepository, times(5)).existsByName(anyString());
+        verify(idGenerator, times(5)).getNextId("productid");
+        verify(productRepository, times(5)).save(any());
+        assertTrue(result.size() >= 1);
     }
 
-//    @Test
-//    public void addProductFromExcelExistsTest() throws Exception {
-//        when(productRepository.existsByName(product1.getName()))
-//                .thenReturn(true);
-//        when(productRepository.findByName(product1.getName()))
-//                .thenReturn(product1);
-//        when(productRepository.save(product1))
-//                .thenReturn(product1);
-//        when(productRepository.existsByName(product2.getName()))
-//                .thenReturn(false);
-//        when(idGenerator.getNextId("productid"))
-//                .thenReturn(2L);
-//        when(productRepository.save(product2))
-//                .thenReturn(product2);
-//
-//        List<Product> result = productServiceImpl.addProducts(products);
-//
-//        verify(productRepository).existsByName(product1.getName());
-//        verify(productRepository).findByName(product1.getName());
-//        verify(productRepository).save(product1);
-//        verify(productRepository).existsByName(product2.getName());
-//        verify(idGenerator).getNextId("productid");
-//        verify(productRepository).save(product2);
-//        assertEquals(2, result.size());
-//    }
-//
-//    @Test
-//    public void addProductFromExcelGenerateIdErrorTest() throws Exception {
-//        when(productRepository.existsByName(product1.getName()))
-//                .thenReturn(false);
-//        when(idGenerator.getNextId("productid"))
-//                .thenThrow(new Exception());
-//
-//        try {
-//            productServiceImpl.addProducts(products);
-//        } catch (CustomException ex) {
-//            verify(productRepository).existsByName(product1.getName());
-//            verify(idGenerator).getNextId("productid");
-//            assertEquals(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), ex.getMessage());
-//        }
-//    }
+    @Test
+    public void addProductsSameTest() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Same Product Test.xlsx")));
+
+        when(productRepository.existsByName(anyString()))
+            .thenReturn(true);
+        when(productRepository.findByName("Note FE"))
+            .thenReturn(excelProduct);
+        when(productRepository.save(excelProduct))
+            .thenReturn(excelProduct);
+
+        List<Product> result = productServiceImpl.addProducts(file);
+
+        verify(productRepository).existsByName(anyString());
+        verify(productRepository).findByName("Note FE");
+        verify(productRepository).save(excelProduct);
+        assertTrue(result.size() >= 1);
+    }
+
+    @Test
+    public void addProductsFileFormatWrongTest() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Wrong Format Test.xlsx")));
+
+        try {
+            productServiceImpl.addProducts(file);
+        } catch (CustomException ex) {
+            assertEquals(ErrorCode.EXCEL_FORMAT_ERROR.getMessage(), ex.getMessage());
+        }
+    }
+
+    @Test
+    public void addProductsGenerateIdFailTest() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Same Product Test.xlsx")));
+
+        when(productRepository.existsByName(anyString()))
+                .thenReturn(false);
+        when(idGenerator.getNextId("productid"))
+                .thenThrow(new Exception());
+
+        try {
+            productServiceImpl.addProducts(file);
+        } catch (CustomException ex) {
+            verify(productRepository).existsByName(anyString());
+            verify(idGenerator).getNextId("productid");
+            assertEquals(ErrorCode.GENERATE_ID_FAIL.getMessage(), ex.getMessage());
+        }
+    }
 
     @Test
     public void updateProductByIdTest() {

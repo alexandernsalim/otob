@@ -83,7 +83,7 @@ public class OrderControllerTest {
         orderId = "ORD1561436040000";
         userEmail = "alexandernsalim@gmail.com";
         order = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate("2019/06/25 11:14")
                 .ordItems(items)
@@ -92,7 +92,7 @@ public class OrderControllerTest {
                 .ordStatus(Status.ORD_WAIT)
                 .build();
         orderAccepted = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate("2019/06/25 11:14")
                 .ordItems(items)
@@ -101,7 +101,7 @@ public class OrderControllerTest {
                 .ordStatus(Status.ORD_ACCEPT)
                 .build();
         orderRejected = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate("2019/06/25 11:14")
                 .ordItems(items)
@@ -152,6 +152,23 @@ public class OrderControllerTest {
     }
 
     @Test
+    public void getAllOrderByFilter() throws Exception {
+        when(orderService.getAllOrderByFilter("2019/06/25", null, page, size))
+            .thenReturn(pageableOrderDto);
+
+        mvc.perform(
+            get(OrderApiPath.BASE_PATH + OrderApiPath.GET_ORDER_BY_FILTER)
+                .param("date", "2019/06/25")
+                .param("page", "1")
+                .param("size", "5")
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.orders", hasSize(1)));
+
+        verify(orderService).getAllOrderByFilter("2019/06/25", null, page, size);
+    }
+
+    @Test
     public void findOrderTest() throws Exception {
         when(orderService.getOrderByOrderId(orderId))
                 .thenReturn(order);
@@ -191,6 +208,21 @@ public class OrderControllerTest {
         .andExpect(jsonPath("$.data").value(orderRejected));
 
         verify(orderService).rejectOrder(orderId);
+    }
+
+    @Test
+    public void exportOrderTest() throws Exception {
+        String year = "2019";
+        String month = "08";
+
+        mvc.perform(
+            get(OrderApiPath.BASE_PATH + OrderApiPath.EXPORT_ORDER_HISTORY)
+                .param("year", year)
+                .param("month", month)
+        )
+        .andExpect(status().isOk());
+
+        verify(orderService).exportOrder(year, month);
     }
 
     @After

@@ -58,8 +58,8 @@ public class CartServiceImpl implements CartService {
     public Cart getUserCart(String userEmail) {
         if (!userService.checkUser(userEmail)) {
             throw new CustomException(
-                    ErrorCode.USER_NOT_FOUND.getCode(),
-                    ErrorCode.USER_NOT_FOUND.getMessage()
+                ErrorCode.USER_NOT_FOUND.getCode(),
+                ErrorCode.USER_NOT_FOUND.getMessage()
             );
         }
 
@@ -116,7 +116,7 @@ public class CartServiceImpl implements CartService {
         String orderId;
         int totItem = 0;
         long totPrice = 0;
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         String ordDate = dateFormat.format(new Date());
         List<String> outOfStockProducts = new ArrayList<>();
 
@@ -168,7 +168,7 @@ public class CartServiceImpl implements CartService {
         }
 
         Order order = Order.builder()
-                .orderId(orderId)
+                .ordId(orderId)
                 .userEmail(userEmail)
                 .ordDate(ordDate)
                 .ordItems(cartItems)

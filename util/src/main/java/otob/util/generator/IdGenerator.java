@@ -15,14 +15,20 @@ public class IdGenerator {
     @Autowired
     private MongoProperties mongoProperties;
 
+    private MongoClient mongoClient;
+    private DB db;
+    private DBCollection collection;
+    private BasicDBObject find;
+    private BasicDBObject update;
+
     private final String ORD_PRE = "ORD";
 
     public Long getNextId(String name) throws Exception {
-        MongoClient mongoClient = new MongoClient(mongoProperties.getHost(), mongoProperties.getPort());
-        DB db = mongoClient.getDB(mongoProperties.getDatabase());
-        DBCollection collection = db.getCollection("counters");
-        BasicDBObject find = new BasicDBObject();
-        BasicDBObject update = new BasicDBObject();
+        mongoClient = new MongoClient(mongoProperties.getHost(), mongoProperties.getPort());
+        db = mongoClient.getDB(mongoProperties.getDatabase());
+        collection = db.getCollection("counters");
+        find = new BasicDBObject();
+        update = new BasicDBObject();
 
         find.put("_id", name);
         update.put("$inc", new BasicDBObject("seq", 1));
@@ -34,7 +40,7 @@ public class IdGenerator {
     }
 
     public String generateOrderId(String checkoutDate) throws Exception {
-        Date date = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(checkoutDate);
+        Date date = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(checkoutDate);
         Timestamp timestamp = new Timestamp(date.getTime());
         String ordId = ORD_PRE + timestamp.getTime();
 

@@ -1,6 +1,9 @@
 package otob.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import otob.model.constant.path.OrderApiPath;
 import otob.model.response.Response;
@@ -10,7 +13,9 @@ import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayInputStream;
 
 @RestController
 @RequestMapping(OrderApiPath.BASE_PATH)
@@ -30,7 +35,7 @@ public class OrderController extends GlobalController {
         @RequestParam(required = false) Integer size
     ) {
         page = (page == null) ? 0 : page-1;
-        if(size == null) size = 5;
+        size = (size == null) ? 5 : size;
 
         return toResponse(orderService.getAllOrder(page, size));
     }
@@ -44,21 +49,22 @@ public class OrderController extends GlobalController {
         session = request.getSession(true);
         String email = session.getAttribute("userId").toString();
         page = (page == null) ? 0 : page-1;
-        if(size == null) size = 5;
+        size = (size == null) ? 5 : size;
 
         return toResponse(orderService.getAllOrderByUserEmail(email, page, size));
     }
 
-    @GetMapping(OrderApiPath.GET_ORDER_BY_STATUS)
-    public Response<PageableOrderDto> getAllOrderByOrderStatus(
-        @PathVariable String orderStatus,
+    @GetMapping(OrderApiPath.GET_ORDER_BY_FILTER)
+    public Response<PageableOrderDto> getAllOrderByFilter(
+        @RequestParam(required = false) String date,
+        @RequestParam(required = false) String status,
         @RequestParam(required = false) Integer page,
         @RequestParam(required = false) Integer size
     ) {
         page = (page == null) ? 0 : page-1;
-        if(size == null) size = 5;
+        size = (size == null) ? 5 : size;
 
-        return toResponse(orderService.getAllOrderByOrderStatus(orderStatus, page, size));
+        return toResponse(orderService.getAllOrderByFilter(date, status, page, size));
     }
 
     @GetMapping(OrderApiPath.FIND_ORDER)
@@ -77,6 +83,21 @@ public class OrderController extends GlobalController {
     public Response<OrderDto> rejectOrder(@PathVariable String orderId) {
 
         return toResponse(mapper.map(orderService.rejectOrder(orderId), OrderDto.class));
+    }
+
+    @GetMapping(OrderApiPath.EXPORT_ORDER_HISTORY)
+    public ResponseEntity<InputStreamResource> exportOrder(
+        @RequestParam(required = false) String year,
+        @RequestParam(required = false) String month
+    ) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=orders.xlsx");
+
+        ByteArrayInputStream in = orderService.exportOrder(year, month);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new InputStreamResource(in));
     }
 
 }
