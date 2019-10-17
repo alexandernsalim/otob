@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import otob.model.constant.Status;
 import otob.model.entity.CartItem;
@@ -75,22 +74,22 @@ public class OrderRepositoryCustomImplTest {
 
         item = CartItem.builder()
                 .productId(1L)
-                .name("Asus")
-                .offerPrice(5000000)
-                .qty(1)
+                .cartItemName("Asus")
+                .cartItemOfferPrice(5000000)
+                .cartItemQty(1)
                 .build();
 
         items = new ArrayList<>();
         items.add(item);
 
         order = Order.builder()
-                .ordId("ORD12346578910")
+                .orderId("ORD12346578910")
                 .userEmail("test@mail.com")
-                .ordDate("2019/08/12 11:14")
-                .ordItems(items)
-                .totItem(1)
-                .totPrice(5000000L)
-                .ordStatus(Status.ORD_WAIT)
+                .orderDate("2019/08/12 11:14")
+                .orderItems(items)
+                .orderTotalItem(1)
+                .orderTotalPrice(5000000L)
+                .orderStatus(Status.ORD_WAIT)
                 .build();
 
         orders = new ArrayList<>();

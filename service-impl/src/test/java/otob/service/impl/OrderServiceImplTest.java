@@ -20,7 +20,6 @@ import otob.service.ProductService;
 import otob.service.UserService;
 import otob.web.model.PageableOrderDto;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,9 +68,9 @@ public class OrderServiceImplTest {
 
         item1 = CartItem.builder()
                 .productId(1L)
-                .name("Asus")
-                .offerPrice(5000000)
-                .qty(1)
+                .cartItemName("Asus")
+                .cartItemOfferPrice(5000000)
+                .cartItemQty(1)
                 .build();
 
         items = new ArrayList<>();
@@ -81,33 +80,33 @@ public class OrderServiceImplTest {
         userEmail = "alexandernsalim@gmail.com";
 
         order = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate("2019/06/25 11:14")
-                .ordItems(items)
-                .totItem(1)
-                .totPrice(5000000L)
-                .ordStatus(Status.ORD_WAIT)
+                .orderDate("2019/06/25 11:14")
+                .orderItems(items)
+                .orderTotalItem(1)
+                .orderTotalPrice(5000000L)
+                .orderStatus(Status.ORD_WAIT)
                 .build();
 
         orderAccepted = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate("2019/06/25 11:14")
-                .ordItems(items)
-                .totItem(1)
-                .totPrice(5000000L)
-                .ordStatus(Status.ORD_ACCEPT)
+                .orderDate("2019/06/25 11:14")
+                .orderItems(items)
+                .orderTotalItem(1)
+                .orderTotalPrice(5000000L)
+                .orderStatus(Status.ORD_ACCEPT)
                 .build();
 
         orderRejected = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate("2019/06/25 11:14")
-                .ordItems(items)
-                .totItem(1)
-                .totPrice(5000000L)
-                .ordStatus(Status.ORD_REJECT)
+                .orderDate("2019/06/25 11:14")
+                .orderItems(items)
+                .orderTotalItem(1)
+                .orderTotalPrice(5000000L)
+                .orderStatus(Status.ORD_REJECT)
                 .build();
 
         orders = new ArrayList<>();
@@ -115,20 +114,20 @@ public class OrderServiceImplTest {
 
         product = Product.builder()
                 .productId(1L)
-                .name("Asus")
-                .description("Laptop")
-                .listPrice(7500000)
-                .offerPrice(5000000)
-                .stock(0)
+                .productName("Asus")
+                .productCondition("Laptop")
+                .productListPrice(7500000)
+                .productOfferPrice(5000000)
+                .productStock(0)
                 .build();
 
         productUpdated = Product.builder()
                 .productId(1L)
-                .name("Asus")
-                .description("Laptop")
-                .listPrice(7500000)
-                .offerPrice(5000000)
-                .stock(1)
+                .productName("Asus")
+                .productCondition("Laptop")
+                .productListPrice(7500000)
+                .productOfferPrice(5000000)
+                .productStock(1)
                 .build();
 
         orderFilter = OrderFilter.builder()
@@ -148,8 +147,8 @@ public class OrderServiceImplTest {
 
         verify(orderRepository).existsByOrdId(orderId);
         verify(orderRepository).findByOrdId(orderId);
-        assertEquals(order.getOrdId(), result.getOrdId());
-        assertTrue(order.getOrdItems().size() == 1);
+        assertEquals(order.getOrderId(), result.getOrderId());
+        assertTrue(order.getOrderItems().size() == 1);
     }
 
     @Test
@@ -266,7 +265,7 @@ public class OrderServiceImplTest {
         Order result = orderServiceImpl.createOrder(order);
 
         verify(orderRepository).save(order);
-        assertTrue(result.getOrdItems().size() >= 1);
+        assertTrue(result.getOrderItems().size() >= 1);
         assertTrue(result.getUserEmail().equals(userEmail));
     }
 
@@ -284,7 +283,7 @@ public class OrderServiceImplTest {
         verify(orderRepository).existsByOrdId(orderId);
         verify(orderRepository).findByOrdId(orderId);
         verify(orderRepository).save(order);
-        assertTrue(result.getOrdStatus().equals(Status.ORD_ACCEPT));
+        assertTrue(result.getOrderStatus().equals(Status.ORD_ACCEPT));
     }
 
     @Test
@@ -320,7 +319,7 @@ public class OrderServiceImplTest {
         verify(productService).getProductById(productUpdated.getProductId());
         verify(productService).updateProductById(product.getProductId(), product);
         verify(orderRepository).save(orderRejected);
-        assertTrue(result.getOrdStatus().equals(Status.ORD_REJECT));
+        assertTrue(result.getOrderStatus().equals(Status.ORD_REJECT));
     }
 
     @Test

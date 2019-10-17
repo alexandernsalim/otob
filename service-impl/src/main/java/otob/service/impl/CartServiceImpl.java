@@ -129,11 +129,11 @@ public class CartServiceImpl implements CartService {
 
         for (CartItem item : cartItems) {
             Product product = productService.getProductById(item.getProductId());
-            int itemQty = item.getQty();
-            int productStock = product.getStock();
+            int itemQty = item.getCartItemQty();
+            int productStock = product.getProductStock();
 
             if (itemQty > productStock) {
-                outOfStockProducts.add(product.getName());
+                outOfStockProducts.add(product.getProductName());
             }
         }
 
@@ -147,13 +147,13 @@ public class CartServiceImpl implements CartService {
 
         for (CartItem item : cartItems) {
             Product product = productService.getProductById(item.getProductId());
-            double itemPrice = item.getOfferPrice();
-            int itemQty = item.getQty();
-            int productStock = product.getStock();
+            double itemPrice = item.getCartItemOfferPrice();
+            int itemQty = item.getCartItemQty();
+            int productStock = product.getProductStock();
 
             totPrice += itemPrice * itemQty;
             totItem++;
-            product.setStock(productStock - itemQty);
+            product.setProductStock(productStock - itemQty);
             productService.updateProductById(product.getProductId(), product);
             removeItemFromCart(userEmail, product.getProductId());
         }
@@ -168,13 +168,13 @@ public class CartServiceImpl implements CartService {
         }
 
         Order order = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate(ordDate)
-                .ordItems(cartItems)
-                .totItem(totItem)
-                .totPrice(totPrice)
-                .ordStatus(Status.ORD_WAIT)
+                .orderDate(ordDate)
+                .orderItems(cartItems)
+                .orderTotalItem(totItem)
+                .orderTotalPrice(totPrice)
+                .orderStatus(Status.ORD_WAIT)
                 .build();
 
         return orderService.createOrder(order);

@@ -19,12 +19,12 @@ public class Order {
     @Id
     private String id;
 
-    private String ordId;
+    private String orderId;
     private String userEmail;
-    private String ordDate;
-    private List<CartItem> ordItems;
-    private int totItem;
-    private Long totPrice;
-    private String ordStatus;
+    private String orderDate;
+    private List<CartItem> orderItems;
+    private int orderTotalItem;
+    private Long orderTotalPrice;
+    private String orderStatus;
 
 }

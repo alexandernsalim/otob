@@ -10,10 +10,10 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     Product findByProductId(Long productId);
 
-    @Query("{'name': {$regex: ?0, $options: 'i'}}")
+    @Query("{'productName': {$regex: ?0, $options: 'i'}}")
     Page<Product> findAllByNameContaining(String name, Pageable pageable);
 
-    @Query("{'name': {$regex: ?0, $options: 'i'}}")
+    @Query("{'productName': {$regex: ?0, $options: 'i'}}")
     Product findByName(String name);
 
     boolean existsByName(String name);

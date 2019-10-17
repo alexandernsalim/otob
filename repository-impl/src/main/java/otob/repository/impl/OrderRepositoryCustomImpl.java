@@ -28,9 +28,9 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         Query query = new Query();
 
         if(month.isEmpty()){
-            query.addCriteria(Criteria.where("ordDate").regex("^" + year + "/.+"));
+            query.addCriteria(Criteria.where("orderDate").regex("^" + year + "/.+"));
         }else {
-            query.addCriteria(Criteria.where("ordDate").regex("^" + year + "/" + month + "/.+"));
+            query.addCriteria(Criteria.where("orderDate").regex("^" + year + "/" + month + "/.+"));
         }
 
         return mongoTemplate.find(query, Order.class);
@@ -45,11 +45,11 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
         query.with(pageable);
 
         if(!status.isEmpty()) {
-            query.addCriteria(Criteria.where("ordStatus").is(status));
+            query.addCriteria(Criteria.where("orderStatus").is(status));
         }
 
         if(!date.isEmpty()) {
-            query.addCriteria(Criteria.where("ordDate").regex(date + ".+"));
+            query.addCriteria(Criteria.where("orderDate").regex(date + ".+"));
         }
 
         List<Order> orders = mongoTemplate.find(query, Order.class);

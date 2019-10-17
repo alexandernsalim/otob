@@ -19,8 +19,6 @@ import otob.web.model.PageableProductDto;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,38 +60,38 @@ public class ProductServiceImplTest {
 
         product1 = Product.builder()
                 .productId(1L)
-                .name("Asus")
-                .description("Laptop")
-                .listPrice(7500000)
-                .offerPrice(5000000)
-                .stock(1)
+                .productName("Asus")
+                .productCondition("Laptop")
+                .productListPrice(7500000)
+                .productOfferPrice(5000000)
+                .productStock(1)
                 .build();
 
         product2 = Product.builder()
                 .productId(2L)
-                .name("Xiaomi")
-                .description("Handphone")
-                .listPrice(3000000)
-                .offerPrice(2000000)
-                .stock(2)
+                .productName("Xiaomi")
+                .productCondition("Handphone")
+                .productListPrice(3000000)
+                .productOfferPrice(2000000)
+                .productStock(2)
                 .build();
 
         productUpdated2 = Product.builder()
                 .productId(2L)
-                .name("Xiaomi")
-                .description("Handphone")
-                .listPrice(3000000)
-                .offerPrice(1500000)
-                .stock(2)
+                .productName("Xiaomi")
+                .productCondition("Handphone")
+                .productListPrice(3000000)
+                .productOfferPrice(1500000)
+                .productStock(2)
                 .build();
 
         excelProduct = Product.builder()
                 .productId(3L)
-                .name("Note FE")
-                .description("Mismatch Product")
-                .listPrice(8000000)
-                .offerPrice(4000000)
-                .stock(1)
+                .productName("Note FE")
+                .productCondition("Mismatch Product")
+                .productListPrice(8000000)
+                .productOfferPrice(4000000)
+                .productStock(1)
                 .build();
 
         products = new ArrayList<>();
@@ -135,7 +133,7 @@ public class ProductServiceImplTest {
         Product result = productServiceImpl.getProductById(1L);
 
         verify(productRepository).findByProductId(1L);
-        assertEquals(result.getName(), product1.getName());
+        assertEquals(result.getProductName(), product1.getProductName());
     }
 
     @Test
@@ -177,24 +175,24 @@ public class ProductServiceImplTest {
 
     @Test
     public void addProductExistsTest() {
-        when(productRepository.existsByName(product2.getName()))
+        when(productRepository.existsByName(product2.getProductName()))
                 .thenReturn(true);
-        when(productRepository.findByName(product2.getName()))
+        when(productRepository.findByName(product2.getProductName()))
                 .thenReturn(product2);
         when(productRepository.save(product2))
                 .thenReturn(product2);
 
         Product result = productServiceImpl.addProduct(product2);
 
-        verify(productRepository).existsByName(product2.getName());
-        verify(productRepository).findByName(product2.getName());
+        verify(productRepository).existsByName(product2.getProductName());
+        verify(productRepository).findByName(product2.getProductName());
         verify(productRepository).save(product2);
-        assertEquals(product2.getName(), result.getName());
+        assertEquals(product2.getProductName(), result.getProductName());
     }
 
     @Test
     public void addProductNotExistsTest() throws Exception {
-        when(productRepository.existsByName(product1.getName()))
+        when(productRepository.existsByName(product1.getProductName()))
                 .thenReturn(false);
         when(idGenerator.getNextId("productid"))
                 .thenReturn(1L);
@@ -203,15 +201,15 @@ public class ProductServiceImplTest {
 
         Product result = productServiceImpl.addProduct(product1);
 
-        verify(productRepository).existsByName(product1.getName());
+        verify(productRepository).existsByName(product1.getProductName());
         verify(idGenerator).getNextId("productid");
         verify(productRepository).save(product1);
-        assertEquals(product1.getName(), result.getName());
+        assertEquals(product1.getProductName(), result.getProductName());
     }
 
     @Test
     public void addProductGenerateIdErrorTest() throws Exception {
-        when(productRepository.existsByName(product1.getName()))
+        when(productRepository.existsByName(product1.getProductName()))
                 .thenReturn(false);
         when(idGenerator.getNextId("productid"))
                 .thenThrow(new Exception());
@@ -219,7 +217,7 @@ public class ProductServiceImplTest {
         try {
             productServiceImpl.addProduct(product1);
         } catch (CustomException ex) {
-            verify(productRepository).existsByName(product1.getName());
+            verify(productRepository).existsByName(product1.getProductName());
             verify(idGenerator).getNextId("productid");
             assertEquals(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), ex.getMessage());
         }
@@ -301,8 +299,8 @@ public class ProductServiceImplTest {
 
         verify(productRepository).findByProductId(2L);
         verify(productRepository).save(product2);
-        assertEquals(productUpdated2.getName(), result.getName());
-        assertEquals(productUpdated2.getListPrice(), result.getListPrice());
+        assertEquals(productUpdated2.getProductName(), result.getProductName());
+        assertEquals(productUpdated2.getProductListPrice(), result.getProductListPrice());
     }
 
     @Test
@@ -329,8 +327,8 @@ public class ProductServiceImplTest {
 
         verify(productRepository).findByName("Xiaomi");
         verify(productRepository).save(product2);
-        assertEquals(productUpdated2.getName(), result.getName());
-        assertEquals(productUpdated2.getListPrice(), result.getListPrice());
+        assertEquals(productUpdated2.getProductName(), result.getProductName());
+        assertEquals(productUpdated2.getProductListPrice(), result.getProductListPrice());
     }
 
     @Test

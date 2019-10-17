@@ -69,9 +69,9 @@ public class CartControllerTest {
         orderId = "ORD1561436040000";
         CartItem item = CartItem.builder()
                 .productId(1L)
-                .name("Redmi 7")
-                .offerPrice(1000000)
-                .qty(1)
+                .cartItemName("Redmi 7")
+                .cartItemOfferPrice(1000000)
+                .cartItemQty(1)
                 .build();
         cartItems = new ArrayList<>();
         cartItems.add(item);
@@ -85,13 +85,13 @@ public class CartControllerTest {
                 .cartItems(cartItems)
                 .build();
         order = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate("2019/06/25 11:14")
-                .ordItems(cartItems)
-                .totItem(1)
-                .totPrice(5000000L)
-                .ordStatus(Status.ORD_WAIT)
+                .orderDate("2019/06/25 11:14")
+                .orderItems(cartItems)
+                .orderTotalItem(1)
+                .orderTotalPrice(5000000L)
+                .orderStatus(Status.ORD_WAIT)
                 .build();
         orderDto = BeanMapper.map(order, OrderDto.class);
     }
@@ -128,8 +128,8 @@ public class CartControllerTest {
 
     @Test
     public void updateItemQtyTest() throws Exception {
-        cart.getCartItems().get(0).setQty(2);
-        cartDto.getCartItems().get(0).setQty(2);
+        cart.getCartItems().get(0).setCartItemQty(2);
+        cartDto.getCartItems().get(0).setCartItemQty(2);
         when(cartService.updateItemQty(userEmail, 1L, 1))
                 .thenReturn(cart);
 

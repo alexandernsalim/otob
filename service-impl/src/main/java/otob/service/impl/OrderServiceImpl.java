@@ -25,7 +25,6 @@ import otob.util.mapper.BeanMapper;
 import otob.web.model.OrderDto;
 import otob.web.model.PageableOrderDto;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -115,7 +114,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order order = orderRepository.findByOrdId(ordId);
-        order.setOrdStatus(Status.ORD_ACCEPT);
+        order.setOrderStatus(Status.ORD_ACCEPT);
 
         return orderRepository.save(order);
     }
@@ -131,22 +130,22 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderRepository.findByOrdId(ordId);
 
-        if (!order.getOrdStatus().equals(Status.ORD_WAIT)) {
+        if (!order.getOrderStatus().equals(Status.ORD_WAIT)) {
             throw new CustomException(
                     ErrorCode.ORDER_PROCESSED.getCode(),
                     ErrorCode.ORDER_PROCESSED.getMessage()
             );
         }
 
-        order.setOrdStatus(Status.ORD_REJECT);
+        order.setOrderStatus(Status.ORD_REJECT);
 
-        List<CartItem> ordItems = order.getOrdItems();
+        List<CartItem> ordItems = order.getOrderItems();
 
         for (CartItem item : ordItems) {
             Product product = productService.getProductById(item.getProductId());
-            int currStock = product.getStock();
+            int currStock = product.getProductStock();
 
-            product.setStock(currStock + item.getQty());
+            product.setProductStock(currStock + item.getCartItemQty());
 
             productService.updateProductById(product.getProductId(), product);
         }
@@ -193,20 +192,20 @@ public class OrderServiceImpl implements OrderService {
                 Row row = sheet.createRow(i);
                 Order order = orders.get(i-1);
                 StringBuilder items = new StringBuilder();
-                for (int j = 0; j < order.getTotItem(); j++) {
+                for (int j = 0; j < order.getOrderTotalItem(); j++) {
                     items.append(j+1)
                         .append(". ")
-                        .append(order.getOrdItems().get(j).getName())
+                        .append(order.getOrderItems().get(j).getCartItemName())
                         .append(System.lineSeparator());
                 }
 
-                row.createCell(0).setCellValue(order.getOrdId());
+                row.createCell(0).setCellValue(order.getOrderId());
                 row.createCell(1).setCellValue(order.getUserEmail());
-                row.createCell(2).setCellValue(order.getOrdDate());
+                row.createCell(2).setCellValue(order.getOrderDate());
                 row.createCell(3).setCellValue(items.toString());
-                row.createCell(4).setCellValue(order.getTotItem());
-                row.createCell(5).setCellValue(order.getTotPrice());
-                row.createCell(6).setCellValue(order.getOrdStatus());
+                row.createCell(4).setCellValue(order.getOrderTotalItem());
+                row.createCell(5).setCellValue(order.getOrderTotalPrice());
+                row.createCell(6).setCellValue(order.getOrderStatus());
             }
 
             sheet.autoSizeColumn(0);

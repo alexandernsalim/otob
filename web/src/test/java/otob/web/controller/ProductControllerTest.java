@@ -64,29 +64,29 @@ public class ProductControllerTest {
 
         product1 = Product.builder()
                 .productId(1L)
-                .name("Redmi Note 7")
-                .description("4/64 GB")
-                .listPrice(2700000)
-                .offerPrice(2000000)
-                .stock(1)
+                .productName("Redmi Note 7")
+                .productCondition("4/64 GB")
+                .productListPrice(2700000)
+                .productOfferPrice(2000000)
+                .productStock(1)
                 .build();
 
         product1Updated = Product.builder()
             .productId(1L)
-            .name("Redmi Note 7")
-            .description("4/64 GB")
-            .listPrice(2000000)
-            .offerPrice(1800000)
-            .stock(1)
+            .productName("Redmi Note 7")
+            .productCondition("4/64 GB")
+            .productListPrice(2000000)
+            .productOfferPrice(1800000)
+            .productStock(1)
             .build();
 
         product2 = Product.builder()
                 .productId(2L)
-                .name("Acer Aspire E5")
-                .description("i5")
-                .listPrice(6000000)
-                .offerPrice(4500000)
-                .stock(1)
+                .productName("Acer Aspire E5")
+                .productCondition("i5")
+                .productListPrice(6000000)
+                .productOfferPrice(4500000)
+                .productStock(1)
                 .build();
 
         products = new ArrayList<>();
