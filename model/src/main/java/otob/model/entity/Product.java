@@ -17,9 +17,12 @@ public class Product {
     private String id;
 
     private Long productId;
-    private String name;
-    private String description;
-    private double listPrice;
-    private double offerPrice;
-    private int stock;
+    private String productName;
+    private String productCondition;
+    private String productCategory;
+    private String productReturnReason;
+    private String productGrade;
+    private double productListPrice;
+    private double productOfferPrice;
+    private int productStock;
 }

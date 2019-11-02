@@ -11,9 +11,9 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH("400", "Password not match"),
 
     PRODUCT_NOT_FOUND("404", "Product not found"),
-    STOCK_INSUFFICIENT("400", "Insufficient stock"),
+    STOCK_INSUFFICIENT("400", "Insufficient productStock"),
 
-    SOME_PRODUCTS_INVALID("400", "Insufficient stock of one or more product"),
+    SOME_PRODUCTS_INVALID("400", "Insufficient productStock of one or more product"),
     ORDER_NOT_FOUND("404", "Order not found"),
     ORDER_PROCESSED("400", "Order already processed"),
 

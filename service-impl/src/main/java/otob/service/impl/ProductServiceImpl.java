@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product addProduct(Product product) {
-        if(productRepository.existsByName(product.getName())){
+        if(productRepository.existsByName(product.getProductName())){
             return updateProductByName(product);
         }else{
             try{
@@ -108,18 +108,18 @@ public class ProductServiceImpl implements ProductService {
                 int productStock = (int) row.getCell(4).getNumericCellValue();
 
                 Product product = Product.builder()
-                    .name(productName)
-                    .description(productDescription)
-                    .listPrice(productListPrice)
-                    .offerPrice(productOfferPrice)
-                    .stock(productStock)
+                    .productName(productName)
+                    .productCondition(productDescription)
+                    .productListPrice(productListPrice)
+                    .productOfferPrice(productOfferPrice)
+                    .productStock(productStock)
                     .build();
 
                 products.add(product);
             }
 
             for(Product product : products) {
-                if(productRepository.existsByName(product.getName())){
+                if(productRepository.existsByName(product.getProductName())){
                     updateProductByName(product);
                 }else{
                     product.setProductId(idGenerator.getNextId("productid"));
@@ -156,17 +156,17 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
-        product.setName(productReq.getName());
-        product.setDescription(productReq.getDescription());
-        product.setListPrice(productReq.getListPrice());
-        product.setOfferPrice(productReq.getOfferPrice());
-        product.setStock(productReq.getStock());
+        product.setProductName(productReq.getProductName());
+        product.setProductCondition(productReq.getProductCondition());
+        product.setProductListPrice(productReq.getProductListPrice());
+        product.setProductOfferPrice(productReq.getProductOfferPrice());
+        product.setProductStock(productReq.getProductStock());
 
         return productRepository.save(product);
     }
 
     public Product updateProductByName(Product productReq) {
-        Product product = productRepository.findByName(productReq.getName());
+        Product product = productRepository.findByName(productReq.getProductName());
 
         if(product == null){
             throw new CustomException(
@@ -175,10 +175,10 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
-        product.setDescription(productReq.getDescription());
-        product.setListPrice(productReq.getListPrice());
-        product.setOfferPrice(productReq.getOfferPrice());
-        product.setStock(productReq.getStock());
+        product.setProductCondition(productReq.getProductCondition());
+        product.setProductListPrice(productReq.getProductListPrice());
+        product.setProductOfferPrice(productReq.getProductOfferPrice());
+        product.setProductStock(productReq.getProductStock());
 
         return productRepository.save(product);
     }

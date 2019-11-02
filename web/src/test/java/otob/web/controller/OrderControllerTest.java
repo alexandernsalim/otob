@@ -74,40 +74,40 @@ public class OrderControllerTest {
 
         item1 = CartItem.builder()
                 .productId(1L)
-                .name("Asus")
-                .offerPrice(5000000)
-                .qty(1)
+                .cartItemName("Asus")
+                .cartItemOfferPrice(5000000)
+                .cartItemQty(1)
                 .build();
         items = new ArrayList<>();
         items.add(item1);
         orderId = "ORD1561436040000";
         userEmail = "alexandernsalim@gmail.com";
         order = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate("2019/06/25 11:14")
-                .ordItems(items)
-                .totItem(1)
-                .totPrice(5000000L)
-                .ordStatus(Status.ORD_WAIT)
+                .orderDate("2019/06/25 11:14")
+                .orderItems(items)
+                .orderTotalItem(1)
+                .orderTotalPrice(5000000L)
+                .orderStatus(Status.ORD_WAIT)
                 .build();
         orderAccepted = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate("2019/06/25 11:14")
-                .ordItems(items)
-                .totItem(1)
-                .totPrice(5000000L)
-                .ordStatus(Status.ORD_ACCEPT)
+                .orderDate("2019/06/25 11:14")
+                .orderItems(items)
+                .orderTotalItem(1)
+                .orderTotalPrice(5000000L)
+                .orderStatus(Status.ORD_ACCEPT)
                 .build();
         orderRejected = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate("2019/06/25 11:14")
-                .ordItems(items)
-                .totItem(1)
-                .totPrice(5000000L)
-                .ordStatus(Status.ORD_REJECT)
+                .orderDate("2019/06/25 11:14")
+                .orderItems(items)
+                .orderTotalItem(1)
+                .orderTotalPrice(5000000L)
+                .orderStatus(Status.ORD_REJECT)
                 .build();
         orders = new ArrayList<>();
         orders.add(order);

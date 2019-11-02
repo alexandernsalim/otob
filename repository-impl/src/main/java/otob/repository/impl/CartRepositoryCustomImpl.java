@@ -31,21 +31,21 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
         Cart cart = checkItemExistsInCart(email, product.getProductId());
 
         if (cart == null) {
-            checkStock(qty, product.getStock());
+            checkStock(qty, product.getProductStock());
 
             query.addCriteria(Criteria.where("userEmail").is(email));
             update.push("cartItems", new BasicDBObject()
                     .append("productId", product.getProductId())
-                    .append("name", product.getName())
-                    .append("offerPrice", product.getOfferPrice())
-                    .append("qty", qty)
+                    .append("cartItemName", product.getProductName())
+                    .append("cartItemOfferPrice", product.getProductOfferPrice())
+                    .append("cartItemQty", qty)
             );
         } else {
             int currQty = getExistingItemQty(cart, product.getProductId());
 
-            checkStock(currQty + qty, product.getStock());
+            checkStock(currQty + qty, product.getProductStock());
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(product.getProductId()));
-            update.inc("cartItems.$.qty", qty);
+            update.inc("cartItems.$.cartItemQty", qty);
         }
 
         return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
@@ -59,9 +59,9 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
         Cart cart = checkItemExistsInCart(email, product.getProductId());
 
         if (cart != null) {
-            checkStock(qty, product.getStock());
+            checkStock(qty, product.getProductStock());
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(product.getProductId()));
-            update.set("cartItems.$.qty", qty);
+            update.set("cartItems.$.cartItemQty", qty);
 
             return mongoTemplate.findAndModify(query, update, new FindAndModifyOptions().returnNew(true), Cart.class);
         } else {
@@ -108,7 +108,7 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
 
         for (CartItem item : cartItems) {
             if (item.getProductId().equals(productId)) {
-                currStock = item.getQty();
+                currStock = item.getCartItemQty();
                 break;
             }
         }

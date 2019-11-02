@@ -47,16 +47,16 @@ public class CartRepositoryCustomImplTest {
 
         product = Product.builder()
                 .productId(1L)
-                .name("Asus")
-                .offerPrice(5000000)
-                .stock(2)
+                .productName("Asus")
+                .productOfferPrice(5000000)
+                .productStock(2)
                 .build();
 
         CartItem cartItem = CartItem.builder()
                 .productId(product.getProductId())
-                .name(product.getName())
-                .qty(1)
-                .offerPrice(product.getOfferPrice())
+                .cartItemName(product.getProductName())
+                .cartItemQty(1)
+                .cartItemOfferPrice(product.getProductOfferPrice())
                 .build();
 
         List<CartItem> cartItems = new ArrayList<>();
@@ -79,9 +79,9 @@ public class CartRepositoryCustomImplTest {
         query.addCriteria(Criteria.where("userEmail").is(userEmail));
         update.push("cartItems", new BasicDBObject()
                 .append("productId", product.getProductId())
-                .append("name", product.getName())
-                .append("offerPrice", product.getOfferPrice())
-                .append("qty", 1)
+                .append("productName", product.getProductName())
+                .append("productOfferPrice", product.getProductOfferPrice())
+                .append("cartItemQty", 1)
         );
 
         when(mongoTemplate.findOne(eq(checkItemQuery), eq(Cart.class)))
@@ -100,7 +100,7 @@ public class CartRepositoryCustomImplTest {
     public void addToCartItemExistTest() {
         checkItemQuery.addCriteria(Criteria.where("userEmail").is(userEmail).and("cartItems.productId").is(product.getProductId()));
         query.addCriteria(Criteria.where("userEmail").is(userEmail).and("cartItems.productId").is(product.getProductId()));
-        update.inc("cartItems.$.qty", 1);
+        update.inc("cartItems.$.cartItemQty", 1);
 
         when(mongoTemplate.findOne(eq(checkItemQuery), eq(Cart.class)))
                 .thenReturn(cart);
@@ -118,7 +118,7 @@ public class CartRepositoryCustomImplTest {
     public void updateQtyTest() {
         checkItemQuery.addCriteria(Criteria.where("userEmail").is(userEmail).and("cartItems.productId").is(product.getProductId()));
         query.addCriteria(Criteria.where("userEmail").is(userEmail).and("cartItems.productId").is(product.getProductId()));
-        update.set("cartItems.$.qty", 1);
+        update.set("cartItems.$.cartItemQty", 1);
 
         when(mongoTemplate.findOne(eq(checkItemQuery), eq(Cart.class)))
                 .thenReturn(cart);

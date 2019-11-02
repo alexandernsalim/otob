@@ -72,9 +72,9 @@ public class CartServiceImplTest {
 
         item = CartItem.builder()
                 .productId(1L)
-                .name("Redmi 7")
-                .offerPrice(1000000)
-                .qty(1)
+                .cartItemName("Redmi 7")
+                .cartItemOfferPrice(1000000)
+                .cartItemQty(1)
                 .build();
 
         cartItems = new ArrayList<>();
@@ -91,11 +91,11 @@ public class CartServiceImplTest {
 
         product = Product.builder()
                 .productId(1L)
-                .name("Redmi 7")
-                .description("Smartphone 2/16 GB")
-                .listPrice(1500000)
-                .offerPrice(1000000)
-                .stock(4)
+                .productName("Redmi 7")
+                .productCondition("Smartphone 2/16 GB")
+                .productListPrice(1500000)
+                .productOfferPrice(1000000)
+                .productStock(4)
                 .build();
 
         dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -103,13 +103,13 @@ public class CartServiceImplTest {
         orderId = "ORD1235648790";
 
         order = Order.builder()
-                .ordId(orderId)
+                .orderId(orderId)
                 .userEmail(userEmail)
-                .ordDate(orderDate)
-                .ordItems(cartItems)
-                .totItem(1)
-                .totPrice(1000000L)
-                .ordStatus(Status.ORD_WAIT)
+                .orderDate(orderDate)
+                .orderItems(cartItems)
+                .orderTotalItem(1)
+                .orderTotalPrice(1000000L)
+                .orderStatus(Status.ORD_WAIT)
                 .build();
 
     }
@@ -170,7 +170,7 @@ public class CartServiceImplTest {
         verify(productService).getProductById(1L);
         verify(cartRepository).addToCart(userEmail, qty, product);
         assertTrue(result.getCartItems().size() >= 1);
-        assertEquals(product.getName(), result.getCartItems().get(0).getName());
+        assertEquals(product.getProductName(), result.getCartItems().get(0).getCartItemName());
     }
 
     @Test
@@ -207,13 +207,13 @@ public class CartServiceImplTest {
         verify(productService).getProductById(1L);
         verify(cartRepository).addToCart(userEmail, qty, product);
         assertTrue(result.getCartItems().size() >= 1);
-        assertEquals(product.getName(), result.getCartItems().get(0).getName());
+        assertEquals(product.getProductName(), result.getCartItems().get(0).getCartItemName());
 
     }
 
     @Test
     public void updateItemQtyTest() {
-        updatedCart.getCartItems().get(0).setQty(2);
+        updatedCart.getCartItems().get(0).setCartItemQty(2);
 
         when(userService.checkUser(userEmail))
                 .thenReturn(true);
@@ -227,7 +227,7 @@ public class CartServiceImplTest {
         verify(userService).checkUser(userEmail);
         verify(productService).getProductById(1L);
         verify(cartRepository).updateQty(userEmail, 1, product);
-        assertEquals(2, result.getCartItems().get(0).getQty());
+        assertEquals(2, result.getCartItems().get(0).getCartItemQty());
     }
 
     @Test
@@ -339,7 +339,7 @@ public class CartServiceImplTest {
 
     @Test
     public void checkoutCartOutOfStockTest() {
-        product.setStock(0);
+        product.setProductStock(0);
 
         when(userService.checkUser(userEmail))
             .thenReturn(true);
