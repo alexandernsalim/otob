@@ -151,48 +151,48 @@ public class ProductServiceImplTest {
 
     @Test
     public void getAllProductByNameTest() {
-        when(productRepository.findAllByNameContaining("Asus", pageable))
+        when(productRepository.findAllByProductNameContaining("Asus", pageable))
             .thenReturn(new PageImpl<>(productsByName));
 
         PageableProductDto result = productServiceImpl.getAllProductByName("Asus", page, size);
 
-        verify(productRepository).findAllByNameContaining("Asus", pageable);
+        verify(productRepository).findAllByProductNameContaining("Asus", pageable);
         assertTrue(result.getProducts().size() >= 1);
     }
 
     @Test
     public void getAllProductByNameEmptyTest() {
-        when(productRepository.findAllByNameContaining("Asus", pageable))
+        when(productRepository.findAllByProductNameContaining("Asus", pageable))
                 .thenReturn(new PageImpl<>(emptyProducts));
 
         try {
             productServiceImpl.getAllProductByName("Asus", page, size);
         } catch (CustomException ex) {
-            verify(productRepository).findAllByNameContaining("Asus", pageable);
+            verify(productRepository).findAllByProductNameContaining("Asus", pageable);
             assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
         }
     }
 
     @Test
     public void addProductExistsTest() {
-        when(productRepository.existsByName(product2.getProductName()))
+        when(productRepository.existsByProductName(product2.getProductName()))
                 .thenReturn(true);
-        when(productRepository.findByName(product2.getProductName()))
+        when(productRepository.findByProductName(product2.getProductName()))
                 .thenReturn(product2);
         when(productRepository.save(product2))
                 .thenReturn(product2);
 
         Product result = productServiceImpl.addProduct(product2);
 
-        verify(productRepository).existsByName(product2.getProductName());
-        verify(productRepository).findByName(product2.getProductName());
+        verify(productRepository).existsByProductName(product2.getProductName());
+        verify(productRepository).findByProductName(product2.getProductName());
         verify(productRepository).save(product2);
         assertEquals(product2.getProductName(), result.getProductName());
     }
 
     @Test
     public void addProductNotExistsTest() throws Exception {
-        when(productRepository.existsByName(product1.getProductName()))
+        when(productRepository.existsByProductName(product1.getProductName()))
                 .thenReturn(false);
         when(idGenerator.getNextId("productid"))
                 .thenReturn(1L);
@@ -201,7 +201,7 @@ public class ProductServiceImplTest {
 
         Product result = productServiceImpl.addProduct(product1);
 
-        verify(productRepository).existsByName(product1.getProductName());
+        verify(productRepository).existsByProductName(product1.getProductName());
         verify(idGenerator).getNextId("productid");
         verify(productRepository).save(product1);
         assertEquals(product1.getProductName(), result.getProductName());
@@ -209,7 +209,7 @@ public class ProductServiceImplTest {
 
     @Test
     public void addProductGenerateIdErrorTest() throws Exception {
-        when(productRepository.existsByName(product1.getProductName()))
+        when(productRepository.existsByProductName(product1.getProductName()))
                 .thenReturn(false);
         when(idGenerator.getNextId("productid"))
                 .thenThrow(new Exception());
@@ -217,7 +217,7 @@ public class ProductServiceImplTest {
         try {
             productServiceImpl.addProduct(product1);
         } catch (CustomException ex) {
-            verify(productRepository).existsByName(product1.getProductName());
+            verify(productRepository).existsByProductName(product1.getProductName());
             verify(idGenerator).getNextId("productid");
             assertEquals(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), ex.getMessage());
         }
@@ -227,14 +227,14 @@ public class ProductServiceImplTest {
     public void addProductsTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Simple Product List.xlsx")));
 
-        when(productRepository.existsByName(anyString()))
+        when(productRepository.existsByProductName(anyString()))
             .thenReturn(false);
         when(idGenerator.getNextId("productid"))
             .thenReturn(any());
 
         List<Product> result = productServiceImpl.addProducts(file);
 
-        verify(productRepository, times(5)).existsByName(anyString());
+        verify(productRepository, times(5)).existsByProductName(anyString());
         verify(idGenerator, times(5)).getNextId("productid");
         verify(productRepository, times(5)).save(any());
         assertTrue(result.size() >= 1);
@@ -244,17 +244,17 @@ public class ProductServiceImplTest {
     public void addProductsSameTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Same Product Test.xlsx")));
 
-        when(productRepository.existsByName(anyString()))
+        when(productRepository.existsByProductName(anyString()))
             .thenReturn(true);
-        when(productRepository.findByName("Note FE"))
+        when(productRepository.findByProductName("Note FE"))
             .thenReturn(excelProduct);
         when(productRepository.save(excelProduct))
             .thenReturn(excelProduct);
 
         List<Product> result = productServiceImpl.addProducts(file);
 
-        verify(productRepository).existsByName(anyString());
-        verify(productRepository).findByName("Note FE");
+        verify(productRepository).existsByProductName(anyString());
+        verify(productRepository).findByProductName("Note FE");
         verify(productRepository).save(excelProduct);
         assertTrue(result.size() >= 1);
     }
@@ -274,7 +274,7 @@ public class ProductServiceImplTest {
     public void addProductsGenerateIdFailTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Same Product Test.xlsx")));
 
-        when(productRepository.existsByName(anyString()))
+        when(productRepository.existsByProductName(anyString()))
                 .thenReturn(false);
         when(idGenerator.getNextId("productid"))
                 .thenThrow(new Exception());
@@ -282,7 +282,7 @@ public class ProductServiceImplTest {
         try {
             productServiceImpl.addProducts(file);
         } catch (CustomException ex) {
-            verify(productRepository).existsByName(anyString());
+            verify(productRepository).existsByProductName(anyString());
             verify(idGenerator).getNextId("productid");
             assertEquals(ErrorCode.GENERATE_ID_FAIL.getMessage(), ex.getMessage());
         }
@@ -318,14 +318,14 @@ public class ProductServiceImplTest {
 
     @Test
     public void updateProductByNameTest() {
-        when(productRepository.findByName("Xiaomi"))
+        when(productRepository.findByProductName("Xiaomi"))
                 .thenReturn(product2);
         when(productRepository.save(product2))
                 .thenReturn(productUpdated2);
 
         Product result = productServiceImpl.updateProductByName(product2);
 
-        verify(productRepository).findByName("Xiaomi");
+        verify(productRepository).findByProductName("Xiaomi");
         verify(productRepository).save(product2);
         assertEquals(productUpdated2.getProductName(), result.getProductName());
         assertEquals(productUpdated2.getProductListPrice(), result.getProductListPrice());
@@ -333,13 +333,13 @@ public class ProductServiceImplTest {
 
     @Test
     public void updateProductByNameNotFoundTest() {
-        when(productRepository.findByName("Xiaomi"))
+        when(productRepository.findByProductName("Xiaomi"))
                 .thenReturn(null);
 
         try {
             productServiceImpl.updateProductByName(product2);
         } catch (CustomException ex) {
-            verify(productRepository).findByName("Xiaomi");
+            verify(productRepository).findByProductName("Xiaomi");
             assertEquals(ErrorCode.BAD_REQUEST.getMessage(), ex.getMessage());
         }
     }

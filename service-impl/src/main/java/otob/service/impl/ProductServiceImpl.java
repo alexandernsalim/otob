@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PageableProductDto getAllProductByName(String name, Integer page, Integer size){
         Pageable pageable = PageRequest.of(page, size);
-        Page<Product> pages = productRepository.findAllByNameContaining(name, pageable);
+        Page<Product> pages = productRepository.findAllByProductNameContaining(name, pageable);
         List<Product> products = pages.getContent();
 
         return generateResult(pages, products);
@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product addProduct(Product product) {
-        if(productRepository.existsByName(product.getProductName())){
+        if(productRepository.existsByProductName(product.getProductName())){
             return updateProductByName(product);
         }else{
             try{
@@ -119,7 +119,7 @@ public class ProductServiceImpl implements ProductService {
             }
 
             for(Product product : products) {
-                if(productRepository.existsByName(product.getProductName())){
+                if(productRepository.existsByProductName(product.getProductName())){
                     updateProductByName(product);
                 }else{
                     product.setProductId(idGenerator.getNextId("productid"));
@@ -166,7 +166,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public Product updateProductByName(Product productReq) {
-        Product product = productRepository.findByName(productReq.getProductName());
+        Product product = productRepository.findByProductName(productReq.getProductName());
 
         if(product == null){
             throw new CustomException(

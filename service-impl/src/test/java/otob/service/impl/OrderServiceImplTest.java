@@ -139,26 +139,26 @@ public class OrderServiceImplTest {
 
     @Test
     public void getOrderByOrderIdTest() {
-        when(orderRepository.existsByOrdId(orderId)).thenReturn(true);
-        when(orderRepository.findByOrdId(orderId))
+        when(orderRepository.existsByOrderId(orderId)).thenReturn(true);
+        when(orderRepository.findByOrderId(orderId))
                 .thenReturn(order);
 
         Order result = orderServiceImpl.getOrderByOrderId(orderId);
 
-        verify(orderRepository).existsByOrdId(orderId);
-        verify(orderRepository).findByOrdId(orderId);
+        verify(orderRepository).existsByOrderId(orderId);
+        verify(orderRepository).findByOrderId(orderId);
         assertEquals(order.getOrderId(), result.getOrderId());
         assertTrue(order.getOrderItems().size() == 1);
     }
 
     @Test
     public void getOrderByOrderIdNotExistsTest() {
-        when(orderRepository.existsByOrdId(orderId)).thenReturn(false);
+        when(orderRepository.existsByOrderId(orderId)).thenReturn(false);
 
         try {
             orderServiceImpl.getOrderByOrderId(orderId);
         } catch (CustomException ex) {
-            verify(orderRepository).existsByOrdId(orderId);
+            verify(orderRepository).existsByOrderId(orderId);
             assertTrue(ex.getMessage().equals(ErrorCode.ORDER_NOT_FOUND.getMessage()));
         }
     }
@@ -271,39 +271,39 @@ public class OrderServiceImplTest {
 
     @Test
     public void acceptOrderTest() {
-        when(orderRepository.existsByOrdId(orderId))
+        when(orderRepository.existsByOrderId(orderId))
                 .thenReturn(true);
-        when(orderRepository.findByOrdId(orderId))
+        when(orderRepository.findByOrderId(orderId))
                 .thenReturn(order);
         when(orderRepository.save(order))
                 .thenReturn(order);
 
         Order result = orderServiceImpl.acceptOrder(orderId);
 
-        verify(orderRepository).existsByOrdId(orderId);
-        verify(orderRepository).findByOrdId(orderId);
+        verify(orderRepository).existsByOrderId(orderId);
+        verify(orderRepository).findByOrderId(orderId);
         verify(orderRepository).save(order);
         assertTrue(result.getOrderStatus().equals(Status.ORD_ACCEPT));
     }
 
     @Test
     public void acceptOrderFailTest() {
-        when(orderRepository.existsByOrdId(orderId))
+        when(orderRepository.existsByOrderId(orderId))
                 .thenReturn(false);
 
         try {
             orderServiceImpl.acceptOrder(orderId);
         } catch (CustomException ex) {
-            verify(orderRepository).existsByOrdId(orderId);
+            verify(orderRepository).existsByOrderId(orderId);
             assertTrue(ex.getMessage().equals(ErrorCode.ORDER_NOT_FOUND.getMessage()));
         }
     }
 
     @Test
     public void rejectOrder() {
-        when(orderRepository.existsByOrdId(orderId))
+        when(orderRepository.existsByOrderId(orderId))
                 .thenReturn(true);
-        when(orderRepository.findByOrdId(orderId))
+        when(orderRepository.findByOrderId(orderId))
                 .thenReturn(order);
         when(productService.getProductById(product.getProductId()))
                 .thenReturn(product);
@@ -314,8 +314,8 @@ public class OrderServiceImplTest {
 
         Order result = orderServiceImpl.rejectOrder(orderId);
 
-        verify(orderRepository).existsByOrdId(orderId);
-        verify(orderRepository).findByOrdId(orderId);
+        verify(orderRepository).existsByOrderId(orderId);
+        verify(orderRepository).findByOrderId(orderId);
         verify(productService).getProductById(productUpdated.getProductId());
         verify(productService).updateProductById(product.getProductId(), product);
         verify(orderRepository).save(orderRejected);
@@ -324,29 +324,29 @@ public class OrderServiceImplTest {
 
     @Test
     public void rejectOrderFailNotFoundTest() {
-        when(orderRepository.existsByOrdId(orderId))
+        when(orderRepository.existsByOrderId(orderId))
                 .thenReturn(false);
 
         try {
             orderServiceImpl.rejectOrder(orderId);
         } catch (CustomException ex) {
-            verify(orderRepository).existsByOrdId(orderId);
+            verify(orderRepository).existsByOrderId(orderId);
             assertTrue(ex.getMessage().equals(ErrorCode.ORDER_NOT_FOUND.getMessage()));
         }
     }
 
     @Test
     public void rejectOrderFailOrderProcessedTest() {
-        when(orderRepository.existsByOrdId(orderId))
+        when(orderRepository.existsByOrderId(orderId))
                 .thenReturn(true);
-        when(orderRepository.findByOrdId(orderId))
+        when(orderRepository.findByOrderId(orderId))
                 .thenReturn(orderAccepted);
 
         try {
             orderServiceImpl.rejectOrder(orderId);
         } catch (CustomException ex) {
-            verify(orderRepository).existsByOrdId(orderId);
-            verify(orderRepository).findByOrdId(orderId);
+            verify(orderRepository).existsByOrderId(orderId);
+            verify(orderRepository).findByOrderId(orderId);
             assertTrue(ex.getMessage().equals(ErrorCode.ORDER_PROCESSED.getMessage()));
         }
 

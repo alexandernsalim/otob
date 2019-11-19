@@ -64,14 +64,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrderByOrderId(String orderId) {
-        if(!orderRepository.existsByOrdId(orderId)){
+        if(!orderRepository.existsByOrderId(orderId)){
             throw new CustomException(
                 ErrorCode.ORDER_NOT_FOUND.getCode(),
                 ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
-        return orderRepository.findByOrdId(orderId);
+        return orderRepository.findByOrderId(orderId);
     }
 
     @Override
@@ -106,14 +106,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order acceptOrder(String ordId) {
-        if (!orderRepository.existsByOrdId(ordId)) {
+        if (!orderRepository.existsByOrderId(ordId)) {
             throw new CustomException(
                     ErrorCode.ORDER_NOT_FOUND.getCode(),
                     ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
-        Order order = orderRepository.findByOrdId(ordId);
+        Order order = orderRepository.findByOrderId(ordId);
         order.setOrderStatus(Status.ORD_ACCEPT);
 
         return orderRepository.save(order);
@@ -121,14 +121,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order rejectOrder(String ordId) {
-        if (!orderRepository.existsByOrdId(ordId)) {
+        if (!orderRepository.existsByOrderId(ordId)) {
             throw new CustomException(
                     ErrorCode.ORDER_NOT_FOUND.getCode(),
                     ErrorCode.ORDER_NOT_FOUND.getMessage()
             );
         }
 
-        Order order = orderRepository.findByOrdId(ordId);
+        Order order = orderRepository.findByOrderId(ordId);
 
         if (!order.getOrderStatus().equals(Status.ORD_WAIT)) {
             throw new CustomException(
