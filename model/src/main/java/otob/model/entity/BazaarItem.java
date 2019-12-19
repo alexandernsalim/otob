@@ -4,20 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "product") 
-public class Product {
+public class BazaarItem {
 
-    @Id
-    private String id;
-
-    private Long productId;
     private String productName;
     private String productCondition;
     private String productCategory;

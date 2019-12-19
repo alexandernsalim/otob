@@ -1,11 +1,10 @@
-package otob.model.entity;
+package otob.web.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import otob.model.entity.BazaarItem;
 
 import java.util.Date;
 import java.util.List;
@@ -14,13 +13,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "bazaar")
-public class Bazaar {
+public class BazaarDto {
 
-    @Id
-    private String id;
-
-    private Long bazaarId;
+    private String bazaarId;
     private String bazaarName;
     private List<BazaarItem> bazaarProducts;
     private Date bazaarStartDate;
