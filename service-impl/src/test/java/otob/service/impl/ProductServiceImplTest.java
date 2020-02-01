@@ -59,39 +59,39 @@ public class ProductServiceImplTest {
         pageable = PageRequest.of(page, size);
 
         product1 = Product.builder()
-                .productId(1L)
-                .productName("Asus")
-                .productCondition("Laptop")
-                .productListPrice(7500000)
-                .productOfferPrice(5000000)
-                .productStock(1)
+                .productId("B-1234")
+                .name("Asus")
+                .condition("Laptop")
+                .listPrice(7500000)
+                .offerPrice(5000000)
+                .stock(1)
                 .build();
 
         product2 = Product.builder()
-                .productId(2L)
-                .productName("Xiaomi")
-                .productCondition("Handphone")
-                .productListPrice(3000000)
-                .productOfferPrice(2000000)
-                .productStock(2)
+                .productId("B-1233")
+                .name("Xiaomi")
+                .condition("Handphone")
+                .listPrice(3000000)
+                .offerPrice(2000000)
+                .stock(2)
                 .build();
 
         productUpdated2 = Product.builder()
-                .productId(2L)
-                .productName("Xiaomi")
-                .productCondition("Handphone")
-                .productListPrice(3000000)
-                .productOfferPrice(1500000)
-                .productStock(2)
+                .productId("B-1233")
+                .name("Xiaomi")
+                .condition("Handphone")
+                .listPrice(3000000)
+                .offerPrice(1500000)
+                .stock(2)
                 .build();
 
         excelProduct = Product.builder()
-                .productId(3L)
-                .productName("Note FE")
-                .productCondition("Mismatch Product")
-                .productListPrice(8000000)
-                .productOfferPrice(4000000)
-                .productStock(1)
+                .productId("B-1235")
+                .name("Note FE")
+                .condition("Mismatch Product")
+                .listPrice(8000000)
+                .offerPrice(4000000)
+                .stock(1)
                 .build();
 
         products = new ArrayList<>();
@@ -127,89 +127,89 @@ public class ProductServiceImplTest {
 
     @Test
     public void getProductByIdTest() {
-        when(productRepository.findByProductId(1L))
+        when(productRepository.findByProductId("B-1234"))
                 .thenReturn(product1);
 
-        Product result = productServiceImpl.getProductById(1L);
+        Product result = productServiceImpl.getProductById("B-1234");
 
-        verify(productRepository).findByProductId(1L);
-        assertEquals(result.getProductName(), product1.getProductName());
+        verify(productRepository).findByProductId("B-1234");
+        assertEquals(result.getName(), product1.getName());
     }
 
     @Test
     public void getProductByIdNotFoundTest() {
-        when(productRepository.findByProductId(1L))
+        when(productRepository.findByProductId("B-1234"))
                 .thenReturn(null);
 
         try {
-            productServiceImpl.getProductById(1L);
+            productServiceImpl.getProductById("B-1234");
         } catch (CustomException ex) {
-            verify(productRepository).findByProductId(1L);
+            verify(productRepository).findByProductId("B-1234");
             assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
         }
     }
 
     @Test
     public void getAllProductByNameTest() {
-        when(productRepository.findAllByProductNameContaining("Asus", pageable))
+        when(productRepository.findAllByNameContaining("Asus", pageable))
             .thenReturn(new PageImpl<>(productsByName));
 
         PageableProductDto result = productServiceImpl.getAllProductByName("Asus", page, size);
 
-        verify(productRepository).findAllByProductNameContaining("Asus", pageable);
+        verify(productRepository).findAllByNameContaining("Asus", pageable);
         assertTrue(result.getProducts().size() >= 1);
     }
 
     @Test
     public void getAllProductByNameEmptyTest() {
-        when(productRepository.findAllByProductNameContaining("Asus", pageable))
+        when(productRepository.findAllByNameContaining("Asus", pageable))
                 .thenReturn(new PageImpl<>(emptyProducts));
 
         try {
             productServiceImpl.getAllProductByName("Asus", page, size);
         } catch (CustomException ex) {
-            verify(productRepository).findAllByProductNameContaining("Asus", pageable);
+            verify(productRepository).findAllByNameContaining("Asus", pageable);
             assertEquals(ErrorCode.PRODUCT_NOT_FOUND.getMessage(), ex.getMessage());
         }
     }
 
     @Test
     public void addProductExistsTest() {
-        when(productRepository.existsByProductName(product2.getProductName()))
+        when(productRepository.existsByName(product2.getName()))
                 .thenReturn(true);
-        when(productRepository.findByProductName(product2.getProductName()))
+        when(productRepository.findByName(product2.getName()))
                 .thenReturn(product2);
         when(productRepository.save(product2))
                 .thenReturn(product2);
 
         Product result = productServiceImpl.addProduct(product2);
 
-        verify(productRepository).existsByProductName(product2.getProductName());
-        verify(productRepository).findByProductName(product2.getProductName());
+        verify(productRepository).existsByName(product2.getName());
+        verify(productRepository).findByName(product2.getName());
         verify(productRepository).save(product2);
-        assertEquals(product2.getProductName(), result.getProductName());
+        assertEquals(product2.getName(), result.getName());
     }
 
     @Test
     public void addProductNotExistsTest() throws Exception {
-        when(productRepository.existsByProductName(product1.getProductName()))
+        when(productRepository.existsByName(product1.getName()))
                 .thenReturn(false);
-        when(idGenerator.getNextId("productid"))
-                .thenReturn(1L);
+//        when(idGenerator.getNextId("productid"))
+//                .thenReturn("B-1234");
         when(productRepository.save(product1))
                 .thenReturn(product1);
 
         Product result = productServiceImpl.addProduct(product1);
 
-        verify(productRepository).existsByProductName(product1.getProductName());
+        verify(productRepository).existsByName(product1.getName());
         verify(idGenerator).getNextId("productid");
         verify(productRepository).save(product1);
-        assertEquals(product1.getProductName(), result.getProductName());
+        assertEquals(product1.getName(), result.getName());
     }
 
     @Test
     public void addProductGenerateIdErrorTest() throws Exception {
-        when(productRepository.existsByProductName(product1.getProductName()))
+        when(productRepository.existsByName(product1.getName()))
                 .thenReturn(false);
         when(idGenerator.getNextId("productid"))
                 .thenThrow(new Exception());
@@ -217,7 +217,7 @@ public class ProductServiceImplTest {
         try {
             productServiceImpl.addProduct(product1);
         } catch (CustomException ex) {
-            verify(productRepository).existsByProductName(product1.getProductName());
+            verify(productRepository).existsByName(product1.getName());
             verify(idGenerator).getNextId("productid");
             assertEquals(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), ex.getMessage());
         }
@@ -227,14 +227,14 @@ public class ProductServiceImplTest {
     public void addProductsTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Simple Product List.xlsx")));
 
-        when(productRepository.existsByProductName(anyString()))
+        when(productRepository.existsByName(anyString()))
             .thenReturn(false);
         when(idGenerator.getNextId("productid"))
             .thenReturn(any());
 
         List<Product> result = productServiceImpl.addProducts(file);
 
-        verify(productRepository, times(5)).existsByProductName(anyString());
+        verify(productRepository, times(5)).existsByName(anyString());
         verify(idGenerator, times(5)).getNextId("productid");
         verify(productRepository, times(5)).save(any());
         assertTrue(result.size() >= 1);
@@ -244,17 +244,17 @@ public class ProductServiceImplTest {
     public void addProductsSameTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Same Product Test.xlsx")));
 
-        when(productRepository.existsByProductName(anyString()))
+        when(productRepository.existsByName(anyString()))
             .thenReturn(true);
-        when(productRepository.findByProductName("Note FE"))
+        when(productRepository.findByName("Note FE"))
             .thenReturn(excelProduct);
         when(productRepository.save(excelProduct))
             .thenReturn(excelProduct);
 
         List<Product> result = productServiceImpl.addProducts(file);
 
-        verify(productRepository).existsByProductName(anyString());
-        verify(productRepository).findByProductName("Note FE");
+        verify(productRepository).existsByName(anyString());
+        verify(productRepository).findByName("Note FE");
         verify(productRepository).save(excelProduct);
         assertTrue(result.size() >= 1);
     }
@@ -274,7 +274,7 @@ public class ProductServiceImplTest {
     public void addProductsGenerateIdFailTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", new FileInputStream(new File("/home/alexandernsalim/Projects/FUTURE/init/Same Product Test.xlsx")));
 
-        when(productRepository.existsByProductName(anyString()))
+        when(productRepository.existsByName(anyString()))
                 .thenReturn(false);
         when(idGenerator.getNextId("productid"))
                 .thenThrow(new Exception());
@@ -282,7 +282,7 @@ public class ProductServiceImplTest {
         try {
             productServiceImpl.addProducts(file);
         } catch (CustomException ex) {
-            verify(productRepository).existsByProductName(anyString());
+            verify(productRepository).existsByName(anyString());
             verify(idGenerator).getNextId("productid");
             assertEquals(ErrorCode.GENERATE_ID_FAIL.getMessage(), ex.getMessage());
         }
@@ -290,80 +290,80 @@ public class ProductServiceImplTest {
 
     @Test
     public void updateProductByIdTest() {
-        when(productRepository.findByProductId(2L))
+        when(productRepository.findByProductId("B-1233"))
                 .thenReturn(product2);
         when(productRepository.save(product2))
                 .thenReturn(productUpdated2);
 
-        Product result = productServiceImpl.updateProductById(2L, product2);
+        Product result = productServiceImpl.updateProductById("B-1233", product2);
 
-        verify(productRepository).findByProductId(2L);
+        verify(productRepository).findByProductId("B-1233");
         verify(productRepository).save(product2);
-        assertEquals(productUpdated2.getProductName(), result.getProductName());
-        assertEquals(productUpdated2.getProductListPrice(), result.getProductListPrice());
+        assertEquals(productUpdated2.getName(), result.getName());
+        assertEquals(productUpdated2.getListPrice(), result.getListPrice());
     }
 
     @Test
     public void updateProductByIdNotFoundTest() {
-        when(productRepository.findByProductId(3L))
+        when(productRepository.findByProductId("B-1235"))
                 .thenReturn(null);
 
         try {
-            productServiceImpl.updateProductById(3L, any());
+            productServiceImpl.updateProductById("B-1235", any());
         } catch (CustomException ex) {
-            verify(productRepository).findByProductId(3L);
+            verify(productRepository).findByProductId("B-1235");
             assertEquals(ErrorCode.BAD_REQUEST.getMessage(), ex.getMessage());
         }
     }
 
     @Test
     public void updateProductByNameTest() {
-        when(productRepository.findByProductName("Xiaomi"))
+        when(productRepository.findByName("Xiaomi"))
                 .thenReturn(product2);
         when(productRepository.save(product2))
                 .thenReturn(productUpdated2);
 
         Product result = productServiceImpl.updateProductByName(product2);
 
-        verify(productRepository).findByProductName("Xiaomi");
+        verify(productRepository).findByName("Xiaomi");
         verify(productRepository).save(product2);
-        assertEquals(productUpdated2.getProductName(), result.getProductName());
-        assertEquals(productUpdated2.getProductListPrice(), result.getProductListPrice());
+        assertEquals(productUpdated2.getName(), result.getName());
+        assertEquals(productUpdated2.getListPrice(), result.getListPrice());
     }
 
     @Test
     public void updateProductByNameNotFoundTest() {
-        when(productRepository.findByProductName("Xiaomi"))
+        when(productRepository.findByName("Xiaomi"))
                 .thenReturn(null);
 
         try {
             productServiceImpl.updateProductByName(product2);
         } catch (CustomException ex) {
-            verify(productRepository).findByProductName("Xiaomi");
+            verify(productRepository).findByName("Xiaomi");
             assertEquals(ErrorCode.BAD_REQUEST.getMessage(), ex.getMessage());
         }
     }
 
     @Test
     public void deleteProductByIdTest() {
-        when(productRepository.findByProductId(1L))
+        when(productRepository.findByProductId("B-1234"))
                 .thenReturn(product1);
 
-        boolean result = productServiceImpl.deleteProductById(1L);
+        boolean result = productServiceImpl.deleteProductById("B-1234");
 
-        verify(productRepository).findByProductId(1L);
+        verify(productRepository).findByProductId("B-1234");
         verify(productRepository).delete(product1);
         assertEquals(true, result);
     }
 
     @Test
     public void deleteProductByIdNotFoundTest() {
-        when(productRepository.findByProductId(1L))
+        when(productRepository.findByProductId("B-1234"))
                 .thenReturn(null);
         try {
-            productServiceImpl.deleteProductById(1L);
+            productServiceImpl.deleteProductById("B-1234");
         } catch (CustomException ex) {
-            verify(productRepository).findByProductId(1L);
+            verify(productRepository).findByProductId("B-1234");
             assertEquals(ErrorCode.BAD_REQUEST.getMessage(), ex.getMessage());
         }
     }

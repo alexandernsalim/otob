@@ -46,8 +46,7 @@ public class OrderController extends GlobalController {
         @RequestParam(required = false) Integer page,
         @RequestParam(required = false) Integer size
     ) {
-        session = request.getSession(true);
-        String email = session.getAttribute("userId").toString();
+        String email = request.getUserPrincipal().getName();
         page = (page == null) ? 0 : page-1;
         size = (size == null) ? 5 : size;
 

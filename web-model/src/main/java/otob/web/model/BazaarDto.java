@@ -15,10 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 public class BazaarDto {
 
-    private String bazaarId;
+    private Long bazaarId;
     private String bazaarName;
-    private List<BazaarItem> bazaarProducts;
     private Date bazaarStartDate;
     private Date bazaarEndDate;
+    private List<BazaarItem> bazaarProducts;
 
 }

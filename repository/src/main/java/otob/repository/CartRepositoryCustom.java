@@ -7,6 +7,6 @@ public interface CartRepositoryCustom {
 
     Cart addToCart(String email, int qty, Product product);
     Cart updateQty(String email, int qty, Product productId);
-    Cart removeFromCart(String email, Long productId);
+    Cart removeFromCart(String email, String productId);
 
 }

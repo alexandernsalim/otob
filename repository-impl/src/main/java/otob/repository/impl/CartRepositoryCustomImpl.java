@@ -31,19 +31,21 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
         Cart cart = checkItemExistsInCart(email, product.getProductId());
 
         if (cart == null) {
-            checkStock(qty, product.getProductStock());
+            checkStock(qty, product.getStock());
 
             query.addCriteria(Criteria.where("userEmail").is(email));
             update.push("cartItems", new BasicDBObject()
                     .append("productId", product.getProductId())
-                    .append("cartItemName", product.getProductName())
-                    .append("cartItemOfferPrice", product.getProductOfferPrice())
+                    .append("cartItemName", product.getName())
+                    .append("cartItemReturnReason", product.getReturnReason())
+                    .append("cartItemCondition", product.getCondition())
+                    .append("cartItemOfferPrice", product.getOfferPrice())
                     .append("cartItemQty", qty)
             );
         } else {
             int currQty = getExistingItemQty(cart, product.getProductId());
 
-            checkStock(currQty + qty, product.getProductStock());
+            checkStock(currQty + qty, product.getStock());
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(product.getProductId()));
             update.inc("cartItems.$.cartItemQty", qty);
         }
@@ -59,7 +61,7 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
         Cart cart = checkItemExistsInCart(email, product.getProductId());
 
         if (cart != null) {
-            checkStock(qty, product.getProductStock());
+            checkStock(qty, product.getStock());
             query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(product.getProductId()));
             update.set("cartItems.$.cartItemQty", qty);
 
@@ -73,7 +75,7 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
     }
 
     @Override
-    public Cart removeFromCart(String email, Long productId) {
+    public Cart removeFromCart(String email, String productId) {
         Query query = new Query();
         Update update = new Update();
 
@@ -95,14 +97,14 @@ public class CartRepositoryCustomImpl implements CartRepositoryCustom {
     }
 
     //Private Method
-    private Cart checkItemExistsInCart(String email, Long productId) {
+    private Cart checkItemExistsInCart(String email, String productId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("userEmail").is(email).and("cartItems.productId").is(productId));
 
         return mongoTemplate.findOne(query, Cart.class);
     }
 
-    private int getExistingItemQty(Cart cart, Long productId) {
+    private int getExistingItemQty(Cart cart, String productId) {
         List<CartItem> cartItems = cart.getCartItems();
         int currStock = 0;
 

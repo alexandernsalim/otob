@@ -11,14 +11,16 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH("400", "Password not match"),
 
     PRODUCT_NOT_FOUND("200", "Product not found"),
-    STOCK_INSUFFICIENT("400", "Insufficient productStock"),
+    STOCK_INSUFFICIENT("400", "Insufficient stock"),
 
-    SOME_PRODUCTS_INVALID("400", "Insufficient productStock of one or more product"),
+    SOME_PRODUCTS_INVALID("400", "Insufficient stock of one or more product"),
     ORDER_NOT_FOUND("200", "Order not found"),
     ORDER_PROCESSED("400", "Order already processed"),
 
     GENERATE_ID_FAIL("500", "Failed to generate id"),
-    EXCEL_FORMAT_ERROR("400", "Wrong format in file");
+    EXCEL_FORMAT_ERROR("400", "Wrong format in file"),
+
+    BAZAAR_ENDED("400", "Bazaar already ended");
 
     private String code;
     private String message;

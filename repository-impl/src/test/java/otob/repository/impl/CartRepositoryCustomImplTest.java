@@ -46,17 +46,17 @@ public class CartRepositoryCustomImplTest {
         userEmail = "test@mail.com";
 
         product = Product.builder()
-                .productId(1L)
-                .productName("Asus")
-                .productOfferPrice(5000000)
-                .productStock(2)
+                .productId("B-1323")
+                .name("Asus")
+                .offerPrice(5000000)
+                .stock(2)
                 .build();
 
         CartItem cartItem = CartItem.builder()
                 .productId(product.getProductId())
-                .cartItemName(product.getProductName())
+                .cartItemName(product.getName())
                 .cartItemQty(1)
-                .cartItemOfferPrice(product.getProductOfferPrice())
+                .cartItemOfferPrice(product.getOfferPrice())
                 .build();
 
         List<CartItem> cartItems = new ArrayList<>();
@@ -79,8 +79,8 @@ public class CartRepositoryCustomImplTest {
         query.addCriteria(Criteria.where("userEmail").is(userEmail));
         update.push("cartItems", new BasicDBObject()
                 .append("productId", product.getProductId())
-                .append("productName", product.getProductName())
-                .append("productOfferPrice", product.getProductOfferPrice())
+                .append("name", product.getName())
+                .append("offerPrice", product.getOfferPrice())
                 .append("cartItemQty", 1)
         );
 

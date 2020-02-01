@@ -143,9 +143,9 @@ public class OrderServiceImpl implements OrderService {
 
         for (CartItem item : ordItems) {
             Product product = productService.getProductById(item.getProductId());
-            int currStock = product.getProductStock();
+            int currStock = product.getStock();
 
-            product.setProductStock(currStock + item.getCartItemQty());
+            product.setStock(currStock + item.getCartItemQty());
 
             productService.updateProductById(product.getProductId(), product);
         }

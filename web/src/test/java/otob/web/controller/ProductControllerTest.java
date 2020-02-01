@@ -63,30 +63,30 @@ public class ProductControllerTest {
         size = 5;
 
         product1 = Product.builder()
-                .productId(1L)
-                .productName("Redmi Note 7")
-                .productCondition("4/64 GB")
-                .productListPrice(2700000)
-                .productOfferPrice(2000000)
-                .productStock(1)
+                .productId("B-1234")
+                .name("Redmi Note 7")
+                .condition("4/64 GB")
+                .listPrice(2700000)
+                .offerPrice(2000000)
+                .stock(1)
                 .build();
 
         product1Updated = Product.builder()
-            .productId(1L)
-            .productName("Redmi Note 7")
-            .productCondition("4/64 GB")
-            .productListPrice(2000000)
-            .productOfferPrice(1800000)
-            .productStock(1)
+            .productId("B-1234")
+            .name("Redmi Note 7")
+            .condition("4/64 GB")
+            .listPrice(2000000)
+            .offerPrice(1800000)
+            .stock(1)
             .build();
 
         product2 = Product.builder()
-                .productId(2L)
-                .productName("Acer Aspire E5")
-                .productCondition("i5")
-                .productListPrice(6000000)
-                .productOfferPrice(4500000)
-                .productStock(1)
+                .productId("B-1233")
+                .name("Acer Aspire E5")
+                .condition("i5")
+                .listPrice(6000000)
+                .offerPrice(4500000)
+                .stock(1)
                 .build();
 
         products = new ArrayList<>();
@@ -139,16 +139,16 @@ public class ProductControllerTest {
 
     @Test
     public void getProductByIdTest() throws Exception {
-        when(productService.getProductById(1L))
+        when(productService.getProductById("B-1234"))
             .thenReturn(product1);
 
         mvc.perform(
-            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_ID, 1L)
+            get(ProductApiPath.BASE_PATH + ProductApiPath.GET_PRODUCT_BY_ID, "B-1234")
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data").value(product1));
 
-        verify(productService).getProductById(1L);
+        verify(productService).getProductById("B-1234");
     }
 
     @Test

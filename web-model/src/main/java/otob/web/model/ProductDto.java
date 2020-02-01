@@ -13,9 +13,12 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ProductDto implements Serializable {
 
-    private int productId;
+    private String productId;
     private String name;
-    private String description;
+    private String condition;
+    private String category;
+    private String returnReason;
+    private String grade;
     private double listPrice;
     private double offerPrice;
     private int stock;

@@ -67,7 +67,7 @@ public class OrderServiceImplTest {
         pageable = PageRequest.of(page, size);
 
         item1 = CartItem.builder()
-                .productId(1L)
+                .productId("B-1234")
                 .cartItemName("Asus")
                 .cartItemOfferPrice(5000000)
                 .cartItemQty(1)
@@ -113,21 +113,21 @@ public class OrderServiceImplTest {
         orders.add(order);
 
         product = Product.builder()
-                .productId(1L)
-                .productName("Asus")
-                .productCondition("Laptop")
-                .productListPrice(7500000)
-                .productOfferPrice(5000000)
-                .productStock(0)
+                .productId("B-1234")
+                .name("Asus")
+                .condition("Laptop")
+                .listPrice(7500000)
+                .offerPrice(5000000)
+                .stock(0)
                 .build();
 
         productUpdated = Product.builder()
-                .productId(1L)
-                .productName("Asus")
-                .productCondition("Laptop")
-                .productListPrice(7500000)
-                .productOfferPrice(5000000)
-                .productStock(1)
+                .productId("B-1234")
+                .name("Asus")
+                .condition("Laptop")
+                .listPrice(7500000)
+                .offerPrice(5000000)
+                .stock(1)
                 .build();
 
         orderFilter = OrderFilter.builder()

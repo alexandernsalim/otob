@@ -58,7 +58,7 @@ public class ProductController extends GlobalController {
     }
 
     @GetMapping(ProductApiPath.GET_PRODUCT_BY_ID)
-    public Response<ProductDto> getProductById(@PathVariable Long productId) {
+    public Response<ProductDto> getProductById(@PathVariable String productId) {
         return toResponse(mapper.map(productService.getProductById(productId), ProductDto.class));
     }
 
@@ -76,14 +76,14 @@ public class ProductController extends GlobalController {
     }
 
     @PutMapping(ProductApiPath.PRODUCTID_PLACEHOLDER)
-    public Response<ProductDto> updateById(@PathVariable Long productId, @Valid @RequestBody ProductDto productDto) {
+    public Response<ProductDto> updateById(@PathVariable String productId, @Valid @RequestBody ProductDto productDto) {
         Product product = mapper.map(productDto, Product.class);
 
         return toResponse(mapper.map(productService.updateProductById(productId, product), ProductDto.class));
     }
 
     @DeleteMapping(ProductApiPath.PRODUCTID_PLACEHOLDER)
-    public Response<Boolean> deleteById(@PathVariable Long productId) {
+    public Response<Boolean> deleteById(@PathVariable String productId) {
 
         return toResponse(productService.deleteProductById(productId));
     }

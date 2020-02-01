@@ -67,7 +67,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart addItemToCart(String userEmail, Long productId, int qty) {
+    public Cart addItemToCart(String userEmail, String productId, int qty) {
         if (!userService.checkUser(userEmail)) {
             throw new CustomException(
                 ErrorCode.USER_NOT_FOUND.getCode(),
@@ -84,7 +84,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart updateItemQty(String userEmail, Long productId, int qty) {
+    public Cart updateItemQty(String userEmail, String productId, int qty) {
         if (!userService.checkUser(userEmail)) {
             throw new CustomException(
                     ErrorCode.USER_NOT_FOUND.getCode(),
@@ -98,7 +98,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart removeItemFromCart(String userEmail, Long productId) {
+    public Cart removeItemFromCart(String userEmail, String productId) {
         if (!userService.checkUser(userEmail)) {
             throw new CustomException(
                     ErrorCode.USER_NOT_FOUND.getCode(),
@@ -130,10 +130,10 @@ public class CartServiceImpl implements CartService {
         for (CartItem item : cartItems) {
             Product product = productService.getProductById(item.getProductId());
             int itemQty = item.getCartItemQty();
-            int productStock = product.getProductStock();
+            int productStock = product.getStock();
 
             if (itemQty > productStock) {
-                outOfStockProducts.add(product.getProductName());
+                outOfStockProducts.add(product.getName());
             }
         }
 
@@ -149,11 +149,11 @@ public class CartServiceImpl implements CartService {
             Product product = productService.getProductById(item.getProductId());
             double itemPrice = item.getCartItemOfferPrice();
             int itemQty = item.getCartItemQty();
-            int productStock = product.getProductStock();
+            int productStock = product.getStock();
 
             totPrice += itemPrice * itemQty;
             totItem++;
-            product.setProductStock(productStock - itemQty);
+            product.setStock(productStock - itemQty);
             productService.updateProductById(product.getProductId(), product);
             removeItemFromCart(userEmail, product.getProductId());
         }

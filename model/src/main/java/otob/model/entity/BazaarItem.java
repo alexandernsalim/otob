@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BazaarItem {
 
+    private int productId;
     private String productName;
     private String productCondition;
     private String productCategory;

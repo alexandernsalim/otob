@@ -2,8 +2,6 @@ package otob.web.config.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,11 +15,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
+public class
+JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private JwtConfig jwtConfig;
-
-    private static Logger log = LoggerFactory.getLogger(JwtTokenAuthenticationFilter.class);
 
     public JwtTokenAuthenticationFilter(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
@@ -50,14 +47,8 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
             String username = claims.getSubject();
 
             if(username != null) {
-//                log.info(username);
-
                 @SuppressWarnings("unchecked")
                 List<String> authorities = (List<String>) claims.get("authorities");
-
-//                for (String authority : authorities){
-//                    System.out.println(authority);
-//                }
 
                 // UsernamePasswordAuthenticationToken: A built-in object, used by spring to represent the current authenticated / being authenticated user.
                 // It needs a list of authorities, which has type of GrantedAuthority interface, where SimpleGrantedAuthority is an implementation of that interface

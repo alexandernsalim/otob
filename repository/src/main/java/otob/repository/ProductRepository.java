@@ -8,14 +8,15 @@ import otob.model.entity.Product;
 
 public interface ProductRepository extends MongoRepository<Product, String> {
 
-    Product findByProductId(Long productId);
+    Product findByProductId(String productId);
 
-    @Query("{'productName': {$regex: ?0, $options: 'i'}}")
-    Page<Product> findAllByProductNameContaining(String name, Pageable pageable);
+    @Query("{'name': {$regex: ?0, $options: 'i'}}")
+    Page<Product> findAllByNameContaining(String name, Pageable pageable);
 
-    @Query("{'productName': {$regex: ?0, $options: 'i'}}")
-    Product findByProductName(String name);
+    @Query("{'name': {$regex: ?0, $options: 'i'}}")
+    Product findByName(String name);
 
-    boolean existsByProductName(String name);
+    boolean existsByName(String name);
+    boolean existsByProductId(String id);
 
 }

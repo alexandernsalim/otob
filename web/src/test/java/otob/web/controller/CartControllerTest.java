@@ -68,7 +68,7 @@ public class CartControllerTest {
         userEmail = "user@mail.com";
         orderId = "ORD1561436040000";
         CartItem item = CartItem.builder()
-                .productId(1L)
+                .productId("B-1234")
                 .cartItemName("Redmi 7")
                 .cartItemOfferPrice(1000000)
                 .cartItemQty(1)
@@ -113,7 +113,7 @@ public class CartControllerTest {
 
     @Test
     public void addItemToCartTest() throws Exception {
-        when(cartService.addItemToCart(userEmail, 1L, 1))
+        when(cartService.addItemToCart(userEmail, "B-1234", 1))
                 .thenReturn(cart);
 
         mvc.perform(
@@ -123,14 +123,14 @@ public class CartControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data").value(cartDto));
 
-        verify(cartService).addItemToCart(userEmail, 1L, 1);
+        verify(cartService).addItemToCart(userEmail, "B-1234", 1);
     }
 
     @Test
     public void updateItemQtyTest() throws Exception {
         cart.getCartItems().get(0).setCartItemQty(2);
         cartDto.getCartItems().get(0).setCartItemQty(2);
-        when(cartService.updateItemQty(userEmail, 1L, 1))
+        when(cartService.updateItemQty(userEmail, "B-1234", 1))
                 .thenReturn(cart);
 
         mvc.perform(
@@ -140,14 +140,14 @@ public class CartControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data").value(cartDto));
 
-        verify(cartService).updateItemQty(userEmail, 1L, 1);
+        verify(cartService).updateItemQty(userEmail, "B-1234", 1);
     }
 
     @Test
     public void removeItemFromCartTest() throws Exception {
         cart.getCartItems().clear();
         cartDto.getCartItems().clear();
-        when(cartService.removeItemFromCart(userEmail, 1L))
+        when(cartService.removeItemFromCart(userEmail, "B-1234"))
                 .thenReturn(cart);
 
         mvc.perform(
@@ -157,7 +157,7 @@ public class CartControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data").value(cartDto));
 
-        verify(cartService).removeItemFromCart(userEmail, 1L);
+        verify(cartService).removeItemFromCart(userEmail, "B-1234");
     }
 
     @Test

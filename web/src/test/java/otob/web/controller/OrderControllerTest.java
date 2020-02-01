@@ -73,7 +73,7 @@ public class OrderControllerTest {
         size = 5;
 
         item1 = CartItem.builder()
-                .productId(1L)
+                .productId("B-1234")
                 .cartItemName("Asus")
                 .cartItemOfferPrice(5000000)
                 .cartItemQty(1)

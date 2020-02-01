@@ -7,17 +7,14 @@ import otob.web.model.PageableProductDto;
 import java.util.List;
 
 public interface ProductService {
-    Product addProduct(Product product);
-
-    List<Product> addProducts(MultipartFile file);
 
     PageableProductDto getAllProduct(Integer page, Integer size);
-
-    Product getProductById (Long productId);
-
+    Product getProductById (String productId);
     PageableProductDto getAllProductByName(String name, Integer page, Integer size);
 
-    Product updateProductById(Long productId, Product product);
+    Product addProduct(Product product);
+    List<Product> addProducts(MultipartFile file);
+    Product updateProductById(String productId, Product product);
+    boolean deleteProductById(String productId);
 
-    boolean deleteProductById(Long productId);
 }

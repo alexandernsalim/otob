@@ -3,6 +3,7 @@ package otob.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import otob.model.entity.Bazaar;
+import otob.model.entity.BazaarItem;
 import otob.model.enumerator.ErrorCode;
 import otob.model.exception.CustomException;
 import otob.repository.BazaarRepository;
@@ -32,8 +33,18 @@ public class BazaarServiceImpl implements BazaarService {
     }
 
     @Override
-    public Bazaar getBazaarItems(Long bazaarId) {
-        return bazaarRepository.findByBazaarId(bazaarId);
+    public List<BazaarItem> getBazaarItems(Long bazaarId) {
+        Date today = new Date();
+        Bazaar bazaar = bazaarRepository.findByBazaarId(bazaarId);
+
+        if(bazaar.getBazaarEndDate().after(today)) {
+            return bazaar.getBazaarProducts();
+        } else {
+            throw new CustomException(
+                ErrorCode.BAZAAR_ENDED.getCode(),
+                ErrorCode.BAZAAR_ENDED.getMessage()
+            );
+        }
     }
 
     @Override

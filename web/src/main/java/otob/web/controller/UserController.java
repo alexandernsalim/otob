@@ -63,8 +63,7 @@ public class UserController extends GlobalController {
             HttpServletRequest request,
             @RequestParam String oldPassword,
             @RequestParam String newPassword) {
-        HttpSession session = request.getSession(true);
-        String email = session.getAttribute("userId").toString();
+        String email = request.getUserPrincipal().getName();
 
         return toResponse(userService.changePassword(email, oldPassword, newPassword));
     }
